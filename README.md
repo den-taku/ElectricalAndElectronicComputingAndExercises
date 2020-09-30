@@ -1,2 +1,2 @@
-# Tmp
+# ElectricalAndElectronicComputingAndExercises
 for lecture, ElectricalAndElectronicComputingAndExercises
