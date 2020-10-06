@@ -1,6 +1,6 @@
 mod algebra {
     pub use num_traits::Zero;
-    pub use std::ops::Neg;
+    pub use std::ops::{Neg, Not};
 
     #[derive(Clone, Debug, PartialEq)]
     pub struct Matrix<T> {
@@ -70,6 +70,20 @@ mod algebra {
         type Output = Matrix<T>;
         fn neg(self) -> Self {
             let new_field = self.array.iter().map(|e| e.clone().neg()).collect();
+            Matrix {
+                array: new_field,
+                ..self
+            }
+        }
+    }
+
+    impl<T> Not for Matrix<T>
+    where
+        T: Not<Output = T> + Clone,
+    {
+        type Output = Matrix<T>;
+        fn not(self) -> Self {
+            let new_field = self.array.iter().map(|e| e.clone().not()).collect();
             Matrix {
                 array: new_field,
                 ..self
@@ -196,6 +210,54 @@ mod tests {
                     10.neg(),
                     11.neg(),
                     12.neg()
+                ]
+            }
+        );
+    }
+    #[test]
+    fn test_not() {
+        assert_eq!(
+            !Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true, true, false, false, true, false, true, false, false, true, true, false
+                ]
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    !true, !true, !false, !false, !true, !false, !true, !false, !false, !true,
+                    !true, !false
+                ]
+            }
+        );
+        assert_eq!(
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true, true, false, false, true, false, true, false, false, true, true, false
+                ]
+            }
+            .not(),
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true.not(),
+                    true.not(),
+                    false.not(),
+                    false.not(),
+                    true.not(),
+                    false.not(),
+                    true.not(),
+                    false.not(),
+                    false.not(),
+                    true.not(),
+                    true.not(),
+                    false.not()
                 ]
             }
         );
