@@ -1,5 +1,6 @@
 mod algebra {
     pub use num_traits::Zero;
+    pub use std::ops::Neg;
 
     #[derive(Clone, Debug, PartialEq)]
     pub struct Matrix<T> {
@@ -58,6 +59,20 @@ mod algebra {
                     }
                     v
                 },
+            }
+        }
+    }
+
+    impl<T> Neg for Matrix<T>
+    where
+        T: Neg<Output = T> + Clone,
+    {
+        type Output = Matrix<T>;
+        fn neg(self) -> Self {
+            let new_field = self.array.iter().map(|e| e.clone().neg()).collect();
+            Matrix {
+                array: new_field,
+                ..self
             }
         }
     }
@@ -142,5 +157,47 @@ mod tests {
     fn test_append_column_panic() {
         let _dummy_matrix =
             Matrix::append_column(vec![vec![1, 4, 7, 10], vec![2, 5, 8, 11], vec![3, 6, 9]]);
+    }
+
+    #[test]
+    fn test_neg() {
+        assert_eq!(
+            -Matrix {
+                n: 4,
+                m: 3,
+                array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12]
+            }
+        );
+        assert_eq!(
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            }
+            .neg(),
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1.neg(),
+                    2.neg(),
+                    3.neg(),
+                    4.neg(),
+                    5.neg(),
+                    6.neg(),
+                    7.neg(),
+                    8.neg(),
+                    9.neg(),
+                    10.neg(),
+                    11.neg(),
+                    12.neg()
+                ]
+            }
+        );
     }
 }
