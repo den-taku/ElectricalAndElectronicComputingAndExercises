@@ -1,15 +1,35 @@
-#[derive(Clone, Debug, Default, PartialEq)]
+use num_traits::Zero;
+
+#[derive(Clone, Debug, PartialEq)]
 pub struct Matrix<T> {
-    n: usize, // line
-    m: usize, // column
-    array: Vec<T>,
+    n: usize,      // line           [* * * * *]
+    m: usize,      // column         [* * * * *] -> n = 3, m = 5
+    array: Vec<T>, //                [* * * * *]
 }
 
-impl<T> Matrix<T> 
-    where T: Default + Clone
+impl<T> Matrix<T>
+where
+    T: Zero + Clone,
 {
     pub fn new(n: usize, m: usize) -> Self {
-        Matrix { n, m, array: vec![T::default(); n * m] }
+        Matrix {
+            n,
+            m,
+            array: vec![T::zero(); n * m],
+        }
+    }
+
+    pub fn append_line(vec: Vec<Vec<T>>) -> Self {
+        let n = vec.len();
+        let m = vec[0].len();
+        if vec.iter().all(|e| e.len() == m) {
+            panic!("`append_line` needs appropriaty sized Vec<Vec<>>");
+        }
+        Matrix {
+            n,
+            m,
+            array: vec.concat()
+        }
     }
 }
 
@@ -26,4 +46,5 @@ fn main() {
             array: vec![0.0]
         }
     );
+    println!("{:?}", Matrix::<f32>::new(3, 4));
 }
