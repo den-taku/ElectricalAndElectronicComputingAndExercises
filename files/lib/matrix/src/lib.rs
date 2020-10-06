@@ -1,6 +1,6 @@
 mod algebra {
     pub use num_traits::Zero;
-    pub use std::ops::{Add, Neg, Not};
+    pub use std::ops::{Add, BitAnd, Neg, Not, Sub};
 
     #[derive(Clone, Debug, PartialEq)]
     pub struct Matrix<T> {
@@ -98,7 +98,7 @@ mod algebra {
         type Output = Matrix<T>;
         fn add(self, rhs: Self) -> Self::Output {
             if !(self.n == rhs.n && self.m == rhs.m) {
-                panic!("`Matrix::add` needs two Matrix<T> the same size.");
+                panic!("`Matrix::add` needs two Matrix<T> the same sized.");
             }
             Matrix {
                 n: self.n,
@@ -113,8 +113,55 @@ mod algebra {
             }
         }
     }
+
+    impl<T> Sub for &Matrix<T>
+    where
+        T: Add<Output = T> + Neg<Output = T> + Clone,
+    {
+        type Output = Matrix<T>;
+        fn sub(self, rhs: Self) -> Self::Output {
+            if !(self.n == rhs.n && self.m == rhs.m) {
+                panic!("`Matrix::sub` needs two Matrix<T> the same sized.")
+            }
+            Matrix {
+                n: self.n,
+                m: self.m,
+                array: {
+                    let mut v = Vec::new();
+                    for i in 0..self.n * self.m {
+                        v.push(self.array[i].clone() + (-rhs.array[i].clone()))
+                    }
+                    v
+                },
+            }
+        }
+    }
+
+    impl<T> BitAnd for &Matrix<T>
+    where
+        T: BitAnd<Output = T> + Clone,
+    {
+        type Output = Matrix<T>;
+        fn bitand(self, rhs: Self) -> Self::Output {
+            if !(self.n == rhs.n && self.m == rhs.m) {
+                panic!("`Matrix::bitand` needs two Matrix<T> the same sized.")
+            }
+            Matrix {
+                n: self.n,
+                m: self.m,
+                array: {
+                    let mut v = Vec::new();
+                    for i in 0..self.n * self.m {
+                        v.push(self.array[i].clone() & rhs.array[i].clone())
+                    }
+                    v
+                },
+            }
+        }
+    }
 }
 
+// TEST
 #[cfg(test)]
 mod tests {
     use crate::algebra::*;
@@ -351,7 +398,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "`Matrix::add` needs two Matrix<T> the same size.")]
+    #[should_panic(expected = "`Matrix::add` needs two Matrix<T> the same sized.")]
     fn test_add_panic() {
         let _dummy_matrix = &Matrix {
             n: 3,
@@ -361,6 +408,174 @@ mod tests {
             n: 4,
             m: 3,
             array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        };
+    }
+
+    #[test]
+    fn test_sub() {
+        assert_eq!(
+            &Matrix {
+                n: 4,
+                m: 3,
+                array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            } - &Matrix {
+                n: 4,
+                m: 3,
+                array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1 - 1,
+                    2 - 2,
+                    3 - 3,
+                    4 - 4,
+                    5 - 5,
+                    6 - 6,
+                    7 - 7,
+                    8 - 8,
+                    9 - 9,
+                    10 - 10,
+                    11 - 11,
+                    12 - 12
+                ]
+            }
+        );
+
+        assert_eq!(
+            *(&Matrix {
+                n: 4,
+                m: 3,
+                array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            }
+            .sub(&Matrix {
+                n: 4,
+                m: 3,
+                array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            })),
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1.sub(1),
+                    2.sub(2),
+                    3.sub(3),
+                    4.sub(4),
+                    5.sub(5),
+                    6.sub(6),
+                    7.sub(7),
+                    8.sub(8),
+                    9.sub(9),
+                    10.sub(10),
+                    11.sub(11),
+                    12.sub(12)
+                ]
+            }
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "`Matrix::sub` needs two Matrix<T> the same sized.")]
+    fn test_sub_panic() {
+        let _dummy_matrix = &Matrix {
+            n: 3,
+            m: 4,
+            array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        } - &Matrix {
+            n: 4,
+            m: 3,
+            array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        };
+    }
+
+    #[test]
+    fn test_bitand() {
+        assert_eq!(
+            &Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true, true, false, false, true, false, true, false, false, true, true, false
+                ]
+            } & &Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true, false, false, true, true, false, false, true, false, true, false, true
+                ]
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true & true,
+                    true & false,
+                    false & false,
+                    false & true,
+                    true & true,
+                    false & false,
+                    true & false,
+                    false & true,
+                    false & false,
+                    true & true,
+                    true & false,
+                    false & true
+                ]
+            }
+        );
+
+        assert_eq!(
+            *(&Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true, true, false, false, true, false, true, false, false, true, true, false
+                ]
+            }
+            .bitand(&Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true, false, false, true, true, false, false, true, false, true, false, true
+                ]
+            })),
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true.bitand(true),
+                    true.bitand(false),
+                    false.bitand(false),
+                    false.bitand(true),
+                    true.bitand(true),
+                    false.bitand(false),
+                    true.bitand(false),
+                    false.bitand(true),
+                    false.bitand(false),
+                    true.bitand(true),
+                    true.bitand(false),
+                    false.bitand(true)
+                ]
+            }
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "`Matrix::bitand` needs two Matrix<T> the same sized.")]
+    fn test_bitand_panic() {
+        let _dummy_matrix = &Matrix {
+            n: 3,
+            m: 4,
+            array: vec![
+                true, true, false, false, true, false, true, false, false, true, true, false,
+            ],
+        } & &Matrix {
+            n: 4,
+            m: 3,
+            array: vec![
+                true, false, false, true, true, false, false, true, false, true, false, true,
+            ],
         };
     }
 }
