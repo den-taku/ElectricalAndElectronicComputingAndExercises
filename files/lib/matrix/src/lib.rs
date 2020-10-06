@@ -1,6 +1,6 @@
 mod algebra {
     pub use num_traits::Zero;
-    pub use std::ops::{Neg, Not};
+    pub use std::ops::{Add, Neg, Not};
 
     #[derive(Clone, Debug, PartialEq)]
     pub struct Matrix<T> {
@@ -23,7 +23,7 @@ mod algebra {
 
         pub fn append(n: usize, m: usize, array: Vec<T>) -> Self {
             if array.len() != n * m {
-                panic!("`Matrix::append` needs appropriately sized Vec<T>");
+                panic!("`Matrix::append` needs appropriately sized Vec<T>.");
             }
             Matrix { n, m, array }
         }
@@ -32,7 +32,7 @@ mod algebra {
             let n = vec.len();
             let m = vec[0].len();
             if !vec.iter().all(|e| e.len() == m) {
-                panic!("`Matrix::append_line` needs appropriatly sized Vec<Vec<T>>");
+                panic!("`Matrix::append_line` needs appropriatly sized Vec<Vec<T>>.");
             }
             Matrix {
                 n,
@@ -45,7 +45,7 @@ mod algebra {
             let n = vec[0].len();
             let m = vec.len();
             if !vec.iter().all(|e| e.len() == n) {
-                panic!("`Matrix::append_column` needs appropriatly sized Vec<Vec<T>>>");
+                panic!("`Matrix::append_column` needs appropriatly sized Vec<Vec<T>>.");
             }
             Matrix {
                 n,
@@ -67,7 +67,7 @@ mod algebra {
     where
         T: Neg<Output = T> + Clone,
     {
-        type Output = Matrix<T>;
+        type Output = Self;
         fn neg(self) -> Self {
             let new_field = self.array.iter().map(|e| e.clone().neg()).collect();
             Matrix {
@@ -81,12 +81,35 @@ mod algebra {
     where
         T: Not<Output = T> + Clone,
     {
-        type Output = Matrix<T>;
+        type Output = Self;
         fn not(self) -> Self {
             let new_field = self.array.iter().map(|e| e.clone().not()).collect();
             Matrix {
                 array: new_field,
                 ..self
+            }
+        }
+    }
+
+    impl<T> Add for &Matrix<T>
+    where
+        T: Add<Output = T> + Clone,
+    {
+        type Output = Matrix<T>;
+        fn add(self, rhs: Self) -> Self::Output {
+            if !(self.n == rhs.n && self.m == rhs.m) {
+                panic!("`Matrix::add` needs two Matrix<T> the same size.");
+            }
+            Matrix {
+                n: self.n,
+                m: self.m,
+                array: {
+                    let mut v = Vec::new();
+                    for i in 0..self.n * self.m {
+                        v.push(self.array[i].clone() + rhs.array[i].clone())
+                    }
+                    v
+                },
             }
         }
     }
@@ -121,7 +144,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "`Matrix::append` needs appropriately sized Vec<T>")]
+    #[should_panic(expected = "`Matrix::append` needs appropriately sized Vec<T>.")]
     fn test_append_panic() {
         let _dummy_matrix = Matrix::append(3, 3, vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
     }
@@ -144,7 +167,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "`Matrix::append_line` needs appropriatly sized Vec<Vec<T>>")]
+    #[should_panic(expected = "`Matrix::append_line` needs appropriatly sized Vec<Vec<T>>.")]
     fn test_append_line_panic() {
         let _dummy_matrix =
             Matrix::append_line(vec![vec![1, 2, 3], vec![4, 5, 6], vec![7, 8], vec![9]]);
@@ -167,7 +190,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "`Matrix::append_column` needs appropriatly sized Vec<Vec<T>>")]
+    #[should_panic(expected = "`Matrix::append_column` needs appropriatly sized Vec<Vec<T>>.")]
     fn test_append_column_panic() {
         let _dummy_matrix =
             Matrix::append_column(vec![vec![1, 4, 7, 10], vec![2, 5, 8, 11], vec![3, 6, 9]]);
@@ -261,5 +284,83 @@ mod tests {
                 ]
             }
         );
+    }
+
+    #[test]
+    fn test_add() {
+        assert_eq!(
+            &Matrix {
+                n: 4,
+                m: 3,
+                array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            } + &Matrix {
+                n: 4,
+                m: 3,
+                array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1 + 1,
+                    2 + 2,
+                    3 + 3,
+                    4 + 4,
+                    5 + 5,
+                    6 + 6,
+                    7 + 7,
+                    8 + 8,
+                    9 + 9,
+                    10 + 10,
+                    11 + 11,
+                    12 + 12
+                ]
+            }
+        );
+
+        assert_eq!(
+            *(&Matrix {
+                n: 4,
+                m: 3,
+                array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            }
+            .add(&Matrix {
+                n: 4,
+                m: 3,
+                array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            })),
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1.add(1),
+                    2.add(2),
+                    3.add(3),
+                    4.add(4),
+                    5.add(5),
+                    6.add(6),
+                    7.add(7),
+                    8.add(8),
+                    9.add(9),
+                    10.add(10),
+                    11.add(11),
+                    12.add(12)
+                ]
+            }
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "`Matrix::add` needs two Matrix<T> the same size.")]
+    fn test_add_panic() {
+        let _dummy_matrix = &Matrix {
+            n: 3,
+            m: 4,
+            array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        } + &Matrix {
+            n: 4,
+            m: 3,
+            array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        };
     }
 }
