@@ -5,7 +5,7 @@ mod algebra {
         Shl, Shr, Sub, SubAssign,
     };
 
-    #[derive(Clone, Debug, PartialEq)]
+    #[derive(Clone, Debug, PartialEq, PartialOrd)]
     pub struct Matrix<T> {
         pub n: usize,      // line           [* * * * *]
         pub m: usize,      // column         [* * * * *] -> n = 3, m = 5
