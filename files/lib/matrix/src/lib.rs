@@ -1,6 +1,8 @@
 mod algebra {
     pub use num_traits::Zero;
-    pub use std::ops::{Add, BitAnd, Neg, Not, Sub};
+    pub use std::ops::{
+        Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitXor, Neg, Not, Sub, SubAssign,
+    };
 
     #[derive(Clone, Debug, PartialEq)]
     pub struct Matrix<T> {
@@ -159,6 +161,94 @@ mod algebra {
             }
         }
     }
+
+    impl<T> BitOr for &Matrix<T>
+    where
+        T: BitOr<Output = T> + Clone,
+    {
+        type Output = Matrix<T>;
+        fn bitor(self, rhs: Self) -> Self::Output {
+            if !(self.n == rhs.n && self.m == rhs.m) {
+                panic!("`Matrix::bitor` needs two Matrix<T> the same sized.")
+            }
+            Matrix {
+                n: self.n,
+                m: self.m,
+                array: {
+                    let mut v = Vec::new();
+                    for i in 0..self.n * self.m {
+                        v.push(self.array[i].clone() | rhs.array[i].clone())
+                    }
+                    v
+                },
+            }
+        }
+    }
+
+    impl<T> BitXor for &Matrix<T>
+    where
+        T: BitXor<Output = T> + Clone,
+    {
+        type Output = Matrix<T>;
+        fn bitxor(self, rhs: Self) -> Self::Output {
+            if !(self.n == rhs.n && self.m == rhs.m) {
+                panic!("`Matrix::bitxor` needs two Matrix<T> the same sized.")
+            }
+            Matrix {
+                n: self.n,
+                m: self.m,
+                array: {
+                    let mut v = Vec::new();
+                    for i in 0..self.n * self.m {
+                        v.push(self.array[i].clone() ^ rhs.array[i].clone())
+                    }
+                    v
+                },
+            }
+        }
+    }
+
+    impl<T> AddAssign<&Self> for Matrix<T>
+    where
+        T: AddAssign + Clone,
+    {
+        fn add_assign(&mut self, rhs: &Matrix<T>) {
+            if !(self.n == rhs.n && self.m == rhs.m) {
+                panic!("`Matrix::add_assign` needs two Matrix<T> the same sized.");
+            }
+            for i in 0..self.n * self.m {
+                self.array[i] += rhs.array[i].clone()
+            }
+        }
+    }
+
+    impl<T> SubAssign<&Self> for Matrix<T>
+    where
+        T: SubAssign + Clone,
+    {
+        fn sub_assign(&mut self, rhs: &Matrix<T>) {
+            if !(self.n == rhs.n && self.m == rhs.m) {
+                panic!("`Matrix::sub_assign` needs two Matrix<T> the same sized.");
+            }
+            for i in 0..self.n * self.m {
+                self.array[i] -= rhs.array[i].clone()
+            }
+        }
+    }
+
+    impl<T> BitAndAssign<&Self> for Matrix<T>
+    where
+        T: BitAndAssign + Clone,
+    {
+        fn bitand_assign(&mut self, rhs: &Matrix<T>) {
+            if !(self.n == rhs.n && self.m == rhs.m) {
+                panic!("`Matrix::bitand_assign` needs two Matrix<T> the same sized.");
+            }
+            for i in 0..self.n * self.m {
+                self.array[i] &= rhs.array[i].clone()
+            }
+        }
+    }
 }
 
 // TEST
@@ -175,7 +265,7 @@ mod tests {
                 m: 4,
                 array: vec![0.0; 12]
             }
-        ); // TODO: Implement appropriate test
+        ); 
     }
 
     #[test]
@@ -412,6 +502,92 @@ mod tests {
     }
 
     #[test]
+    fn test_addassign() {
+        assert_eq!(
+            {
+                let mut dummy_matrix = Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                };
+                dummy_matrix += &Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                };
+                dummy_matrix
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1 + 1,
+                    2 + 2,
+                    3 + 3,
+                    4 + 4,
+                    5 + 5,
+                    6 + 6,
+                    7 + 7,
+                    8 + 8,
+                    9 + 9,
+                    10 + 10,
+                    11 + 11,
+                    12 + 12
+                ]
+            }
+        );
+
+        assert_eq!(
+            {
+                let mut dummy_matrix = Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                };
+                dummy_matrix.add_assign(&Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                });
+                dummy_matrix
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1.add(1),
+                    2.add(2),
+                    3.add(3),
+                    4.add(4),
+                    5.add(5),
+                    6.add(6),
+                    7.add(7),
+                    8.add(8),
+                    9.add(9),
+                    10.add(10),
+                    11.add(11),
+                    12.add(12)
+                ]
+            }
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "`Matrix::add_assign` needs two Matrix<T> the same sized.")]
+    fn test_addassign_panic() {
+        let mut dummy_matrix = Matrix {
+            n: 3,
+            m: 4,
+            array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        };
+        dummy_matrix += &Matrix {
+            n: 4,
+            m: 3,
+            array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        };
+    }
+
+    #[test]
     fn test_sub() {
         assert_eq!(
             &Matrix {
@@ -483,6 +659,92 @@ mod tests {
             m: 4,
             array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
         } - &Matrix {
+            n: 4,
+            m: 3,
+            array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        };
+    }
+
+    #[test]
+    fn test_subassign() {
+        assert_eq!(
+            {
+                let mut dummy_matrix = Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                };
+                dummy_matrix -= &Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                };
+                dummy_matrix
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1 - 1,
+                    2 - 2,
+                    3 - 3,
+                    4 - 4,
+                    5 - 5,
+                    6 - 6,
+                    7 - 7,
+                    8 - 8,
+                    9 - 9,
+                    10 - 10,
+                    11 - 11,
+                    12 - 12
+                ]
+            }
+        );
+
+        assert_eq!(
+            {
+                let mut dummy_matrix = Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                };
+                dummy_matrix.sub_assign(&Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                });
+                dummy_matrix
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1.sub(1),
+                    2.sub(2),
+                    3.sub(3),
+                    4.sub(4),
+                    5.sub(5),
+                    6.sub(6),
+                    7.sub(7),
+                    8.sub(8),
+                    9.sub(9),
+                    10.sub(10),
+                    11.sub(11),
+                    12.sub(12)
+                ]
+            }
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "`Matrix::sub_assign` needs two Matrix<T> the same sized.")]
+    fn test_subassign_panic() {
+        let mut dummy_matrix = Matrix {
+            n: 3,
+            m: 4,
+            array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        };
+        dummy_matrix -= &Matrix {
             n: 4,
             m: 3,
             array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
@@ -571,6 +833,288 @@ mod tests {
                 true, true, false, false, true, false, true, false, false, true, true, false,
             ],
         } & &Matrix {
+            n: 4,
+            m: 3,
+            array: vec![
+                true, false, false, true, true, false, false, true, false, true, false, true,
+            ],
+        };
+    }
+
+    #[test]
+    fn test_bitand_assign() {
+        assert_eq!(
+            {
+                let mut dummy_matrix = Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![
+                        true, true, false, false, true, false, true, false, false, true, true,
+                        false,
+                    ],
+                };
+                dummy_matrix &= &Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![
+                        true, false, false, true, true, false, false, true, false, true, false,
+                        true,
+                    ],
+                };
+                dummy_matrix
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true & true,
+                    true & false,
+                    false & false,
+                    false & true,
+                    true & true,
+                    false & false,
+                    true & false,
+                    false & true,
+                    false & false,
+                    true & true,
+                    true & false,
+                    false & true
+                ]
+            }
+        );
+
+        assert_eq!(
+            {
+                let mut dummy_matrix = Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![
+                        true, true, false, false, true, false, true, false, false, true, true,
+                        false,
+                    ],
+                };
+                dummy_matrix.bitand_assign(&Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![
+                        true, false, false, true, true, false, false, true, false, true, false,
+                        true,
+                    ],
+                });
+                dummy_matrix
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true.bitand(true),
+                    true.bitand(false),
+                    false.bitand(false),
+                    false.bitand(true),
+                    true.bitand(true),
+                    false.bitand(false),
+                    true.bitand(false),
+                    false.bitand(true),
+                    false.bitand(false),
+                    true.bitand(true),
+                    true.bitand(false),
+                    false.bitand(true)
+                ]
+            }
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "`Matrix::bitand_assign` needs two Matrix<T> the same sized.")]
+    fn test_bitand_assign_panic() {
+        let mut dummy_matrix = Matrix {
+            n: 3,
+            m: 4,
+            array: vec![
+                true, true, false, false, true, false, true, false, false, true, true, false,
+            ],
+        };
+        dummy_matrix &= &Matrix {
+            n: 4,
+            m: 3,
+            array: vec![
+                true, false, false, true, true, false, false, true, false, true, false, true,
+            ],
+        };
+    }
+
+    #[test]
+    fn test_bitor() {
+        assert_eq!(
+            &Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true, true, false, false, true, false, true, false, false, true, true, false
+                ]
+            } | &Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true, false, false, true, true, false, false, true, false, true, false, true
+                ]
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true | true,
+                    true | false,
+                    false | false,
+                    false | true,
+                    true | true,
+                    false | false,
+                    true | false,
+                    false | true,
+                    false | false,
+                    true | true,
+                    true | false,
+                    false | true
+                ]
+            }
+        );
+
+        assert_eq!(
+            *(&Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true, true, false, false, true, false, true, false, false, true, true, false
+                ]
+            }
+            .bitor(&Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true, false, false, true, true, false, false, true, false, true, false, true
+                ]
+            })),
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true.bitor(true),
+                    true.bitor(false),
+                    false.bitor(false),
+                    false.bitor(true),
+                    true.bitor(true),
+                    false.bitor(false),
+                    true.bitor(false),
+                    false.bitor(true),
+                    false.bitor(false),
+                    true.bitor(true),
+                    true.bitor(false),
+                    false.bitor(true)
+                ]
+            }
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "`Matrix::bitor` needs two Matrix<T> the same sized.")]
+    fn test_bitor_panic() {
+        let _dummy_matrix = &Matrix {
+            n: 3,
+            m: 4,
+            array: vec![
+                true, true, false, false, true, false, true, false, false, true, true, false,
+            ],
+        } | &Matrix {
+            n: 4,
+            m: 3,
+            array: vec![
+                true, false, false, true, true, false, false, true, false, true, false, true,
+            ],
+        };
+    }
+
+    #[test]
+    fn test_bitxor() {
+        assert_eq!(
+            &Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true, true, false, false, true, false, true, false, false, true, true, false
+                ]
+            } ^ &Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true, false, false, true, true, false, false, true, false, true, false, true
+                ]
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true ^ true,
+                    true ^ false,
+                    false ^ false,
+                    false ^ true,
+                    true ^ true,
+                    false ^ false,
+                    true ^ false,
+                    false ^ true,
+                    false ^ false,
+                    true ^ true,
+                    true ^ false,
+                    false ^ true
+                ]
+            }
+        );
+
+        assert_eq!(
+            *(&Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true, true, false, false, true, false, true, false, false, true, true, false
+                ]
+            }
+            .bitxor(&Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true, false, false, true, true, false, false, true, false, true, false, true
+                ]
+            })),
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    true.bitxor(true),
+                    true.bitxor(false),
+                    false.bitxor(false),
+                    false.bitxor(true),
+                    true.bitxor(true),
+                    false.bitxor(false),
+                    true.bitxor(false),
+                    false.bitxor(true),
+                    false.bitxor(false),
+                    true.bitxor(true),
+                    true.bitxor(false),
+                    false.bitxor(true)
+                ]
+            }
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "`Matrix::bitxor` needs two Matrix<T> the same sized.")]
+    fn test_bitxor_panic() {
+        let _dummy_matrix = &Matrix {
+            n: 3,
+            m: 4,
+            array: vec![
+                true, true, false, false, true, false, true, false, false, true, true, false,
+            ],
+        } ^ &Matrix {
             n: 4,
             m: 3,
             array: vec![
