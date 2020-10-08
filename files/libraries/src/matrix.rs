@@ -338,11 +338,10 @@ mod algebra {
         }
     }
 }
-
 // TEST
 #[cfg(test)]
 mod tests {
-    use crate::algebra::*;
+    use crate::matrix::algebra::*;
 
     #[test]
     fn test_matrix_new() {
