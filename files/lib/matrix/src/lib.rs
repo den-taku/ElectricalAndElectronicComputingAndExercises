@@ -345,7 +345,7 @@ mod tests {
     use crate::algebra::*;
 
     #[test]
-    fn test_new() {
+    fn test_matrix_new() {
         assert_eq!(
             Matrix::<f32>::new(3, 4),
             Matrix {
@@ -357,7 +357,7 @@ mod tests {
     }
 
     #[test]
-    fn test_append() {
+    fn test_matrix_append() {
         assert_eq!(
             Matrix::append(4, 3, vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]),
             Matrix {
@@ -370,12 +370,12 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "`Matrix::append` needs appropriately sized Vec<T>.")]
-    fn test_append_panic() {
+    fn test_matrix_append_panic() {
         let _dummy_matrix = Matrix::append(3, 3, vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
     }
 
     #[test]
-    fn test_append_line() {
+    fn test_matrix_append_line() {
         assert_eq!(
             Matrix::append_line(vec![
                 vec![1, 2, 3],
@@ -393,13 +393,13 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "`Matrix::append_line` needs appropriatly sized Vec<Vec<T>>.")]
-    fn test_append_line_panic() {
+    fn test_matrix_append_line_panic() {
         let _dummy_matrix =
             Matrix::append_line(vec![vec![1, 2, 3], vec![4, 5, 6], vec![7, 8], vec![9]]);
     }
 
     #[test]
-    fn test_append_column() {
+    fn test_matrix_append_column() {
         assert_eq!(
             Matrix::append_column(vec![
                 vec![1, 4, 7, 10],
@@ -416,13 +416,13 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "`Matrix::append_column` needs appropriatly sized Vec<Vec<T>>.")]
-    fn test_append_column_panic() {
+    fn test_matrix_append_column_panic() {
         let _dummy_matrix =
             Matrix::append_column(vec![vec![1, 4, 7, 10], vec![2, 5, 8, 11], vec![3, 6, 9]]);
     }
 
     #[test]
-    fn test_neg() {
+    fn test_matrix_neg() {
         assert_eq!(
             -Matrix {
                 n: 4,
@@ -463,7 +463,7 @@ mod tests {
         );
     }
     #[test]
-    fn test_not() {
+    fn test_matrix_not() {
         assert_eq!(
             !Matrix {
                 n: 4,
@@ -512,7 +512,7 @@ mod tests {
     }
 
     #[test]
-    fn test_add() {
+    fn test_matrix_add() {
         assert_eq!(
             &Matrix {
                 n: 4,
@@ -577,7 +577,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "`Matrix::add` needs two Matrix<T> the same sized.")]
-    fn test_add_panic() {
+    fn test_matrix_add_panic() {
         let _dummy_matrix = &Matrix {
             n: 3,
             m: 4,
@@ -590,7 +590,7 @@ mod tests {
     }
 
     #[test]
-    fn test_addassign() {
+    fn test_matrix_addassign() {
         assert_eq!(
             {
                 let mut dummy_matrix = Matrix {
@@ -662,7 +662,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "`Matrix::add_assign` needs two Matrix<T> the same sized.")]
-    fn test_addassign_panic() {
+    fn test_matrix_addassign_panic() {
         let mut dummy_matrix = Matrix {
             n: 3,
             m: 4,
@@ -676,7 +676,7 @@ mod tests {
     }
 
     #[test]
-    fn test_sub() {
+    fn test_matrix_sub() {
         assert_eq!(
             &Matrix {
                 n: 4,
@@ -741,7 +741,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "`Matrix::sub` needs two Matrix<T> the same sized.")]
-    fn test_sub_panic() {
+    fn test_matrix_sub_panic() {
         let _dummy_matrix = &Matrix {
             n: 3,
             m: 4,
@@ -754,7 +754,7 @@ mod tests {
     }
 
     #[test]
-    fn test_subassign() {
+    fn test_matrix_subassign() {
         assert_eq!(
             {
                 let mut dummy_matrix = Matrix {
@@ -826,7 +826,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "`Matrix::sub_assign` needs two Matrix<T> the same sized.")]
-    fn test_subassign_panic() {
+    fn test_matrix_subassign_panic() {
         let mut dummy_matrix = Matrix {
             n: 3,
             m: 4,
@@ -840,7 +840,7 @@ mod tests {
     }
 
     #[test]
-    fn test_bitand() {
+    fn test_matrix_bitand() {
         assert_eq!(
             &Matrix {
                 n: 4,
@@ -913,7 +913,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "`Matrix::bitand` needs two Matrix<T> the same sized.")]
-    fn test_bitand_panic() {
+    fn test_matrix_bitand_panic() {
         let _dummy_matrix = &Matrix {
             n: 3,
             m: 4,
@@ -930,7 +930,7 @@ mod tests {
     }
 
     #[test]
-    fn test_bitand_assign() {
+    fn test_matrix_bitand_assign() {
         assert_eq!(
             {
                 let mut dummy_matrix = Matrix {
@@ -1014,7 +1014,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "`Matrix::bitand_assign` needs two Matrix<T> the same sized.")]
-    fn test_bitand_assign_panic() {
+    fn test_matrix_bitand_assign_panic() {
         let mut dummy_matrix = Matrix {
             n: 3,
             m: 4,
@@ -1032,7 +1032,7 @@ mod tests {
     }
 
     #[test]
-    fn test_bitor() {
+    fn test_matrix_bitor() {
         assert_eq!(
             &Matrix {
                 n: 4,
@@ -1105,7 +1105,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "`Matrix::bitor` needs two Matrix<T> the same sized.")]
-    fn test_bitor_panic() {
+    fn test_matrix_bitor_panic() {
         let _dummy_matrix = &Matrix {
             n: 3,
             m: 4,
@@ -1122,7 +1122,7 @@ mod tests {
     }
 
     #[test]
-    fn test_bitor_assign() {
+    fn test_matrix_bitor_assign() {
         assert_eq!(
             {
                 let mut dummy_matrix = Matrix {
@@ -1206,7 +1206,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "`Matrix::bitor_assign` needs two Matrix<T> the same sized.")]
-    fn test_bitor_assign_panic() {
+    fn test_matrix_bitor_assign_panic() {
         let mut dummy_matrix = Matrix {
             n: 3,
             m: 4,
@@ -1224,7 +1224,7 @@ mod tests {
     }
 
     #[test]
-    fn test_bitxor() {
+    fn test_matrix_bitxor() {
         assert_eq!(
             &Matrix {
                 n: 4,
@@ -1297,7 +1297,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "`Matrix::bitxor` needs two Matrix<T> the same sized.")]
-    fn test_bitxor_panic() {
+    fn test_matrix_bitxor_panic() {
         let _dummy_matrix = &Matrix {
             n: 3,
             m: 4,
@@ -1314,7 +1314,7 @@ mod tests {
     }
 
     #[test]
-    fn test_bitxor_assign() {
+    fn test_matrix_bitxor_assign() {
         assert_eq!(
             {
                 let mut dummy_matrix = Matrix {
@@ -1398,7 +1398,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "`Matrix::bitxor_assign` needs two Matrix<T> the same sized.")]
-    fn test_bitxor_assign_panic() {
+    fn test_matrix_bitxor_assign_panic() {
         let mut dummy_matrix = Matrix {
             n: 3,
             m: 4,
@@ -1416,7 +1416,7 @@ mod tests {
     }
 
     #[test]
-    fn test_shl() {
+    fn test_matrix_shl() {
         assert_eq!(
             &Matrix {
                 n: 3,
@@ -1471,7 +1471,7 @@ mod tests {
     }
 
     #[test]
-    fn test_shr() {
+    fn test_matrix_shr() {
         assert_eq!(
             &Matrix {
                 n: 3,
@@ -1526,7 +1526,7 @@ mod tests {
     }
 
     #[test]
-    fn test_index() {
+    fn test_matrix_index() {
         let dummy_matrix = Matrix {
             n: 3,
             m: 4,
@@ -1539,7 +1539,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "index fail: 12 is out of range.")]
-    fn test_index_panic() {
+    fn test_matrix_index_panic() {
         let dummy_matrix = Matrix {
             n: 3,
             m: 4,
@@ -1551,7 +1551,7 @@ mod tests {
     }
 
     #[test]
-    fn test_index_mut() {
+    fn test_matrix_index_mut() {
         let mut dummy_matrix = Matrix {
             n: 3,
             m: 4,
@@ -1567,7 +1567,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "index_mut fail: 12 is out of range.")]
-    fn test_index_mut_panic() {
+    fn test_matrix_index_mut_panic() {
         let mut dummy_matrix = Matrix {
             n: 3,
             m: 4,
