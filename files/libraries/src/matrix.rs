@@ -340,7 +340,7 @@ mod algebra {
 }
 // TEST
 #[cfg(test)]
-mod tests {
+mod tests_matrix {
     use crate::matrix::algebra::*;
 
     #[test]
