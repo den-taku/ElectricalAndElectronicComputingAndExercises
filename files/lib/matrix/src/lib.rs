@@ -1,8 +1,8 @@
 mod algebra {
     pub use num_traits::Zero;
     pub use std::ops::{
-        Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Neg, Not,
-        Shl, Shr, Sub, SubAssign,
+        Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Index,
+        IndexMut, Neg, Not, Shl, Shr, Sub, SubAssign,
     };
 
     #[derive(Clone, Debug, PartialEq, PartialOrd)]
@@ -316,6 +316,25 @@ mod algebra {
                     v
                 },
             }
+        }
+    }
+
+    impl<T> Index<usize> for Matrix<T> {
+        type Output = T;
+        fn index(&self, index: usize) -> &T {
+            if !(index < self.n * self.m) {
+                panic!(format!("index fail: {} is out of range.", index))
+            }
+            &self.array[index]
+        }
+    }
+
+    impl<T> IndexMut<usize> for Matrix<T> {
+        fn index_mut(&mut self, index: usize) -> &mut T {
+            if !(index < self.n * self.m) {
+                panic!(format!("index_mut fail: {} is out of range.", index));
+            }
+            &mut self.array[index]
         }
     }
 }
@@ -1504,6 +1523,62 @@ mod tests {
                 ]
             }
         )
+    }
+
+    #[test]
+    fn test_index() {
+        let dummy_matrix = Matrix {
+            n: 3,
+            m: 4,
+            array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        };
+        for i in 0..12 {
+            assert_eq!(dummy_matrix.index(i), &(i + 1))
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "index fail: 12 is out of range.")]
+    fn test_index_panic() {
+        let dummy_matrix = Matrix {
+            n: 3,
+            m: 4,
+            array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        };
+        for i in 0..13 {
+            assert_eq!(dummy_matrix.index(i), &(i + 1))
+        }
+    }
+
+    #[test]
+    fn test_index_mut() {
+        let mut dummy_matrix = Matrix {
+            n: 3,
+            m: 4,
+            array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        };
+        for i in 0..12 {
+            *dummy_matrix.index_mut(i) -= 1;
+        }
+        for i in 0..12 {
+            assert_eq!(dummy_matrix.index_mut(i), &mut (i as i32))
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "index_mut fail: 12 is out of range.")]
+    fn test_index_mut_panic() {
+        let mut dummy_matrix = Matrix {
+            n: 3,
+            m: 4,
+            array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        };
+        for i in 0..12 {
+            *dummy_matrix.index_mut(i) -= 1;
+        }
+        for i in 0..13 {
+            assert_eq!(dummy_matrix.index_mut(i), &mut (i as i32))
+        }
     }
 }
 
