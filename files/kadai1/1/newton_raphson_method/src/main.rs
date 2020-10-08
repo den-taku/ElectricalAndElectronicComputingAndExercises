@@ -1,4 +1,4 @@
-mod newton_raohson_method {
+mod newton_raphson_method {
     fn newton_raphson_method(f: Box<dyn Fn(f64) -> f64>) -> Option<f64> {
         if !f.is_converge() {
             return None;
