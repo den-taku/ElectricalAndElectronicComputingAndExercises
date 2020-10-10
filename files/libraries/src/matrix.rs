@@ -1,347 +1,348 @@
-pub mod algebra {
-    pub use num_traits::Zero;
-    pub use std::ops::{
-        Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Index,
-        IndexMut, Neg, Not, Shl, Shr, Sub, SubAssign,
-    };
+// pub mod algebra {
+pub use num_traits::Zero;
+pub use std::ops::{
+    Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Index,
+    IndexMut, Neg, Not, Shl, Shr, Sub, SubAssign,
+};
 
-    #[derive(Clone, Debug, PartialEq, PartialOrd)]
-    pub struct Matrix<T> {
-        pub n: usize,      // line           [* * * * *]
-        pub m: usize,      // column         [* * * * *] -> n = 3, m = 5
-        pub array: Vec<T>, //                [* * * * *]
+#[derive(Clone, Debug, PartialEq, PartialOrd)]
+pub struct Matrix<T> {
+    n: usize,      // line           [* * * * *]
+    m: usize,      // column         [* * * * *] -> n = 3, m = 5
+    array: Vec<T>, //                [* * * * *]
+}
+
+impl<T> Matrix<T>
+where
+    T: Zero + Clone,
+{
+    pub fn new(n: usize, m: usize) -> Self {
+        Matrix {
+            n,
+            m,
+            array: vec![T::zero(); n * m],
+        }
     }
 
-    impl<T> Matrix<T>
-    where
-        T: Zero + Clone,
-    {
-        pub fn new(n: usize, m: usize) -> Self {
-            Matrix {
-                n,
-                m,
-                array: vec![T::zero(); n * m],
-            }
+    pub fn append(n: usize, m: usize, array: Vec<T>) -> Self {
+        if array.len() != n * m {
+            panic!("`Matrix::append` needs appropriately sized Vec<T>.");
         }
+        Matrix { n, m, array }
+    }
 
-        pub fn append(n: usize, m: usize, array: Vec<T>) -> Self {
-            if array.len() != n * m {
-                panic!("`Matrix::append` needs appropriately sized Vec<T>.");
-            }
-            Matrix { n, m, array }
+    pub fn append_line(vec: Vec<Vec<T>>) -> Self {
+        let n = vec.len();
+        let m = vec[0].len();
+        if !vec.iter().all(|e| e.len() == m) {
+            panic!("`Matrix::append_line` needs appropriatly sized Vec<Vec<T>>.");
         }
-
-        pub fn append_line(vec: Vec<Vec<T>>) -> Self {
-            let n = vec.len();
-            let m = vec[0].len();
-            if !vec.iter().all(|e| e.len() == m) {
-                panic!("`Matrix::append_line` needs appropriatly sized Vec<Vec<T>>.");
-            }
-            Matrix {
-                n,
-                m,
-                array: vec.concat(),
-            }
+        Matrix {
+            n,
+            m,
+            array: vec.concat(),
         }
+    }
 
-        pub fn append_column(vec: Vec<Vec<T>>) -> Self {
-            let n = vec[0].len();
-            let m = vec.len();
-            if !vec.iter().all(|e| e.len() == n) {
-                panic!("`Matrix::append_column` needs appropriatly sized Vec<Vec<T>>.");
-            }
-            Matrix {
-                n,
-                m,
-                array: {
-                    let mut v = Vec::new();
-                    for j in 0..n {
-                        for i in 0..m {
-                            v.push((vec[i][j]).clone());
-                        }
+    pub fn append_column(vec: Vec<Vec<T>>) -> Self {
+        let n = vec[0].len();
+        let m = vec.len();
+        if !vec.iter().all(|e| e.len() == n) {
+            panic!("`Matrix::append_column` needs appropriatly sized Vec<Vec<T>>.");
+        }
+        Matrix {
+            n,
+            m,
+            array: {
+                let mut v = Vec::new();
+                for j in 0..n {
+                    for i in 0..m {
+                        v.push((vec[i][j]).clone());
                     }
-                    v
-                },
-            }
-        }
-    }
-
-    impl<T> Neg for Matrix<T>
-    where
-        T: Neg<Output = T> + Clone,
-    {
-        type Output = Self;
-        fn neg(self) -> Self {
-            let new_field = self.array.iter().map(|e| e.clone().neg()).collect();
-            Matrix {
-                array: new_field,
-                ..self
-            }
-        }
-    }
-
-    impl<T> Not for Matrix<T>
-    where
-        T: Not<Output = T> + Clone,
-    {
-        type Output = Self;
-        fn not(self) -> Self {
-            let new_field = self.array.iter().map(|e| e.clone().not()).collect();
-            Matrix {
-                array: new_field,
-                ..self
-            }
-        }
-    }
-
-    impl<T> Add for &Matrix<T>
-    where
-        T: Add<Output = T> + Clone,
-    {
-        type Output = Matrix<T>;
-        fn add(self, rhs: Self) -> Self::Output {
-            if !(self.n == rhs.n && self.m == rhs.m) {
-                panic!("`Matrix::add` needs two Matrix<T> the same sized.");
-            }
-            Matrix {
-                n: self.n,
-                m: self.m,
-                array: {
-                    let mut v = Vec::new();
-                    for i in 0..self.n * self.m {
-                        v.push(self.array[i].clone() + rhs.array[i].clone())
-                    }
-                    v
-                },
-            }
-        }
-    }
-
-    impl<T> Sub for &Matrix<T>
-    where
-        T: Add<Output = T> + Neg<Output = T> + Clone,
-    {
-        type Output = Matrix<T>;
-        fn sub(self, rhs: Self) -> Self::Output {
-            if !(self.n == rhs.n && self.m == rhs.m) {
-                panic!("`Matrix::sub` needs two Matrix<T> the same sized.")
-            }
-            Matrix {
-                n: self.n,
-                m: self.m,
-                array: {
-                    let mut v = Vec::new();
-                    for i in 0..self.n * self.m {
-                        v.push(self.array[i].clone() + (-rhs.array[i].clone()))
-                    }
-                    v
-                },
-            }
-        }
-    }
-
-    impl<T> BitAnd for &Matrix<T>
-    where
-        T: BitAnd<Output = T> + Clone,
-    {
-        type Output = Matrix<T>;
-        fn bitand(self, rhs: Self) -> Self::Output {
-            if !(self.n == rhs.n && self.m == rhs.m) {
-                panic!("`Matrix::bitand` needs two Matrix<T> the same sized.")
-            }
-            Matrix {
-                n: self.n,
-                m: self.m,
-                array: {
-                    let mut v = Vec::new();
-                    for i in 0..self.n * self.m {
-                        v.push(self.array[i].clone() & rhs.array[i].clone())
-                    }
-                    v
-                },
-            }
-        }
-    }
-
-    impl<T> BitOr for &Matrix<T>
-    where
-        T: BitOr<Output = T> + Clone,
-    {
-        type Output = Matrix<T>;
-        fn bitor(self, rhs: Self) -> Self::Output {
-            if !(self.n == rhs.n && self.m == rhs.m) {
-                panic!("`Matrix::bitor` needs two Matrix<T> the same sized.")
-            }
-            Matrix {
-                n: self.n,
-                m: self.m,
-                array: {
-                    let mut v = Vec::new();
-                    for i in 0..self.n * self.m {
-                        v.push(self.array[i].clone() | rhs.array[i].clone())
-                    }
-                    v
-                },
-            }
-        }
-    }
-
-    impl<T> BitXor for &Matrix<T>
-    where
-        T: BitXor<Output = T> + Clone,
-    {
-        type Output = Matrix<T>;
-        fn bitxor(self, rhs: Self) -> Self::Output {
-            if !(self.n == rhs.n && self.m == rhs.m) {
-                panic!("`Matrix::bitxor` needs two Matrix<T> the same sized.")
-            }
-            Matrix {
-                n: self.n,
-                m: self.m,
-                array: {
-                    let mut v = Vec::new();
-                    for i in 0..self.n * self.m {
-                        v.push(self.array[i].clone() ^ rhs.array[i].clone())
-                    }
-                    v
-                },
-            }
-        }
-    }
-
-    impl<T> AddAssign<&Self> for Matrix<T>
-    where
-        T: AddAssign + Clone,
-    {
-        fn add_assign(&mut self, rhs: &Matrix<T>) {
-            if !(self.n == rhs.n && self.m == rhs.m) {
-                panic!("`Matrix::add_assign` needs two Matrix<T> the same sized.");
-            }
-            for i in 0..self.n * self.m {
-                self.array[i] += rhs.array[i].clone()
-            }
-        }
-    }
-
-    impl<T> SubAssign<&Self> for Matrix<T>
-    where
-        T: SubAssign + Clone,
-    {
-        fn sub_assign(&mut self, rhs: &Matrix<T>) {
-            if !(self.n == rhs.n && self.m == rhs.m) {
-                panic!("`Matrix::sub_assign` needs two Matrix<T> the same sized.");
-            }
-            for i in 0..self.n * self.m {
-                self.array[i] -= rhs.array[i].clone()
-            }
-        }
-    }
-
-    impl<T> BitAndAssign<&Self> for Matrix<T>
-    where
-        T: BitAndAssign + Clone,
-    {
-        fn bitand_assign(&mut self, rhs: &Matrix<T>) {
-            if !(self.n == rhs.n && self.m == rhs.m) {
-                panic!("`Matrix::bitand_assign` needs two Matrix<T> the same sized.");
-            }
-            for i in 0..self.n * self.m {
-                self.array[i] &= rhs.array[i].clone()
-            }
-        }
-    }
-
-    impl<T> BitOrAssign<&Self> for Matrix<T>
-    where
-        T: BitOrAssign + Clone,
-    {
-        fn bitor_assign(&mut self, rhs: &Matrix<T>) {
-            if !(self.n == rhs.n && self.m == rhs.m) {
-                panic!("`Matrix::bitor_assign` needs two Matrix<T> the same sized.");
-            }
-            for i in 0..self.n * self.m {
-                self.array[i] |= rhs.array[i].clone()
-            }
-        }
-    }
-
-    impl<T> BitXorAssign<&Self> for Matrix<T>
-    where
-        T: BitXorAssign + Clone,
-    {
-        fn bitxor_assign(&mut self, rhs: &Matrix<T>) {
-            if !(self.n == rhs.n && self.m == rhs.m) {
-                panic!("`Matrix::bitxor_assign` needs two Matrix<T> the same sized.");
-            }
-            for i in 0..self.n * self.m {
-                self.array[i] ^= rhs.array[i].clone()
-            }
-        }
-    }
-
-    impl<T> Shl<usize> for &Matrix<T>
-    where
-        T: Shl<usize, Output = T> + Clone,
-    {
-        type Output = Matrix<T>;
-        fn shl(self, rhs: usize) -> Self::Output {
-            Matrix {
-                n: self.n,
-                m: self.m,
-                array: {
-                    let mut v = Vec::new();
-                    for i in 0..self.n * self.m {
-                        v.push(self.array[i].clone() << rhs)
-                    }
-                    v
-                },
-            }
-        }
-    }
-
-    impl<T> Shr<usize> for &Matrix<T>
-    where
-        T: Shr<usize, Output = T> + Clone,
-    {
-        type Output = Matrix<T>;
-        fn shr(self, rhs: usize) -> Self::Output {
-            Matrix {
-                n: self.n,
-                m: self.m,
-                array: {
-                    let mut v = Vec::new();
-                    for i in 0..self.n * self.m {
-                        v.push(self.array[i].clone() >> rhs)
-                    }
-                    v
-                },
-            }
-        }
-    }
-
-    impl<T> Index<usize> for Matrix<T> {
-        type Output = T;
-        fn index(&self, index: usize) -> &T {
-            if !(index < self.n * self.m) {
-                panic!(format!("index fail: {} is out of range.", index))
-            }
-            &self.array[index]
-        }
-    }
-
-    impl<T> IndexMut<usize> for Matrix<T> {
-        fn index_mut(&mut self, index: usize) -> &mut T {
-            if !(index < self.n * self.m) {
-                panic!(format!("index_mut fail: {} is out of range.", index));
-            }
-            &mut self.array[index]
+                }
+                v
+            },
         }
     }
 }
+
+impl<T> Neg for Matrix<T>
+where
+    T: Neg<Output = T> + Clone,
+{
+    type Output = Self;
+    fn neg(self) -> Self {
+        let new_field = self.array.iter().map(|e| e.clone().neg()).collect();
+        Matrix {
+            array: new_field,
+            ..self
+        }
+    }
+}
+
+impl<T> Not for Matrix<T>
+where
+    T: Not<Output = T> + Clone,
+{
+    type Output = Self;
+    fn not(self) -> Self {
+        let new_field = self.array.iter().map(|e| e.clone().not()).collect();
+        Matrix {
+            array: new_field,
+            ..self
+        }
+    }
+}
+
+impl<T> Add for &Matrix<T>
+where
+    T: Add<Output = T> + Clone,
+{
+    type Output = Matrix<T>;
+    fn add(self, rhs: Self) -> Self::Output {
+        if !(self.n == rhs.n && self.m == rhs.m) {
+            panic!("`Matrix::add` needs two Matrix<T> the same sized.");
+        }
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: {
+                let mut v = Vec::new();
+                for i in 0..self.n * self.m {
+                    v.push(self.array[i].clone() + rhs.array[i].clone())
+                }
+                v
+            },
+        }
+    }
+}
+
+impl<T> Sub for &Matrix<T>
+where
+    T: Add<Output = T> + Neg<Output = T> + Clone,
+{
+    type Output = Matrix<T>;
+    fn sub(self, rhs: Self) -> Self::Output {
+        if !(self.n == rhs.n && self.m == rhs.m) {
+            panic!("`Matrix::sub` needs two Matrix<T> the same sized.")
+        }
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: {
+                let mut v = Vec::new();
+                for i in 0..self.n * self.m {
+                    v.push(self.array[i].clone() + (-rhs.array[i].clone()))
+                }
+                v
+            },
+        }
+    }
+}
+
+impl<T> BitAnd for &Matrix<T>
+where
+    T: BitAnd<Output = T> + Clone,
+{
+    type Output = Matrix<T>;
+    fn bitand(self, rhs: Self) -> Self::Output {
+        if !(self.n == rhs.n && self.m == rhs.m) {
+            panic!("`Matrix::bitand` needs two Matrix<T> the same sized.")
+        }
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: {
+                let mut v = Vec::new();
+                for i in 0..self.n * self.m {
+                    v.push(self.array[i].clone() & rhs.array[i].clone())
+                }
+                v
+            },
+        }
+    }
+}
+
+impl<T> BitOr for &Matrix<T>
+where
+    T: BitOr<Output = T> + Clone,
+{
+    type Output = Matrix<T>;
+    fn bitor(self, rhs: Self) -> Self::Output {
+        if !(self.n == rhs.n && self.m == rhs.m) {
+            panic!("`Matrix::bitor` needs two Matrix<T> the same sized.")
+        }
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: {
+                let mut v = Vec::new();
+                for i in 0..self.n * self.m {
+                    v.push(self.array[i].clone() | rhs.array[i].clone())
+                }
+                v
+            },
+        }
+    }
+}
+
+impl<T> BitXor for &Matrix<T>
+where
+    T: BitXor<Output = T> + Clone,
+{
+    type Output = Matrix<T>;
+    fn bitxor(self, rhs: Self) -> Self::Output {
+        if !(self.n == rhs.n && self.m == rhs.m) {
+            panic!("`Matrix::bitxor` needs two Matrix<T> the same sized.")
+        }
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: {
+                let mut v = Vec::new();
+                for i in 0..self.n * self.m {
+                    v.push(self.array[i].clone() ^ rhs.array[i].clone())
+                }
+                v
+            },
+        }
+    }
+}
+
+impl<T> AddAssign<&Self> for Matrix<T>
+where
+    T: AddAssign + Clone,
+{
+    fn add_assign(&mut self, rhs: &Matrix<T>) {
+        if !(self.n == rhs.n && self.m == rhs.m) {
+            panic!("`Matrix::add_assign` needs two Matrix<T> the same sized.");
+        }
+        for i in 0..self.n * self.m {
+            self.array[i] += rhs.array[i].clone()
+        }
+    }
+}
+
+impl<T> SubAssign<&Self> for Matrix<T>
+where
+    T: SubAssign + Clone,
+{
+    fn sub_assign(&mut self, rhs: &Matrix<T>) {
+        if !(self.n == rhs.n && self.m == rhs.m) {
+            panic!("`Matrix::sub_assign` needs two Matrix<T> the same sized.");
+        }
+        for i in 0..self.n * self.m {
+            self.array[i] -= rhs.array[i].clone()
+        }
+    }
+}
+
+impl<T> BitAndAssign<&Self> for Matrix<T>
+where
+    T: BitAndAssign + Clone,
+{
+    fn bitand_assign(&mut self, rhs: &Matrix<T>) {
+        if !(self.n == rhs.n && self.m == rhs.m) {
+            panic!("`Matrix::bitand_assign` needs two Matrix<T> the same sized.");
+        }
+        for i in 0..self.n * self.m {
+            self.array[i] &= rhs.array[i].clone()
+        }
+    }
+}
+
+impl<T> BitOrAssign<&Self> for Matrix<T>
+where
+    T: BitOrAssign + Clone,
+{
+    fn bitor_assign(&mut self, rhs: &Matrix<T>) {
+        if !(self.n == rhs.n && self.m == rhs.m) {
+            panic!("`Matrix::bitor_assign` needs two Matrix<T> the same sized.");
+        }
+        for i in 0..self.n * self.m {
+            self.array[i] |= rhs.array[i].clone()
+        }
+    }
+}
+
+impl<T> BitXorAssign<&Self> for Matrix<T>
+where
+    T: BitXorAssign + Clone,
+{
+    fn bitxor_assign(&mut self, rhs: &Matrix<T>) {
+        if !(self.n == rhs.n && self.m == rhs.m) {
+            panic!("`Matrix::bitxor_assign` needs two Matrix<T> the same sized.");
+        }
+        for i in 0..self.n * self.m {
+            self.array[i] ^= rhs.array[i].clone()
+        }
+    }
+}
+
+impl<T> Shl<usize> for &Matrix<T>
+where
+    T: Shl<usize, Output = T> + Clone,
+{
+    type Output = Matrix<T>;
+    fn shl(self, rhs: usize) -> Self::Output {
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: {
+                let mut v = Vec::new();
+                for i in 0..self.n * self.m {
+                    v.push(self.array[i].clone() << rhs)
+                }
+                v
+            },
+        }
+    }
+}
+
+impl<T> Shr<usize> for &Matrix<T>
+where
+    T: Shr<usize, Output = T> + Clone,
+{
+    type Output = Matrix<T>;
+    fn shr(self, rhs: usize) -> Self::Output {
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: {
+                let mut v = Vec::new();
+                for i in 0..self.n * self.m {
+                    v.push(self.array[i].clone() >> rhs)
+                }
+                v
+            },
+        }
+    }
+}
+
+impl<T> Index<usize> for Matrix<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &T {
+        if !(index < self.n * self.m) {
+            panic!(format!("index fail: {} is out of range.", index))
+        }
+        &self.array[index]
+    }
+}
+
+impl<T> IndexMut<usize> for Matrix<T> {
+    fn index_mut(&mut self, index: usize) -> &mut T {
+        if !(index < self.n * self.m) {
+            panic!(format!("index_mut fail: {} is out of range.", index));
+        }
+        &mut self.array[index]
+    }
+}
+// }
 // TEST
 #[cfg(test)]
 mod tests_matrix {
-    use crate::matrix::algebra::*;
+    use crate::matrix::Matrix;
+    use crate::matrix::*;
 
     #[test]
     fn test_matrix_new() {
