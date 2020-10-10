@@ -1,4 +1,4 @@
-mod bisection_method {
+pub mod bisection_method {
     pub use std::ops::Range;
 
     pub fn bisection_method<F>(mut range: Range<f64>, e: f64, f: F) -> f64

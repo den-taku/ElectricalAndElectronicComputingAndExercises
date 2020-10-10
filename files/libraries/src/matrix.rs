@@ -1,4 +1,4 @@
-mod algebra {
+pub mod algebra {
     pub use num_traits::Zero;
     pub use std::ops::{
         Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Index,
