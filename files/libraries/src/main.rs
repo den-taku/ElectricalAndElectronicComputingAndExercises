@@ -8,6 +8,10 @@ fn main() {
     });
     println!(
         "{}",
-        if let Ok(v) = newton_raphson_method::newton_raphson_method::newton_raphson_method(f, -1.) {v} else {0.0}
+        if let Ok(v) = newton_raphson_method::newton_raphson_method::newton_raphson_method(f, -1.) {
+            v
+        } else {
+            0.0
+        }
     );
 }
