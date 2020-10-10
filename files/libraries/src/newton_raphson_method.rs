@@ -2,8 +2,9 @@ pub mod newton_raphson_method {
     pub use std::rc::Rc;
     pub use std::result::Result;
 
-    pub fn newton_raphson_method(f: Rc<Box<dyn Fn(f64) -> f64>>, init: f64) -> Result<f64, f64> {
+    pub fn newton_raphson_method(f: Box<dyn Fn(f64) -> f64>, init: f64) -> Result<f64, f64> {
         let threshold = 0.1e-10;
+        let f = Rc::new(f);
         let f_dir = differential_f(f.clone()); // f is consumed here.
         if !f.is_converge() {
             return Err(f64::NEG_INFINITY);
