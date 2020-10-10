@@ -13,7 +13,7 @@ pub mod newton_raphson_method {
         newton_method(newton_transform(f, f_dir), init, threshold, 1, 1000000)
     }
 
-    pub fn differential_f(f: Rc<Box<dyn Fn(f64) -> f64>>) -> Rc<Box<dyn Fn(f64) -> f64>> {
+    fn differential_f(f: Rc<Box<dyn Fn(f64) -> f64>>) -> Rc<Box<dyn Fn(f64) -> f64>> {
         let dx = 0.1e-10;
         let f_ = move |x: f64| -> f64 { (f(x + dx) - f(x)) / dx };
         Rc::new(Box::new(f_))
@@ -58,9 +58,17 @@ pub mod newton_raphson_method {
 #[cfg(test)]
 mod tests_newton_raphson_method {
     use crate::newton_raphson_method::newton_raphson_method::*;
+    // #[test]
+    // fn test_newton_raphson_method_differential_f() {
+    //     let dummy_function = Rc::new(Box::new(|x: f64| -> f64 { x * x }));
+    //     differential_f(dummy_function)(3.0);
+    // }
+
     #[test]
-    fn test_newton_raphson_method_differential_f() {
-        let dummy_function = Rc::new(Box::new(|x: f64| -> f64 { x * x }));
-        differential_f(dummy_function)(3.0);
+    fn test_newton_raphson_method_newton_raphson_method() {
+        let f = Box::new(|x: f64| -> f64 {
+            x.powf(5.) - 3. * x.powf(4.) + x.powf(3.) + 5. * x.powf(2.) - 6. * x + 2.
+        });
+        assert_eq!(newton_raphson_method(f, -1.), Ok(-1.4142135623730951));
     }
 }
