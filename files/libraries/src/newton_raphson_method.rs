@@ -101,7 +101,7 @@ mod tests_newton_raphson_method {
 
     #[test]
     fn test_newton_raphson_method_newton_method_NAN() {
-        let f: Rc<dyn Fn(f64) -> f64> = Rc::new(|x: f64| -> f64 {x});
+        let f: Rc<dyn Fn(f64) -> f64> = Rc::new(|x: f64| -> f64 { x });
         assert_eq!(
             newton_method(f, f64::NAN, 0.1e-10, 1, 10000),
             Err("x^(k+1) is not a number: last value is NaN.".to_string())

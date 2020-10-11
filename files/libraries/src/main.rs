@@ -8,6 +8,7 @@ fn main() {
     let f: Rc<dyn Fn(f64) -> f64> = Rc::new(|x: f64| -> f64 {
         x.powf(5.) - 3. * x.powf(4.) + x.powf(3.) + 5. * x.powf(2.) - 6. * x + 2.
     });
+    let _ = bisection_method::bisection_method(-2f64..0f64, 1e-6, f.clone());
     // println!(
     //     "{}",
     //     if let Ok(v) = newton_raphson_method::newton_raphson_method(f.clone(), -1.) {
@@ -30,7 +31,7 @@ fn main() {
     // for i in (9972)..(10016) {
     //     println!("{}, {},", (i as f64) / 10000., f((i as f64) / 10000.));
     // }
-    if let Err(s) = newton_raphson_method::newton_raphson_method(f.clone(), 0.6) {
-        println!("{}", s);
-    };
+    // if let Err(s) = newton_raphson_method::newton_raphson_method(f.clone(), 0.6) {
+    //     println!("{}", s);
+    // };
 }
