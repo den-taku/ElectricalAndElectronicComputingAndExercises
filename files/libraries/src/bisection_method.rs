@@ -22,7 +22,7 @@ fn bisection_method_inner(
     } else {
         range.end = x_new;
     }
-    println!("{}, {}", times, (-1.414213562373 - x_new).abs()); // for plot |true value - approximate solution|
+    println!("{}, {}", times, (0. - x_new).abs()); // for plot |true value - approximate solution|
     if range.end - range.start <= e {
         x_new
     } else {
