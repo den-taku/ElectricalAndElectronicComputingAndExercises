@@ -27,7 +27,8 @@ fn main() {
     //         0.0
     //     }
     // );
-    for i in (9972)..(10016) {
-        println!("{}, {},", (i as f64) / 10000., f((i as f64) / 10000.));
-    }
+    // for i in (9972)..(10016) {
+    //     println!("{}, {},", (i as f64) / 10000., f((i as f64) / 10000.));
+    // }
+    let _ = newton_raphson_method::newton_raphson_method(f.clone(), 0.6);
 }

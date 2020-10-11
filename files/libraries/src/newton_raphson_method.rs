@@ -41,6 +41,7 @@ fn newton_method(
     if (next - guess).abs() <= threshold {
         Ok(next)
     } else {
+        println!("{}, {},", times, guess);
         newton_method(f, next, threshold, times + 1, limit)
     }
 }
