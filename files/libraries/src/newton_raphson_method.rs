@@ -7,10 +7,9 @@ pub fn newton_raphson_method(f: Rc<dyn Fn(f64) -> f64>, init: f64) -> Result<f64
     let threshold = 0.1e-10;
     // let f = Rc::new(f);
     let f_dir = differential_f(f.clone()); // f is consumed here.
-    if !f.is_convergence() {
+    if !f.is_convergence() { // TODO: check convergency in newton_method()
         return Err("function is not convergence.".to_string());
     }
-    // TODO: implement nrm using defferntail_f
     newton_method(newton_transform(f, f_dir), init, threshold, 1, 1000000)
 }
 
