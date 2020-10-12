@@ -2,10 +2,20 @@
 
 \usepackage{assets/preamble}
 \usepackage{assets/info}
+\usepackage{listings,jlisting}
+
+% \lstset{
+% language = Rust,   
+% breaklines = true,
+% numbers = left,
+% frame = tbrl,
+% tabsize = 4,
+% captionpos = t
+% }
 
 % Title
 \title{第1回 演習課題}
-\date{\today}
+\date{2020年 10月 29日}
 \author{
     \small{\myid} \\
     \myname\thanks{\mymail}
@@ -17,10 +27,79 @@
 % 実験レポート1
 % ここから
 
-\subtitle{2020/10/9}
+\subtitle{2020/10/8}
 
-\theme{実験1:タイトル}
-\section{目的}
+\theme{課題1.1}
+
+二分法およびニュートン法を用いて非線形方程式を解くプログラムを
+それぞれソースコード1、ソースコード2に示す。
+
+\ 
+
+まず二分法を用いたソースコード1について説明する。
+
+bisection\_method 関数は、引数としてrange、e、fを受け取る。
+これらはそれぞれ範囲、許容誤差、関数である。
+まず初期区間をrangeとして与えると、bisection\_methodは
+bisection\_method\_inner関数にrange、e、fを渡し、さらに
+回数としてtimesに1を、反復回数上限値としてlimitに1,000,000を与える。
+二分法は適切に初期区間を与えると必ず近似解が求まるためlimitはオプションである。
+bisection\_method\_inner関数は範囲を半分に区切り、解が存在すると思われる範囲を
+再帰的に渡してtimesを一つ進める。
+この時その範囲が許容誤差内に収まったなら、半分に区切った時の値を近似解として返す。
+ソースコード中に含まれるprintln!関数は、
+課題で反復回数と誤差のcsvファイルを作成するために
+標準出力に値を渡しているだけで求解に直接は影響しない。
+
+\ 
+
+次にニュートン法を用いたソースコード2について説明する。
+
+まず、ニュートン法で非線形方程式を解くには関数を微分する必要がある。
+関数の微分には、微分係数の定義である
+\begin{equation}
+    \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}   
+\end{equation}
+を用いて微分した関数を返すdifferential\_f関数を作成した。
+
+newton\_raphson\_method関数は次のようなアルゴリズムで方程式を解く。
+まず、関数には$f(x)$と初期近似解を与える。すると、その関数を微分し、
+\begin{equation}
+    g(x) = x - \frac{f(x)}{f'(x)}
+\end{equation}
+となる$g(x)$を計算するnewton\_transform関数に$f(x)$、$f'(x)$を渡し、
+また閾値と回数として1、反復回数上限として1,000,000とともに
+newton\_method関数に渡す。
+
+newton\_method関数では、$g(x)$を用いて近似解の候補を求め、元の$x$との
+距離が閾値よりも小さい時、その計算した値を近似解として返す。閾値よりも大きかった場合は
+計算した値を再帰的にnewton\_methodに渡す。それを繰り返すことで非線形方程式を解く。
+最初にnextの値をチェックしているのは、$g(x)$の値が想定していない値になった時の処理を
+まとめてあるだけであり、アルゴリズムに直接は影響しない。これについては後で言及する。
+
+ここでも後で値をplotするためにprintln!関数を用いて標準出力に値を渡している。
+
+
+\section{課題1.1.1}
+\begin{equation}
+    f(x) = x^5 - 3 x^4 + x^3 + 5 x^2 - 6x + 2 
+\end{equation}
+
+ここで、
+
+二分法の初期期間を[-2, 0]とし、ニュートン法の初期近似解を-1とする。
+そしてそれぞれの手法で得られた近似解と
+
+\begin{lstlisting}
+    fn main() {
+        println!("Hello, World!");
+    }
+\end{lstlisting}
+
+% \section{ソースコードの表示}
+% \begin{lstlisting}
+%     //
+% \end{lstlisting}
 \section{実験}
 \section{実験結果}
 \section{考察}
