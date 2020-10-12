@@ -1,20 +1,8 @@
-\documentclass[uplatex, dvipdfmx, 11pt,a4j, titlepage]{jsarticle}
+\documentclass[uplatex, 11pt,a4j, titlepage]{jsarticle}
 
 \usepackage{assets/preamble}
 \usepackage{assets/info}
 \usepackage{listings,jlisting}
-\usepackage[dvipdfmx]{graphicx}
-\usepackage{here}
-\usepackage{float}
-
-% \lstset{
-% language = Rust,   
-% breaklines = true,
-% numbers = left,
-% frame = tbrl,
-% tabsize = 4,
-% captionpos = t
-% }
 
 % Title
 \title{第1回 演習課題}
@@ -202,39 +190,10 @@ fn newton_method(
 それぞれの手法で得られた近似解と真値($\sqrt{2}$)との誤差の絶対値を縦軸にとった
 片対数グラフをそれぞれ図1、図2に作成し、示す。
 
+\begin{equation}
+    f(x)
+\end{equation}
 
-
-\begin{figure}[htpb]
-    \begin{center}
-        \begin{tabular}{c}
-
-            \begin{minipage}{0.33\hsize}
-                \begin{center}
-                    \includegraphics[clip, width=4.5cm]{./bisection.pdf}
-                    \hspace{1.6cm} [1]二分法の収束の速さ
-                \end{center}
-            \end{minipage}
-
-            \begin{minipage}{0.33\hsize}
-                \begin{center}
-                    \includegraphics[clip, width=4.5cm]{./bisection111.pdf}
-                    \hspace{1.6cm} [2]ニュートン法の収束の速さ
-                \end{center}
-            \end{minipage}
-            
-        \end{tabular}
-    \end{center}
-\end{figure}
-
-
-xs
-
-
-
-% \section{ソースコードの表示}
-% \begin{lstlisting}
-%     //
-% \end{lstlisting}
 \section{課題1.1.2}
 
 
