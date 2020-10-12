@@ -79,22 +79,126 @@ newton\_method関数では、$g(x)$を用いて近似解の候補を求め、元
 
 ここでも後で値をplotするためにprintln!関数を用いて標準出力に値を渡している。
 
+\ 
+
+\begin{lstlisting}[caption={bisection\_method.rs}]
+
+use std::ops::Range;
+use std::rc::Rc;
+     
+fn bisection_method(
+    mut range: Range<f64>, 
+    e: f64, 
+    f: Rc<dyn Fn(f64) -> f64>
+)-> f64 {
+    bisection_method_inner(range, e, f, 1, 1000000)
+}
+     
+fn bisection_method_inner(
+    mut range: Range<f64>,
+    e: f64,
+    f: Rc<dyn Fn(f64) -> f64>,
+    times: usize,
+    limit: usize,
+) -> f64 {
+    let x_new = (range.end + range.start) / 2.;
+    if times == limit {
+        return x_new;
+    }
+    if f(x_new) * f(range.start) >= 0. {
+        range.start = x_new;
+    } else {
+        range.end = x_new;
+    }
+    println!("{}, {}", times, (x_new - 1.414213566237).abs()); 
+    if range.end - range.start <= e {
+        x_new
+    } else {
+        bisection_method_inner(range, e, f, times + 1, limit)
+    }
+}
+
+\end{lstlisting}
+
+\begin{lstlisting}[caption={newton\_raphson\_method.rs}]
+use std::rc::Rc;
+use std::result::Result;
+         
+fn newton_raphson_method(
+    f: Rc<dyn Fn(f64) -> f64>, 
+    init: f64
+) -> Result<f64, String> {
+    let threshold = 0.1e-10;
+    let f_dir = differential_f(f.clone()); 
+    newton_method(newton_transform(f, f_dir), 
+                  init, 
+                  threshold, 
+                  1, 
+                  1000000)
+}
+        
+fn differential_f(f: Rc<dyn Fn(f64) -> f64>) 
+    -> Rc<dyn Fn(f64) -> f64> {
+    let dx = 0.1e-10;
+    let f_dir = move |x: f64| 
+                    -> f64 { (f(x + dx) - f(x)) / dx };
+    Rc::new(f_dir)
+}
+        
+fn newton_transform(
+    f: Rc<dyn Fn(f64) -> f64>,
+    f_dir: Rc<dyn Fn(f64) -> f64>,
+) -> Rc<dyn Fn(f64) -> f64> {
+    Rc::new(move |x: f64| -> f64 { x - f(x) / f_dir(x) })
+}
+        
+fn newton_method(
+    f: Rc<dyn Fn(f64) -> f64>,
+    guess: f64,
+    threshold: f64,
+    times: usize,
+    limit: usize,
+) -> Result<f64, String> {
+    let next = f(guess);
+    if next == f64::NEG_INFINITY 
+    || next == f64::INFINITY 
+    || next.is_nan() {
+        return Err(
+            format!(
+                "x^(k+1) is not a number: last value is {}.", 
+                guess
+        ));
+    }
+    if limit == times + 1 {
+        return Err(format!(
+            "solution doesn't converge: last value is {}.",
+            next
+        ));
+    }
+    if (next - guess).abs() <= threshold {
+        Ok(next)
+    } else {
+        println!("{}, {},", times, (next - 1.414213566237).abs());
+        newton_method(f, next, threshold, times + 1, limit)
+    }
+} 
+\end{lstlisting}
+
 
 \section{課題1.1.1}
 \begin{equation}
     f(x) = x^5 - 3 x^4 + x^3 + 5 x^2 - 6x + 2 
 \end{equation}
+とする。
+最初に説明した二分法およびニュートン法を用いて非線形方程式を解くプログラムを用いて課題を解く。
 
-ここで、
 
 二分法の初期期間を[-2, 0]とし、ニュートン法の初期近似解を-1とする。
-そしてそれぞれの手法で得られた近似解と
+そして反復回数を横軸に、
+それぞれの手法で得られた近似解と真値($\sqrt{2}$)との誤差の絶対値を縦軸にとった
+片対数グラフをそれぞれ図1、図2に作成し、示す。
 
-\begin{lstlisting}
-    fn main() {
-        println!("Hello, World!");
-    }
-\end{lstlisting}
+
 
 % \section{ソースコードの表示}
 % \begin{lstlisting}
