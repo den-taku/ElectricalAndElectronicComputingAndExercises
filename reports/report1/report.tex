@@ -1,8 +1,11 @@
-\documentclass[uplatex, 11pt,a4j, titlepage]{jsarticle}
+\documentclass[uplatex, dvipdfmx, 11pt,a4j, titlepage]{jsarticle}
 
 \usepackage{assets/preamble}
 \usepackage{assets/info}
 \usepackage{listings,jlisting}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{here}
+\usepackage{float}
 
 % \lstset{
 % language = Rust,   
@@ -190,7 +193,8 @@ fn newton_method(
     f(x) = x^5 - 3 x^4 + x^3 + 5 x^2 - 6x + 2 
 \end{equation}
 とする。
-最初に説明した二分法およびニュートン法を用いて非線形方程式を解くプログラムを用いて課題を解く。
+5次方程式$f(x) = 0$の解を最初に説明した二分法およびニュートン法を用いた
+プログラムを実行して解く。
 
 
 二分法の初期期間を[-2, 0]とし、ニュートン法の初期近似解を-1とする。
@@ -200,38 +204,60 @@ fn newton_method(
 
 
 
+\begin{figure}[htpb]
+    \begin{center}
+        \begin{tabular}{c}
+
+            \begin{minipage}{0.33\hsize}
+                \begin{center}
+                    \includegraphics[clip, width=4.5cm]{./bisection.pdf}
+                    \hspace{1.6cm} [1]二分法の収束の速さ
+                \end{center}
+            \end{minipage}
+
+            \begin{minipage}{0.33\hsize}
+                \begin{center}
+                    \includegraphics[clip, width=4.5cm]{./bisection111.pdf}
+                    \hspace{1.6cm} [2]ニュートン法の収束の速さ
+                \end{center}
+            \end{minipage}
+            
+        \end{tabular}
+    \end{center}
+\end{figure}
+
+
+xs
+
+
+
 % \section{ソースコードの表示}
 % \begin{lstlisting}
 %     //
 % \end{lstlisting}
-\section{実験}
-\section{実験結果}
-\section{考察}
-\section{課題}
+\section{課題1.1.2}
+
 
 % 実験レポート1
 % ここまで
 
 \newpage
-\resetcounters
+% \resetcounters
 
 % 実験レポート2
 % ここから
 
 \subtitle{2020/10/*}
 
-\theme{実験2:タイトル}
-\section{目的}
-\section{実験}
-\section{実験結果}
-\section{考察}
-\section{課題}
-
+\theme{課題1.2}
+\section{課題1.2.1}
+\section{課題1.2.2}
+\section{課題1.2.3}
 % 実験レポート2
 % ここまで
 
 \newpage
-\resetcounters
+% \resetcounters
 
 
 % 実験レポート3
@@ -239,12 +265,9 @@ fn newton_method(
 
 \subtitle{2019/*/*}
 
-\theme{実験3:タイトル}
-\section{目的}
-\section{実験}
-\section{実験結果}
-\section{考察}
-\section{課題}
+\theme{課題1.3}
+\section{課題1.3.1}
+\section{課題1.3.2}
 
 % 実験レポート3
 % ここまで
