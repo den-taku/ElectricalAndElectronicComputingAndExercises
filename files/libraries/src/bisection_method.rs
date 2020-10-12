@@ -11,10 +11,10 @@ fn bisection_method_inner(
     e: f64,
     f: Rc<dyn Fn(f64) -> f64>,
     times: usize,
-    limits: usize,
+    limit: usize,
 ) -> f64 {
     let x_new = (range.end + range.start) / 2.;
-    if times == limits {
+    if times == limit {
         return x_new;
     }
     if f(x_new) * f(range.start) >= 0. {
@@ -26,7 +26,7 @@ fn bisection_method_inner(
     if range.end - range.start <= e {
         x_new
     } else {
-        bisection_method_inner(range, e, f, times + 1, limits)
+        bisection_method_inner(range, e, f, times + 1, limit)
     }
 }
 // }
