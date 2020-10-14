@@ -2,7 +2,7 @@
 pub use std::ops::Range;
 pub use std::rc::Rc;
 
-pub fn bisection_method(mut range: Range<f64>, e: f64, f: Rc<dyn Fn(f64) -> f64>) -> f64 {
+pub fn bisection_method(range: Range<f64>, e: f64, f: Rc<dyn Fn(f64) -> f64>) -> f64 {
     bisection_method_inner(range, e, f, 1, 1000000)
 }
 

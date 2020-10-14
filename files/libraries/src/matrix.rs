@@ -94,7 +94,7 @@ where
     }
 }
 
-impl<T> Add for &Matrix<T>
+impl<T> Add<Self> for &Matrix<T>
 where
     T: Add<Output = T> + Clone,
 {
@@ -110,6 +110,26 @@ where
                 let mut v = Vec::new();
                 for i in 0..self.n * self.m {
                     v.push(self.array[i].clone() + rhs.array[i].clone())
+                }
+                v
+            },
+        }
+    }
+}
+
+impl<T> Add<T> for &Matrix<T>
+where
+    T: Add<Output = T> + Clone,
+{
+    type Output = Matrix<T>;
+    fn add(self, rhs: T) -> Self::Output {
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: {
+                let mut v = Vec::new();
+                for i in 0..self.n * self.m {
+                    v.push(self.array[i].clone() + rhs.clone());
                 }
                 v
             },
