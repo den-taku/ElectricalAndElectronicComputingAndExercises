@@ -2,7 +2,7 @@
 pub use num_traits::Zero;
 pub use std::ops::{
     Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Index,
-    IndexMut, Neg, Not, Shl, Shr, Sub, SubAssign,
+    IndexMut, Mul, Neg, Not, Shl, Shr, Sub, SubAssign,
 };
 
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
@@ -133,6 +133,38 @@ where
                 let mut v = Vec::new();
                 for i in 0..self.n * self.m {
                     v.push(self.array[i].clone() + (-rhs.array[i].clone()))
+                }
+                v
+            },
+        }
+    }
+}
+
+impl<T> Mul for &Matrix<T>
+where
+    T: Mul<Output = T> + Add<Output = T> + Clone + Zero,
+{
+    type Output = Matrix<T>;
+    fn mul(self, rhs: Self) -> Self::Output {
+        // TODO: use Strassen algorithm
+        if !(self.m == rhs.n) {
+            panic!("`Matrix::mul` needs n * m Matrix<T> and m * k Matrix<T>.")
+        }
+        Matrix {
+            n: self.n,
+            m: rhs.m,
+            array: {
+                let mut v = Vec::<T>::new();
+                for i in 0..self.n {
+                    for j in 0..rhs.m {
+                        let mut sum = T::zero();
+                        for k in 0..self.m {
+                            sum = sum
+                                + self.array[i * self.m + k].clone()
+                                    * rhs.array[j + k * rhs.m].clone()
+                        }
+                        v.push(sum)
+                    }
                 }
                 v
             },
@@ -837,6 +869,11 @@ mod tests_matrix {
             m: 3,
             array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
         };
+    }
+
+    #[test]
+    fn test_matrix_mul(){
+        //
     }
 
     #[test]
