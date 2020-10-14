@@ -2,7 +2,7 @@
 pub use num_traits::Zero;
 pub use std::ops::{
     Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Index,
-    IndexMut, Mul, Neg, Not, Shl, Shr, Sub, SubAssign,
+    IndexMut, Mul, MulAssign, Neg, Not, Shl, Shr, Sub, SubAssign,
 };
 
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
@@ -266,6 +266,30 @@ where
         for i in 0..self.n * self.m {
             self.array[i] -= rhs.array[i].clone()
         }
+    }
+}
+
+impl<T> MulAssign<&Self> for Matrix<T>
+where
+    T: Mul<Output = T> + Add<Output = T> + Clone + Zero,
+{
+    fn mul_assign(&mut self, rhs: &Matrix<T>) {
+        if !(self.m == rhs.n) {
+            panic!("`Matrix::mul_assign` needs n * m Matrix<T> and m * k Matrix<T>.");
+        }
+        let mut v = Vec::<T>::new();
+        for i in 0..self.n {
+            for j in 0..rhs.m {
+                let mut sum = T::zero();
+                for k in 0..self.m {
+                    sum =
+                        sum + self.array[i * self.m + k].clone() * rhs.array[j + k * rhs.m].clone()
+                }
+                v.push(sum)
+            }
+        }
+        self.m = rhs.m;
+        self.array = v;
     }
 }
 
@@ -940,7 +964,87 @@ mod tests_matrix {
             n: 3,
             m: 4,
             array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-        }; 
+        };
+    }
+
+    #[test]
+    fn test_matrix_mulassign() {
+        assert_eq!(
+            {
+                let mut dummy_matrix = Matrix {
+                    n: 3,
+                    m: 4,
+                    array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                };
+                dummy_matrix *= &Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                };
+                dummy_matrix
+            },
+            Matrix {
+                n: 3,
+                m: 3,
+                array: vec![
+                    1 * 1 + 2 * 4 + 3 * 7 + 4 * 10,
+                    1 * 2 + 2 * 5 + 3 * 8 + 4 * 11,
+                    1 * 3 + 2 * 6 + 3 * 9 + 4 * 12,
+                    5 * 1 + 6 * 4 + 7 * 7 + 8 * 10,
+                    5 * 2 + 6 * 5 + 7 * 8 + 8 * 11,
+                    5 * 3 + 6 * 6 + 7 * 9 + 8 * 12,
+                    9 * 1 + 10 * 4 + 11 * 7 + 12 * 10,
+                    9 * 2 + 10 * 5 + 11 * 8 + 12 * 11,
+                    9 * 3 + 10 * 6 + 11 * 9 + 12 * 12,
+                ]
+            }
+        );
+
+        assert_eq!(
+            {
+                let mut dummy_matrix = Matrix {
+                    n: 3,
+                    m: 4,
+                    array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                };
+                dummy_matrix.mul_assign(&Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                });
+                dummy_matrix
+            },
+            Matrix {
+                n: 3,
+                m: 3,
+                array: vec![
+                    1.mul(1) + 2.mul(4) + 3.mul(7) + 4.mul(10),
+                    1.mul(2) + 2.mul(5) + 3.mul(8) + 4.mul(11),
+                    1.mul(3) + 2.mul(6) + 3.mul(9) + 4.mul(12),
+                    5.mul(1) + 6.mul(4) + 7.mul(7) + 8.mul(10),
+                    5.mul(2) + 6.mul(5) + 7.mul(8) + 8.mul(11),
+                    5.mul(3) + 6.mul(6) + 7.mul(9) + 8.mul(12),
+                    9.mul(1) + 10.mul(4) + 11.mul(7) + 12.mul(10),
+                    9.mul(2) + 10.mul(5) + 11.mul(8) + 12.mul(11),
+                    9.mul(3) + 10.mul(6) + 11.mul(9) + 12.mul(12),
+                ]
+            }
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "`Matrix::mul_assign` needs n * m Matrix<T> and m * k Matrix<T>.")]
+    fn test_matrix_mulassgin_panic() {
+        let mut dummy_matrix = Matrix {
+            n: 3,
+            m: 4,
+            array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        };
+        dummy_matrix *= &Matrix {
+            n: 3,
+            m: 4,
+            array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        };
     }
 
     #[test]
