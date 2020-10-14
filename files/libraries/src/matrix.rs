@@ -393,7 +393,6 @@ impl<T> IndexMut<usize> for Matrix<T> {
         &mut self.array[index]
     }
 }
-// }
 // TEST
 #[cfg(test)]
 mod tests_matrix {
