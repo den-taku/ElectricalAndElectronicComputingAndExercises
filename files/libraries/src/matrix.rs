@@ -930,6 +930,20 @@ mod tests_matrix {
     }
 
     #[test]
+    #[should_panic(expected = "`Matrix::mul` needs n * m Matrix<T> and m * k Matrix<T>.")]
+    fn test_matrix_mul_panic() {
+        let _dummy_matrix = &Matrix {
+            n: 3,
+            m: 4,
+            array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        } * &Matrix {
+            n: 3,
+            m: 4,
+            array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        }; 
+    }
+
+    #[test]
     fn test_matrix_bitand() {
         assert_eq!(
             &Matrix {
