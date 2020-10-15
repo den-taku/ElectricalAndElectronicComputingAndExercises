@@ -2,7 +2,7 @@ mod bisection_method;
 mod matrix;
 mod newton_raphson_method;
 
-use std::rc::Rc;
+// use std::rc::Rc;
 
 fn main() {
     // let f: Rc<dyn Fn(f64) -> f64> = Rc::new(|x: f64| -> f64 {

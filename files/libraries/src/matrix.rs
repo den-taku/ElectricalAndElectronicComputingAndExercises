@@ -4,6 +4,7 @@ pub use std::ops::{
     Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Index,
     IndexMut, Mul, MulAssign, Neg, Not, Shl, Shr, Sub, SubAssign,
 };
+pub use std::rc::Rc;
 
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
 pub struct Matrix<T> {
@@ -62,6 +63,61 @@ where
                 }
                 v
             },
+        }
+    }
+
+    pub fn transpose(&mut self) {
+        let mut new_array = Vec::new();
+        for j in 0..self.m {
+            for i in 0..self.n {
+                new_array.push(self.array[i * self.m + j].clone());
+            }
+        }
+        self.array = new_array;
+        let tmp = self.n;
+        self.n = self.m;
+        self.m = tmp;
+    }
+
+    pub fn map(&mut self, f: Rc<dyn Fn(T) -> T>) -> Self {
+        for i in 0..self.n * self.m {
+            self.array[i] = f(self.array[i].clone())
+        }
+        self.clone()
+    }
+
+    pub fn map_new<R>(&self, f: Rc<dyn Fn(T) -> R>) -> Matrix<R> {
+        let mut mapped_array = Vec::new();
+        for i in 0..self.n * self.m {
+            mapped_array.push(f(self.array[i].clone()))
+        }
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: mapped_array,
+        }
+    }
+}
+
+impl<R, T> Matrix<Rc<dyn Fn(R) -> T>>
+where
+    R: Clone,
+{
+    pub fn applicate(&self, x: Vec<R>) -> Matrix<T> {
+        if !(self.n * self.m == x.len()) {
+            panic!(format!(
+                "Matrix<R>::applicate needs {} elements",
+                self.n * self.m
+            ));
+        }
+        let mut mapped_array = Vec::new();
+        for i in 0..self.n * self.m {
+            mapped_array.push(self.array[i](x[i].clone()))
+        }
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: mapped_array,
         }
     }
 }
@@ -517,6 +573,99 @@ mod tests_matrix {
     }
 
     #[test]
+    fn test_matrix_transpose() {
+        let mut dummy_matrix = Matrix {
+            n: 3,
+            m: 4,
+            array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        };
+        dummy_matrix.transpose();
+        assert_eq!(
+            dummy_matrix,
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![1, 5, 9, 2, 6, 10, 3, 7, 11, 4, 8, 12]
+            }
+        );
+        dummy_matrix.transpose();
+        assert_eq!(
+            dummy_matrix,
+            Matrix {
+                n: 3,
+                m: 4,
+                array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            }
+        )
+    }
+
+    #[test]
+    fn test_matrix_map() {
+        let mut dummy_matrix = Matrix {
+            n: 3,
+            m: 4,
+            array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        };
+        let f: Rc<dyn Fn(i32) -> i32> = Rc::new(|x| x * x);
+        assert_eq!(
+            dummy_matrix.map(f),
+            Matrix {
+                n: 3,
+                m: 4,
+                array: vec![1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144]
+            }
+        );
+    }
+
+    #[test]
+    fn test_matrix_map_new() {
+        let dummy_matrix = Matrix {
+            n: 3,
+            m: 4,
+            array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        };
+        let f: Rc<fn(i32) -> f32> = Rc::new(|x| x as f32);
+        assert_eq!(
+            dummy_matrix.map_new(f),
+            Matrix {
+                n: 3,
+                m: 4,
+                array: vec![1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12.]
+            }
+        )
+    }
+
+    #[test]
+    fn test_matrix_applicate() {
+        let f: Rc<dyn Fn(i32) -> f32> = Rc::new(|x| x as f32);
+        let matrix = Matrix {
+            n: 3,
+            m: 4,
+            array: vec![f.clone(); 3 * 4],
+        };
+        assert_eq!(
+            matrix.applicate(vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]),
+            Matrix {
+                n: 3,
+                m: 4,
+                array: vec![1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12.]
+            }
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "Matrix<R>::applicate needs 12 elements")]
+    fn test_matrix_applicate_panic() {
+        let f: Rc<dyn Fn(i32) -> f32> = Rc::new(|x| x as f32);
+        let _ = Matrix {
+            n: 3,
+            m: 4,
+            array: vec![f.clone(); 12],
+        }
+        .applicate(vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    }
+
+    #[test]
     fn test_matrix_neg() {
         assert_eq!(
             -Matrix {
@@ -557,6 +706,7 @@ mod tests_matrix {
             }
         );
     }
+
     #[test]
     fn test_matrix_not() {
         assert_eq!(
