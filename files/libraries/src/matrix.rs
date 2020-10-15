@@ -451,6 +451,28 @@ where
     }
 }
 
+impl<T> MulAssign<T> for Matrix<T>
+where
+    T: MulAssign<T> + Clone,
+{
+    fn mul_assign(&mut self, rhs: T) {
+        for i in 0..self.n * self.m {
+            self.array[i] *= rhs.clone()
+        }
+    }
+}
+
+impl<T> DivAssign<T> for Matrix<T>
+where
+    T: DivAssign<T> + Clone,
+{
+    fn div_assign(&mut self, rhs: T) {
+        for i in 0..self.n * self.m {
+            self.array[i] /= rhs.clone()
+        }
+    }
+}
+
 impl<T> BitAndAssign<&Self> for Matrix<T>
 where
     T: BitAndAssign + Clone,
@@ -1500,7 +1522,7 @@ mod tests_matrix {
 
     #[test]
     #[should_panic(expected = "`Matrix::mul` needs n * m Matrix<T> and m * k Matrix<T>.")]
-    fn test_matrix_mul_panic() {
+    fn test_matrix_mul_self_panic() {
         let _dummy_matrix = &Matrix {
             n: 3,
             m: 4,
@@ -1513,7 +1535,7 @@ mod tests_matrix {
     }
 
     #[test]
-    fn test_matrix_mulassign() {
+    fn test_matrix_mulassign_self() {
         assert_eq!(
             {
                 let mut dummy_matrix = Matrix {
@@ -1578,8 +1600,71 @@ mod tests_matrix {
     }
 
     #[test]
+    fn test_matrix_mulassign_t() {
+        assert_eq!(
+            {
+                let mut dummy_matrix = Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                };
+                dummy_matrix *= 8;
+                dummy_matrix
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1 * 8,
+                    2 * 8,
+                    3 * 8,
+                    4 * 8,
+                    5 * 8,
+                    6 * 8,
+                    7 * 8,
+                    8 * 8,
+                    9 * 8,
+                    10 * 8,
+                    11 * 8,
+                    12 * 8
+                ]
+            }
+        );
+
+        assert_eq!(
+            {
+                let mut dummy_matrix = Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                };
+                dummy_matrix.mul_assign(8);
+                dummy_matrix
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1.mul(8),
+                    2.mul(8),
+                    3.mul(8),
+                    4.mul(8),
+                    5.mul(8),
+                    6.mul(8),
+                    7.mul(8),
+                    8.mul(8),
+                    9.mul(8),
+                    10.mul(8),
+                    11.mul(8),
+                    12.mul(8)
+                ]
+            }
+        );
+    }
+
+    #[test]
     #[should_panic(expected = "`Matrix::mul_assign` needs n * m Matrix<T> and m * k Matrix<T>.")]
-    fn test_matrix_mulassgin_panic() {
+    fn test_matrix_mulassgin_self_panic() {
         let mut dummy_matrix = Matrix {
             n: 3,
             m: 4,
@@ -1627,6 +1712,69 @@ mod tests_matrix {
                 array: vec![1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12.]
             }
             .div(8.)),
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1.0.div(8.),
+                    2.0.div(8.),
+                    3.0.div(8.),
+                    4.0.div(8.),
+                    5.0.div(8.),
+                    6.0.div(8.),
+                    7.0.div(8.),
+                    8.0.div(8.),
+                    9.0.div(8.),
+                    10.0.div(8.),
+                    11.0.div(8.),
+                    12.0.div(8.)
+                ]
+            }
+        );
+    }
+
+    #[test]
+    fn test_matrix_divassign_t() {
+        assert_eq!(
+            {
+                let mut dummy_matrix = Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12.],
+                };
+                dummy_matrix /= 8.;
+                dummy_matrix
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1. / 8.,
+                    2. / 8.,
+                    3. / 8.,
+                    4. / 8.,
+                    5. / 8.,
+                    6. / 8.,
+                    7. / 8.,
+                    8. / 8.,
+                    9. / 8.,
+                    10. / 8.,
+                    11. / 8.,
+                    12. / 8.
+                ]
+            }
+        );
+
+        assert_eq!(
+            {
+                let mut dummy_matrix = Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12.],
+                };
+                dummy_matrix.div_assign(8.);
+                dummy_matrix
+            },
             Matrix {
                 n: 4,
                 m: 3,
