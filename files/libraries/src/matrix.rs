@@ -137,7 +137,7 @@ where
     }
 }
 
-impl<T> Sub for &Matrix<T>
+impl<T> Sub<Self> for &Matrix<T>
 where
     T: Add<Output = T> + Neg<Output = T> + Clone,
 {
@@ -153,6 +153,26 @@ where
                 let mut v = Vec::new();
                 for i in 0..self.n * self.m {
                     v.push(self.array[i].clone() + (-rhs.array[i].clone()))
+                }
+                v
+            },
+        }
+    }
+}
+
+impl<T> Sub<T> for &Matrix<T>
+where
+    T: Sub<Output = T> + Clone,
+{
+    type Output = Matrix<T>;
+    fn sub(self, rhs: T) -> Self::Output {
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: {
+                let mut v = Vec::new();
+                for i in 0..self.n * self.m {
+                    v.push(self.array[i].clone() - rhs.clone());
                 }
                 v
             },
@@ -587,7 +607,7 @@ mod tests_matrix {
     }
 
     #[test]
-    fn test_matrix_add() {
+    fn test_matrix_add_self() {
         assert_eq!(
             &Matrix {
                 n: 4,
@@ -651,8 +671,64 @@ mod tests_matrix {
     }
 
     #[test]
+    fn test_matrix_add_t() {
+        assert_eq!(
+            &Matrix {
+                n: 4,
+                m: 3,
+                array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            } + 8,
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1 + 8,
+                    2 + 8,
+                    3 + 8,
+                    4 + 8,
+                    5 + 8,
+                    6 + 8,
+                    7 + 8,
+                    8 + 8,
+                    9 + 8,
+                    10 + 8,
+                    11 + 8,
+                    12 + 8
+                ]
+            }
+        );
+
+        assert_eq!(
+            *(&Matrix {
+                n: 4,
+                m: 3,
+                array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            }
+            .add(8)),
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1.add(8),
+                    2.add(8),
+                    3.add(8),
+                    4.add(8),
+                    5.add(8),
+                    6.add(8),
+                    7.add(8),
+                    8.add(8),
+                    9.add(8),
+                    10.add(8),
+                    11.add(8),
+                    12.add(8)
+                ]
+            }
+        );
+    }
+
+    #[test]
     #[should_panic(expected = "`Matrix::add` needs two Matrix<T> the same sized.")]
-    fn test_matrix_add_panic() {
+    fn test_matrix_add_self_panic() {
         let _dummy_matrix = &Matrix {
             n: 3,
             m: 4,
@@ -751,7 +827,7 @@ mod tests_matrix {
     }
 
     #[test]
-    fn test_matrix_sub() {
+    fn test_matrix_sub_self() {
         assert_eq!(
             &Matrix {
                 n: 4,
@@ -815,8 +891,64 @@ mod tests_matrix {
     }
 
     #[test]
+    fn test_matrix_sub_t() {
+        assert_eq!(
+            &Matrix {
+                n: 4,
+                m: 3,
+                array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            } - 8,
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1 - 8,
+                    2 - 8,
+                    3 - 8,
+                    4 - 8,
+                    5 - 8,
+                    6 - 8,
+                    7 - 8,
+                    8 - 8,
+                    9 - 8,
+                    10 - 8,
+                    11 - 8,
+                    12 - 8
+                ]
+            }
+        );
+
+        assert_eq!(
+            *(&Matrix {
+                n: 4,
+                m: 3,
+                array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            }
+            .sub(8)),
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1.sub(8),
+                    2.sub(8),
+                    3.sub(8),
+                    4.sub(8),
+                    5.sub(8),
+                    6.sub(8),
+                    7.sub(8),
+                    8.sub(8),
+                    9.sub(8),
+                    10.sub(8),
+                    11.sub(8),
+                    12.sub(8)
+                ]
+            }
+        );
+    }
+
+    #[test]
     #[should_panic(expected = "`Matrix::sub` needs two Matrix<T> the same sized.")]
-    fn test_matrix_sub_panic() {
+    fn test_matrix_sub_self_panic() {
         let _dummy_matrix = &Matrix {
             n: 3,
             m: 4,
