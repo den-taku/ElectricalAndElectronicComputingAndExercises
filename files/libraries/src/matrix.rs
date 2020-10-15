@@ -236,7 +236,7 @@ where
     }
 }
 
-impl<T> Mul for &Matrix<T>
+impl<T> Mul<Self> for &Matrix<T>
 where
     T: Mul<Output = T> + Add<Output = T> + Clone + Zero,
 {
@@ -261,6 +261,26 @@ where
                         }
                         v.push(sum)
                     }
+                }
+                v
+            },
+        }
+    }
+}
+
+impl<T> Mul<T> for &Matrix<T>
+where
+    T: Mul<Output = T> + Clone,
+{
+    type Output = Matrix<T>;
+    fn mul(self, rhs: T) -> Self::Output {
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: {
+                let mut v = Vec::new();
+                for i in 0..self.n * self.m {
+                    v.push(self.array[i].clone() * rhs.clone())
                 }
                 v
             },
@@ -1197,7 +1217,7 @@ mod tests_matrix {
     }
 
     #[test]
-    fn test_matrix_mul() {
+    fn test_matrix_mul_self() {
         assert_eq!(
             &Matrix {
                 n: 3,
@@ -1249,6 +1269,62 @@ mod tests_matrix {
                     9.mul(1) + 10.mul(4) + 11.mul(7) + 12.mul(10),
                     9.mul(2) + 10.mul(5) + 11.mul(8) + 12.mul(11),
                     9.mul(3) + 10.mul(6) + 11.mul(9) + 12.mul(12),
+                ]
+            }
+        );
+    }
+
+    #[test]
+    fn test_matrix_mul_t() {
+        assert_eq!(
+            &Matrix {
+                n: 4,
+                m: 3,
+                array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            } * 8,
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1 * 8,
+                    2 * 8,
+                    3 * 8,
+                    4 * 8,
+                    5 * 8,
+                    6 * 8,
+                    7 * 8,
+                    8 * 8,
+                    9 * 8,
+                    10 * 8,
+                    11 * 8,
+                    12 * 8
+                ]
+            }
+        );
+
+        assert_eq!(
+            *(&Matrix {
+                n: 4,
+                m: 3,
+                array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            }
+            .mul(8)),
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1.mul(8),
+                    2.mul(8),
+                    3.mul(8),
+                    4.mul(8),
+                    5.mul(8),
+                    6.mul(8),
+                    7.mul(8),
+                    8.mul(8),
+                    9.mul(8),
+                    10.mul(8),
+                    11.mul(8),
+                    12.mul(8)
                 ]
             }
         );
