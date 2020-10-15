@@ -2,7 +2,7 @@
 pub use num_traits::Zero;
 pub use std::ops::{
     Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Index,
-    IndexMut, Mul, MulAssign, Neg, Not, Shl, Shr, Sub, SubAssign,
+    IndexMut, Mul, MulAssign, Neg, Not, Shl, Shr, Sub, SubAssign, Div, DivAssign
 };
 pub use std::rc::Rc;
 
@@ -281,6 +281,26 @@ where
                 let mut v = Vec::new();
                 for i in 0..self.n * self.m {
                     v.push(self.array[i].clone() * rhs.clone())
+                }
+                v
+            },
+        }
+    }
+}
+
+impl<T> Div<T> for &Matrix<T>
+where
+    T: Div<Output = T> + Clone,
+{
+    type Output = Matrix<T>;
+    fn div(self, rhs: T) -> Self::Output {
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: {
+                let mut v = Vec::new();
+                for i in 0..self.n * self.m {
+                    v.push(self.array[i].clone() / rhs.clone())
                 }
                 v
             },
@@ -1422,6 +1442,62 @@ mod tests_matrix {
             m: 4,
             array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
         };
+    }
+
+    #[test]
+    fn test_matrix_div_t() {
+        assert_eq!(
+            &Matrix {
+                n: 4,
+                m: 3,
+                array: vec![1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12.]
+            } / 8.,
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1. / 8.,
+                    2. / 8.,
+                    3. / 8.,
+                    4. / 8.,
+                    5. / 8.,
+                    6. / 8.,
+                    7. / 8.,
+                    8. / 8.,
+                    9. / 8.,
+                    10. / 8.,
+                    11. / 8.,
+                    12. / 8.
+                ]
+            }
+        );
+
+        assert_eq!(
+            *(&Matrix {
+                n: 4,
+                m: 3,
+                array: vec![1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12.]
+            }
+            .div(8.)),
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1.0.div(8.),
+                    2.0.div(8.),
+                    3.0.div(8.),
+                    4.0.div(8.),
+                    5.0.div(8.),
+                    6.0.div(8.),
+                    7.0.div(8.),
+                    8.0.div(8.),
+                    9.0.div(8.),
+                    10.0.div(8.),
+                    11.0.div(8.),
+                    12.0.div(8.)
+                ]
+            }
+        );
     }
 
     #[test]
