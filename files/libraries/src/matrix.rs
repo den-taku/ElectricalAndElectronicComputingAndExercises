@@ -1,8 +1,8 @@
 // pub mod algebra {
 pub use num_traits::Zero;
 pub use std::ops::{
-    Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Index,
-    IndexMut, Mul, MulAssign, Neg, Not, Shl, Shr, Sub, SubAssign, Div, DivAssign
+    Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
+    Index, IndexMut, Mul, MulAssign, Neg, Not, Shl, Shr, Sub, SubAssign,
 };
 pub use std::rc::Rc;
 
@@ -387,6 +387,17 @@ where
         }
         for i in 0..self.n * self.m {
             self.array[i] += rhs.array[i].clone()
+        }
+    }
+}
+
+impl<T> AddAssign<T> for Matrix<T>
+where
+    T: AddAssign + Clone,
+{
+    fn add_assign(&mut self, rhs: T) {
+        for i in 0..self.n * self.m {
+            self.array[i] += rhs.clone()
         }
     }
 }
@@ -931,7 +942,7 @@ mod tests_matrix {
     }
 
     #[test]
-    fn test_matrix_addassign() {
+    fn test_matrix_addassign_self() {
         assert_eq!(
             {
                 let mut dummy_matrix = Matrix {
@@ -1002,8 +1013,71 @@ mod tests_matrix {
     }
 
     #[test]
+    fn test_matrix_addassign_t() {
+        assert_eq!(
+            {
+                let mut dummy_matrix = Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                };
+                dummy_matrix += 8;
+                dummy_matrix
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1 + 8,
+                    2 + 8,
+                    3 + 8,
+                    4 + 8,
+                    5 + 8,
+                    6 + 8,
+                    7 + 8,
+                    8 + 8,
+                    9 + 8,
+                    10 + 8,
+                    11 + 8,
+                    12 + 8
+                ]
+            }
+        );
+
+        assert_eq!(
+            {
+                let mut dummy_matrix = Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                };
+                dummy_matrix.add_assign(8);
+                dummy_matrix
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1.add(8),
+                    2.add(8),
+                    3.add(8),
+                    4.add(8),
+                    5.add(8),
+                    6.add(8),
+                    7.add(8),
+                    8.add(8),
+                    9.add(8),
+                    10.add(8),
+                    11.add(8),
+                    12.add(8)
+                ]
+            }
+        );
+    }
+
+    #[test]
     #[should_panic(expected = "`Matrix::add_assign` needs two Matrix<T> the same sized.")]
-    fn test_matrix_addassign_panic() {
+    fn test_matrix_addassign_self_panic() {
         let mut dummy_matrix = Matrix {
             n: 3,
             m: 4,
