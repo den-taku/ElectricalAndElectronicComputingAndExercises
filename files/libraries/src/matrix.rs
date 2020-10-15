@@ -2,7 +2,7 @@
 pub use num_traits::Zero;
 pub use std::ops::{
     Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
-    Index, IndexMut, Mul, MulAssign, Neg, Not, Shl, Shr, Sub, SubAssign,
+    Index, IndexMut, Mul, MulAssign, Neg, Not, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
 };
 pub use std::rc::Rc;
 
