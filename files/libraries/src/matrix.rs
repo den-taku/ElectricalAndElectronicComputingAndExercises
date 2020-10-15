@@ -416,6 +416,17 @@ where
     }
 }
 
+impl<T> SubAssign<T> for Matrix<T>
+where
+    T: SubAssign + Clone,
+{
+    fn sub_assign(&mut self, rhs: T) {
+        for i in 0..self.n * self.m {
+            self.array[i] -= rhs.clone()
+        }
+    }
+}
+
 impl<T> MulAssign<&Self> for Matrix<T>
 where
     T: Mul<Output = T> + Add<Output = T> + Clone + Zero,
@@ -1225,7 +1236,7 @@ mod tests_matrix {
     }
 
     #[test]
-    fn test_matrix_subassign() {
+    fn test_matrix_subassign_self() {
         assert_eq!(
             {
                 let mut dummy_matrix = Matrix {
@@ -1296,8 +1307,71 @@ mod tests_matrix {
     }
 
     #[test]
+    fn test_matrix_subassign_t() {
+        assert_eq!(
+            {
+                let mut dummy_matrix = Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                };
+                dummy_matrix -= 8;
+                dummy_matrix
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1 - 8,
+                    2 - 8,
+                    3 - 8,
+                    4 - 8,
+                    5 - 8,
+                    6 - 8,
+                    7 - 8,
+                    8 - 8,
+                    9 - 8,
+                    10 - 8,
+                    11 - 8,
+                    12 - 8
+                ]
+            }
+        );
+
+        assert_eq!(
+            {
+                let mut dummy_matrix = Matrix {
+                    n: 4,
+                    m: 3,
+                    array: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                };
+                dummy_matrix.sub_assign(8);
+                dummy_matrix
+            },
+            Matrix {
+                n: 4,
+                m: 3,
+                array: vec![
+                    1.sub(8),
+                    2.sub(8),
+                    3.sub(8),
+                    4.sub(8),
+                    5.sub(8),
+                    6.sub(8),
+                    7.sub(8),
+                    8.sub(8),
+                    9.sub(8),
+                    10.sub(8),
+                    11.sub(8),
+                    12.sub(8)
+                ]
+            }
+        );
+    }
+
+    #[test]
     #[should_panic(expected = "`Matrix::sub_assign` needs two Matrix<T> the same sized.")]
-    fn test_matrix_subassign_panic() {
+    fn test_matrix_subassign_self_panic() {
         let mut dummy_matrix = Matrix {
             n: 3,
             m: 4,
