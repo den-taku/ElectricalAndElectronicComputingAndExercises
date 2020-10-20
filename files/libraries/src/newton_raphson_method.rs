@@ -20,9 +20,12 @@ fn differential_f(f: Rc<dyn Fn(f64) -> f64>) -> Rc<dyn Fn(f64) -> f64> {
     Rc::new(f_dir)
 }
 
-unsafe fn partial_derivative(f: Rc<dyn Fn(Vec<f64>) -> f64>, i: usize) -> Rc<dyn Fn(Vec<f64>) -> f64> {
+unsafe fn partial_derivative(
+    f: Rc<dyn Fn(Vec<f64>) -> f64>,
+    i: usize,
+) -> Rc<dyn Fn(Vec<f64>) -> f64> {
     let dx = 0.1e-10;
-    let f_der = move |v: Vec::<f64>| -> f64 {
+    let f_der = move |v: Vec<f64>| -> f64 {
         let mut v_dx = v.clone();
         v_dx[i] += dx;
         (f(v_dx) - f(v)) / dx
