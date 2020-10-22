@@ -1,5 +1,7 @@
+#![allow(dead_code)]
+
 // pub mod algebra {
-pub use num_traits::Zero;
+pub use num_traits::{Float, FromPrimitive, ToPrimitive, Zero};
 pub use std::ops::{
     Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
     Index, IndexMut, Mul, MulAssign, Neg, Not, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
@@ -15,7 +17,7 @@ pub struct Matrix<T> {
 
 impl<T> Matrix<T>
 where
-    T: Zero + Clone,
+    T: Zero + Clone + ToPrimitive,
 {
     pub fn new(n: usize, m: usize) -> Self {
         Matrix {
@@ -96,6 +98,20 @@ where
             m: self.m,
             array: mapped_array,
         }
+    }
+
+    pub fn norm2<F>(&self) -> F
+    where
+        F: Float + Zero + FromPrimitive + Add<Output = F>,
+    {
+        let mut size = F::zero();
+        for i in 0..self.n * self.m {
+            size = size.clone()
+                + F::from(self.array[i].clone())
+                    .unwrap()
+                    .powf(F::from_f32(2.0).unwrap())
+        }
+        size.sqrt()
     }
 }
 
@@ -747,6 +763,19 @@ mod tests_matrix {
             array: vec![f.clone(); 12],
         }
         .applicate(vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    }
+
+    #[test]
+    fn test_matrix_norm2() {
+        assert_eq!(
+            Matrix {
+                n: 1,
+                m: 2,
+                array: vec![3.0, 4.0]
+            }
+            .norm2::<f32>(),
+            5.0
+        )
     }
 
     #[test]

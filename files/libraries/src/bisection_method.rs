@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 // pub mod bisection_method {
 pub use std::ops::Range;
 pub use std::rc::Rc;

@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 // pub mod newton_raphson_method {
 pub use std::rc::Rc;
 pub use std::result::Result;
@@ -95,7 +97,7 @@ mod tests_newton_raphson_method {
     }
 
     #[test]
-    fn test_newton_raphson_method_newton_method_NEG_INF() {
+    fn test_newton_raphson_method_newton_method_neg_inf() {
         let f: Rc<dyn Fn(f64) -> f64> = Rc::new(|x: f64| -> f64 { x });
         assert_eq!(
             newton_method(f, f64::NEG_INFINITY, 0.1e-10, 1, 10000),
@@ -104,7 +106,7 @@ mod tests_newton_raphson_method {
     }
 
     #[test]
-    fn test_newton_raphson_method_newton_method_INF() {
+    fn test_newton_raphson_method_newton_method_inf() {
         let f: Rc<dyn Fn(f64) -> f64> = Rc::new(|x: f64| -> f64 { x });
         assert_eq!(
             newton_method(f, f64::INFINITY, 0.1e-10, 1, 10000),
@@ -113,7 +115,7 @@ mod tests_newton_raphson_method {
     }
 
     #[test]
-    fn test_newton_raphson_method_newton_method_NAN() {
+    fn test_newton_raphson_method_newton_method_nan() {
         let f: Rc<dyn Fn(f64) -> f64> = Rc::new(|x: f64| -> f64 { x });
         assert_eq!(
             newton_method(f, f64::NAN, 0.1e-10, 1, 10000),
