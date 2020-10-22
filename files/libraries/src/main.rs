@@ -9,6 +9,11 @@ mod newton_raphson_method;
 // use plotlib::view::ContinuousView;
 use matrix::Matrix;
 
+use plotlib::page::Page;
+use plotlib::repr::Plot;
+use plotlib::style::{PointMarker, PointStyle};
+use plotlib::view::ContinuousView;
+
 fn kadai121(times: usize) {
     let a = Matrix::append_line(vec![
         vec![2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
@@ -38,7 +43,7 @@ fn kadai121(times: usize) {
     }
 }
 
-fn kadai123(times: usize) {
+fn kadai123(init: f32, times: usize) -> Vec<(f64, f64)> {
     let a = Matrix::append_line(vec![
         vec![2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
         vec![-1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
@@ -52,29 +57,84 @@ fn kadai123(times: usize) {
         vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0],
     ]);
 
-    let f = |x: Matrix<f32>, i: usize| -> Matrix<f32> {
+    let mut data = Vec::new();
+
+    let mut f = |x: Matrix<f32>, i: usize| -> Matrix<f32> {
         let y = &a * &x;
         let y_norm = y.norm2();
         println!("M: {}, y_norm: {}", i, y_norm);
+        data.push((i as f64, y_norm as f64));
         &y / y_norm
     };
 
     let mut x = Matrix::new(10, 1);
-    x += 3.8;
+    x += init;
 
     for i in 0..times {
         x = f(x, i);
     }
+
+    data
 }
 
 fn main() {
-
     kadai121(10);
     kadai121(1000);
 
-    kadai123(10);
+    kadai123(0.1, 10);
+    kadai123(1.0, 10);
+    kadai123(3.8, 10);
+
+    // let data = vec![
+    //     (-3.0, 2.3),
+    //     (-1.6, 5.3),
+    //     (0.3, 0.7),
+    //     (4.3, -1.4),
+    //     (6.4, 4.3),
+    //     (8.5, 3.7),
+    // ];
+    let s1 =
+        Plot::new(kadai123(0.1, 100)).point_style(PointStyle::new().marker(PointMarker::Circle));
+    let s2 =
+        Plot::new(kadai123(1.0, 100)).point_style(PointStyle::new().marker(PointMarker::Square));
+    let s3 =
+        Plot::new(kadai123(3.8, 100)).point_style(PointStyle::new().marker(PointMarker::Cross));
+
+    let v1 = ContinuousView::new()
+        .add(s1)
+        .x_range(0., 100.)
+        .y_range(3., 4.)
+        .x_label("times")
+        .y_label("value");
+
+    let v2 = ContinuousView::new()
+        .add(s2)
+        .x_range(0., 100.)
+        .y_range(3., 4.)
+        .x_label("times")
+        .y_label("value");
+
+    let v3 = ContinuousView::new()
+        .add(s3)
+        .x_range(0., 100.)
+        .y_range(3., 4.)
+        .x_label("times")
+        .y_label("value");
+
+    println!(
+        "{}",
+        Page::single(&v1).dimensions(80, 30).to_text().unwrap()
+    );
+    println!(
+        "{}",
+        Page::single(&v2).dimensions(80, 30).to_text().unwrap()
+    );
+    println!(
+        "{}",
+        Page::single(&v3).dimensions(80, 30).to_text().unwrap()
+    );
     // kadai123(1000);
-    
+
     // let n = Matrix::append(1, 2, vec![3.0, 4.0]);
     // let n2: f32 = n.norm2();
     // println!("test: {}", n2);
