@@ -94,30 +94,30 @@ fn main() {
     //     (8.5, 3.7),
     // ];
     let s1 =
-        Plot::new(kadai123(0.1, 100)).point_style(PointStyle::new().marker(PointMarker::Circle));
+        Plot::new(kadai123(0.1, 1000)).point_style(PointStyle::new().marker(PointMarker::Circle));
     let s2 =
-        Plot::new(kadai123(1.0, 100)).point_style(PointStyle::new().marker(PointMarker::Square));
+        Plot::new(kadai123(1.0, 1000)).point_style(PointStyle::new().marker(PointMarker::Square));
     let s3 =
-        Plot::new(kadai123(3.8, 100)).point_style(PointStyle::new().marker(PointMarker::Cross));
+        Plot::new(kadai123(3.8, 1000)).point_style(PointStyle::new().marker(PointMarker::Cross));
 
     let v1 = ContinuousView::new()
         .add(s1)
-        .x_range(0., 100.)
-        .y_range(3., 4.)
+        .x_range(0., 1000.)
+        .y_range(3.5, 4.)
         .x_label("times")
         .y_label("value");
 
     let v2 = ContinuousView::new()
         .add(s2)
-        .x_range(0., 100.)
-        .y_range(3., 4.)
+        .x_range(0., 1000.)
+        .y_range(3.5, 4.)
         .x_label("times")
         .y_label("value");
 
     let v3 = ContinuousView::new()
         .add(s3)
-        .x_range(0., 100.)
-        .y_range(3., 4.)
+        .x_range(0., 1000.)
+        .y_range(3.5, 4.)
         .x_label("times")
         .y_label("value");
 
