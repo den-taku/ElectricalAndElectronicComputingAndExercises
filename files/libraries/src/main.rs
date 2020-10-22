@@ -9,7 +9,7 @@ mod newton_raphson_method;
 // use plotlib::view::ContinuousView;
 use matrix::Matrix;
 
-fn main() {
+fn kadai121(times: usize) {
     let a = Matrix::append_line(vec![
         vec![2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
         vec![-1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
@@ -33,10 +33,48 @@ fn main() {
     let mut x = Matrix::new(10, 1);
     x += 1.0;
 
-    for i in 0..30 {
+    for i in 0..times {
         x = f(x, i);
     }
+}
 
+fn kadai123(times: usize) {
+    let a = Matrix::append_line(vec![
+        vec![2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        vec![-1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        vec![0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        vec![0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        vec![0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0],
+        vec![0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0],
+        vec![0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0],
+        vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0],
+        vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0],
+        vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0],
+    ]);
+
+    let f = |x: Matrix<f32>, i: usize| -> Matrix<f32> {
+        let y = &a * &x;
+        let y_norm = y.norm2();
+        println!("M: {}, y_norm: {}", i, y_norm);
+        &y / y_norm
+    };
+
+    let mut x = Matrix::new(10, 1);
+    x += 3.8;
+
+    for i in 0..times {
+        x = f(x, i);
+    }
+}
+
+fn main() {
+
+    kadai121(10);
+    kadai121(1000);
+
+    kadai123(10);
+    // kadai123(1000);
+    
     // let n = Matrix::append(1, 2, vec![3.0, 4.0]);
     // let n2: f32 = n.norm2();
     // println!("test: {}", n2);
