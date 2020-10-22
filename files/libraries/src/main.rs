@@ -123,15 +123,15 @@ fn main() {
 
     println!(
         "{}",
-        Page::single(&v1).dimensions(80, 30).to_text().unwrap()
+        Page::single(&v1).dimensions(80, 10).to_text().unwrap()
     );
     println!(
         "{}",
-        Page::single(&v2).dimensions(80, 30).to_text().unwrap()
+        Page::single(&v2).dimensions(80, 10).to_text().unwrap()
     );
     println!(
         "{}",
-        Page::single(&v3).dimensions(80, 30).to_text().unwrap()
+        Page::single(&v3).dimensions(80, 10).to_text().unwrap()
     );
     // kadai123(1000);
 
