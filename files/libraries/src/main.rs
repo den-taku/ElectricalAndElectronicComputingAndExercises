@@ -100,6 +100,9 @@ fn main() {
     let s3 =
         Plot::new(kadai123(3.8, 1000)).point_style(PointStyle::new().marker(PointMarker::Cross));
 
+    let s4 =
+        Plot::new(kadai123(8.0, 1000)).point_style(PointStyle::new().marker(PointMarker::Cross));
+
     let v1 = ContinuousView::new()
         .add(s1)
         .x_range(0., 1000.)
@@ -121,6 +124,13 @@ fn main() {
         .x_label("times")
         .y_label("value");
 
+    let v4 = ContinuousView::new()
+        .add(s4)
+        .x_range(0., 1000.)
+        .y_range(3.5, 4.)
+        .x_label("times")
+        .y_label("value");
+
     println!(
         "{}",
         Page::single(&v1).dimensions(80, 10).to_text().unwrap()
@@ -132,6 +142,10 @@ fn main() {
     println!(
         "{}",
         Page::single(&v3).dimensions(80, 10).to_text().unwrap()
+    );
+    println!(
+        "{}",
+        Page::single(&v4).dimensions(80, 10).to_text().unwrap()
     );
     // kadai123(1000);
 
