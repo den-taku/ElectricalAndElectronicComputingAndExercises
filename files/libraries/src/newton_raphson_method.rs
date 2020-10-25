@@ -74,13 +74,37 @@ fn newton_transform(
 
 fn jacobian_newton_method(
     vec_f: Matrix<Rc<dyn Fn(Vec<f64>) -> f64>>,
-    yacobian: Matrix<Rc<dyn Fn(Vec<f64>) -> f64>>,
+    jacobian: Matrix<Rc<dyn Fn(Vec<f64>) -> f64>>,
     v_guess: Matrix<f64>,
     threshold: f64,
     times: usize,
     limit: usize,
 ) -> Result<Vec<f64>, String> {
-    todo!()
+    let mut v = Vec::new();
+    for i in 0..v_guess.to_vec().len() {
+        let mut u = v_guess.to_vec();
+        u.remove(i);
+        v.push(u);
+    }
+    let x_k_ = vec![v.clone(); v_guess.to_vec().len()];
+    let x_k = x_k_.concat();
+    let jacobian_applicated = jacobian.applicate(&x_k);
+    let f_x_k = vec_f.applicate(&vec![v_guess.to_vec().clone(); v_guess.to_vec().len()]);
+    let v_next = Matrix::solve_eqn(&jacobian_applicated, &f_x_k);
+    // TODO: check value's value.
+    if limit == times + 1 {
+        return Err(format!(
+            "solution doesn't converge: last value is {:?}.",
+            v_next.to_vec()
+        ));
+    }
+    let dx: f64 = (&v_next - &v_guess).norm2();
+    if dx <= threshold {
+        Ok(v_next.to_vec())
+    } else {
+        println!("{}, {:?}", times, v_next.to_vec());
+        jacobian_newton_method(vec_f, jacobian, v_next, threshold, times+1, limit)
+    }
 }
 
 fn newton_method(

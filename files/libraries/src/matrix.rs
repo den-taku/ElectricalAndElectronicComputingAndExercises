@@ -120,6 +120,10 @@ where
             array: mapped_array,
         }
     }
+
+    pub fn to_vec(&self) -> Vec<T> {
+        self.array.clone()
+    }
 }
 
 impl<T> Matrix<T>
@@ -219,7 +223,7 @@ impl<R, T> Matrix<Rc<dyn Fn(R) -> T>>
 where
     R: Clone,
 {
-    pub fn applicate(&self, x: Vec<R>) -> Matrix<T> {
+    pub fn applicate(&self, x: &Vec<R>) -> Matrix<T> {
         if !(self.n * self.m == x.len()) {
             panic!(format!(
                 "Matrix<R>::applicate needs {} elements",
@@ -865,7 +869,7 @@ mod tests_matrix {
             array: vec![f.clone(); 3 * 4],
         };
         assert_eq!(
-            matrix.applicate(vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]),
+            matrix.applicate(&vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]),
             Matrix {
                 n: 3,
                 m: 4,
@@ -883,7 +887,7 @@ mod tests_matrix {
             m: 4,
             array: vec![f.clone(); 12],
         }
-        .applicate(vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+        .applicate(&vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
     }
 
     #[test]

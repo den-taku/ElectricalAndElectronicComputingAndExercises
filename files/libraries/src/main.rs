@@ -2,7 +2,7 @@ mod bisection_method;
 mod matrix;
 mod newton_raphson_method;
 
-// use std::rc::Rc;
+use std::rc::Rc;
 // use plotlib::page::Page;
 // use plotlib::repr::Plot;
 // use plotlib::style::{PointMarker, PointStyle};
@@ -243,4 +243,8 @@ fn main() {
     println!("{}", b);
     let c = Matrix::solve_eqn(&a, &b);
     println!("{}", c);
+
+    let f1: Rc<dyn Fn(Vec<f64>) -> f64> = Rc::new(|v: Vec<f64>| -> f64 {
+        v[0] * v[0] + v[1] * v[1] - 2.0
+    });
 }
