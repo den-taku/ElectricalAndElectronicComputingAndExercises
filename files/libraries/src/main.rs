@@ -78,12 +78,12 @@ fn kadai123(init: f32, times: usize) -> Vec<(f64, f64)> {
 }
 
 fn main() {
-//     kadai121(10);
-//     kadai121(1000);
+    //     kadai121(10);
+    //     kadai121(1000);
 
-//     kadai123(0.1, 10);
-//     kadai123(1.0, 10);
-//     kadai123(3.8, 10);
+    //     kadai123(0.1, 10);
+    //     kadai123(1.0, 10);
+    //     kadai123(3.8, 10);
 
     // let data = vec![
     //     (-3.0, 2.3),

@@ -217,4 +217,19 @@ mod tests_newton_raphson_method {
             vec![2.0f64, 1.0f64]
         );
     }
+
+    #[test]
+    #[should_panic(
+        expected = "`jacobian_newton_raphson_method` needs vec_f and vec_init the same size."
+    )]
+    fn test_newton_raohson_jacobi_newton_raphson_panic() {
+        let f1: Rc<dyn Fn(Vec<f64>) -> f64> =
+            Rc::new(|x1: Vec<f64>| -> f64 { x1[0] * x1[0] + x1[1] * x1[1] - 2.0 });
+        let f2: Rc<dyn Fn(Vec<f64>) -> f64> =
+            Rc::new(|x2: Vec<f64>| -> f64 { x2[0] - x2[1] * x2[1] });
+        let mut vec_f: Vec<Rc<dyn Fn(Vec<f64>) -> f64>> = Vec::new();
+        vec_f.push(f1.clone());
+        vec_f.push(f2.clone());
+        let _ = jacobian_newton_raphson_method(vec_f, vec![2.0f64.sqrt()]);
+    }
 }
