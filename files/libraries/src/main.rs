@@ -244,7 +244,17 @@ fn main() {
     let c = Matrix::solve_eqn(&a, &b);
     println!("{}", c);
 
-    let f1: Rc<dyn Fn(Vec<f64>) -> f64> = Rc::new(|v: Vec<f64>| -> f64 {
-        v[0] * v[0] + v[1] * v[1] - 2.0
-    });
+    let f1: Rc<dyn Fn(Vec<f64>) -> f64> =
+        Rc::new(|x1: Vec<f64>| -> f64 { x1[0] * x1[0] + x1[1] * x1[1] - 2.0 });
+    let f2: Rc<dyn Fn(Vec<f64>) -> f64> = Rc::new(|x2: Vec<f64>| -> f64 { x2[0] - x2[1] * x2[1] });
+    println!("{}", f2(vec![3.0f64, 4.0f64]));
+
+    let mut vec_f: Vec<Rc<dyn Fn(Vec<f64>) -> f64>> = Vec::new();
+    vec_f.push(f1.clone());
+    vec_f.push(f2.clone());
+
+    println!("{}", vec_f[0](vec![2.0f64, 4.0f64]));
+    println!("{}", vec_f[1](vec![3.0f64, 4.0f64]));
+
+    println!("{:?}", newton_raphson_method::jacobian_newton_raphson_method(vec_f, vec![2.0f64.sqrt();2]).unwrap());
 }
