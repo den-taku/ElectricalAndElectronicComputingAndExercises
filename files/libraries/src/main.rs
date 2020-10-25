@@ -2,7 +2,7 @@ mod bisection_method;
 mod matrix;
 mod newton_raphson_method;
 
-use std::rc::Rc;
+// use std::rc::Rc;
 // use plotlib::page::Page;
 // use plotlib::repr::Plot;
 // use plotlib::style::{PointMarker, PointStyle};
@@ -187,10 +187,10 @@ fn main() {
     // // A page with a single view is then saved to an SVG file
     // Page::single(&v).save("scatter.svg").unwrap();
 
-    let f: Rc<dyn Fn(f64) -> f64> = Rc::new(|x: f64| -> f64 {
-        x.powf(5.) - 3. * x.powf(4.) + x.powf(3.) + 5. * x.powf(2.) - 6. * x + 2.
-    });
-    let _ = newton_raphson_method::newton_raphson_method(f.clone(), 0.6);
+    // let f: Rc<dyn Fn(f64) -> f64> = Rc::new(|x: f64| -> f64 {
+    //     x.powf(5.) - 3. * x.powf(4.) + x.powf(3.) + 5. * x.powf(2.) - 6. * x + 2.
+    // });
+    // let _ = newton_raphson_method::newton_raphson_method(f.clone(), 0.6);
     // let _ = bisection_method::bisection_method(0f64..1.2f64, 1e-10, f.clone());
     // println!(
     //     "{}",
