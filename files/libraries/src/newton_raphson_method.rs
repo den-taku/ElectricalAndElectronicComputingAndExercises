@@ -1,8 +1,24 @@
 #![allow(dead_code)]
 
 // pub mod newton_raphson_method {
+pub use crate::matrix::*;
 pub use std::rc::Rc;
 pub use std::result::Result;
+
+pub fn jacobian_newton_raphson_method(
+    vec_f: Vec<Rc<dyn Fn(Vec<f64>) -> f64>>,
+    vec_init: Vec<f64>,
+) -> Result<Vec<f64>, String> {
+    let n = vec_f.len();
+    if n != vec_init.len() {
+        panic!("`jacobian_newton_raphson_method` needs vec_f and vec_init the same size.");
+    }
+    let threshold = 0.1e-10;
+    let jacobian = dif_jacobi(vec_f.clone());
+    let init = Matrix::append(n, 1, vec_init);
+    let f_n: Matrix<Rc<dyn Fn(Vec<f64>) -> f64>> = Matrix::append(n, 1, vec_f);
+    jacobian_newton_method(f_n, jacobian, init, threshold, 1, 1000000)
+}
 
 // f must be declared as dyn Fn trait object.
 pub fn newton_raphson_method(f: Rc<dyn Fn(f64) -> f64>, init: f64) -> Result<f64, String> {
@@ -14,6 +30,20 @@ pub fn newton_raphson_method(f: Rc<dyn Fn(f64) -> f64>, init: f64) -> Result<f64
         return Err("function is not convergence.".to_string());
     }
     newton_method(newton_transform(f, f_dir), init, threshold, 1, 1000000)
+}
+
+fn dif_jacobi(vec_f: Vec<Rc<dyn Fn(Vec<f64>) -> f64>>) -> Matrix<Rc<dyn Fn(Vec<f64>) -> f64>> {
+    Matrix::append_line({
+        let mut v = Vec::new();
+        for i in 0..vec_f.len() {
+            let mut u = Vec::new();
+            for j in 0..vec_f.len() {
+                unsafe { u.push(partial_derivative(vec_f.index(i).clone(), j)) }
+            }
+            v.push(u);
+        }
+        v
+    })
 }
 
 fn differential_f(f: Rc<dyn Fn(f64) -> f64>) -> Rc<dyn Fn(f64) -> f64> {
@@ -40,6 +70,17 @@ fn newton_transform(
     f_dir: Rc<dyn Fn(f64) -> f64>,
 ) -> Rc<dyn Fn(f64) -> f64> {
     Rc::new(move |x: f64| -> f64 { x - f(x) / f_dir(x) })
+}
+
+fn jacobian_newton_method(
+    vec_f: Matrix<Rc<dyn Fn(Vec<f64>) -> f64>>,
+    yacobian: Matrix<Rc<dyn Fn(Vec<f64>) -> f64>>,
+    v_guess: Matrix<f64>,
+    threshold: f64,
+    times: usize,
+    limit: usize,
+) -> Result<Vec<f64>, String> {
+    todo!()
 }
 
 fn newton_method(

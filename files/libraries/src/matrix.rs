@@ -33,14 +33,7 @@ pub struct Matrix<T> {
 
 impl<T> Matrix<T>
 where
-    T: Zero
-        + Clone
-        + ToPrimitive
-        + One
-        + Sub<Output = T>
-        + Mul<Output = T>
-        + Add<Output = T>
-        + Div<Output = T>,
+    T: Clone + Zero,
 {
     pub fn new(n: usize, m: usize) -> Self {
         Matrix {
@@ -49,7 +42,12 @@ where
             array: vec![T::zero(); n * m],
         }
     }
+}
 
+impl<T> Matrix<T>
+where
+    T: Clone,
+{
     pub fn append(n: usize, m: usize, array: Vec<T>) -> Self {
         if array.len() != n * m {
             panic!("`Matrix::append` needs appropriately sized Vec<T>.");
@@ -122,7 +120,19 @@ where
             array: mapped_array,
         }
     }
+}
 
+impl<T> Matrix<T>
+where
+    T: Zero
+        + Clone
+        + ToPrimitive
+        + One
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + Add<Output = T>
+        + Div<Output = T>,
+{
     pub fn norm2<F>(&self) -> F
     where
         F: Float + Zero + FromPrimitive + Add<Output = F>,
@@ -173,6 +183,35 @@ where
             }
         }
         (Matrix::append_line(l), Matrix::append_line(u)) //TODO
+    }
+}
+
+impl<F> Matrix<F>
+where
+    F: Float,
+{
+    pub fn solve_eqn(a: &Self, b: &Self) -> Self {
+        if !a.n == b.n {
+            panic!("`Matrix::solve_eqn` needs n * m matrix and n vector.");
+        }
+        let mut b_mut = b.clone();
+        let lu = a.lu_decompose();
+        // let y = Vec::new();
+        // y.push(b_mut[0] / lu.0[0]); // TODO
+        for i in 0..a.n - 1 {
+            for j in i + 1..a.n {
+                b_mut[j] = b_mut[j].clone() - lu.0[j * a.n + i].clone() * b_mut[i].clone()
+            }
+        }
+        for i in (0..a.n).rev() {
+            b_mut[i] = b_mut[i].clone() / lu.1[i * a.n + i].clone();
+            for k in (0..i).rev() {
+                b_mut[k] = b_mut[k].clone() - lu.1[k * a.n + i].clone() * b_mut[i].clone();
+            }
+        }
+        b_mut.m = 1usize;
+        b_mut.n = b_mut.array.len();
+        b_mut
     }
 }
 
@@ -659,7 +698,7 @@ where
         let mut string = "".to_string();
         for i in 0..self.n {
             for j in 0..self.m {
-                let pad = if self[i * self.n + j] >= T::zero() {
+                let pad = if self[i * self.m + j] >= T::zero() {
                     " ".to_string()
                 } else {
                     "".to_string()
@@ -2695,8 +2734,9 @@ mod tests_matrix {
         Matrix {
             n: 2,
             m: 3,
-            array: vec![0; 6]
-        }.lu_decompose();
+            array: vec![0; 6],
+        }
+        .lu_decompose();
     }
 }
 

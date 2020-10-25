@@ -237,4 +237,10 @@ fn main() {
     // if let Err(s) = newton_raphson_method::newton_raphson_method(f.clone(), 0.6) {
     //     println!("{}", s);
     // };
+    let a = Matrix::append(2, 2, vec![2.0, 3.0, 4.0, 5.0]);
+    let b = Matrix::append(2, 1, vec![7.0, 13.0]);
+    println!("{}", a);
+    println!("{}", b);
+    let c = Matrix::solve_eqn(&a, &b);
+    println!("{}", c);
 }
