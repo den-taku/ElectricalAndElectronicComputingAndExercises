@@ -2,7 +2,7 @@ mod bisection_method;
 mod matrix;
 mod newton_raphson_method;
 
-use std::rc::Rc;
+// use std::rc::Rc;
 // use plotlib::page::Page;
 // use plotlib::repr::Plot;
 // use plotlib::style::{PointMarker, PointStyle};
@@ -14,7 +14,7 @@ use plotlib::repr::Plot;
 use plotlib::style::{PointMarker, PointStyle};
 use plotlib::view::ContinuousView;
 
-fn kadai121(times: usize) {
+fn _kadai121(times: usize) {
     let a = Matrix::append_line(vec![
         vec![2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
         vec![-1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
@@ -78,12 +78,12 @@ fn kadai123(init: f32, times: usize) -> Vec<(f64, f64)> {
 }
 
 fn main() {
-    kadai121(10);
-    kadai121(1000);
+//     kadai121(10);
+//     kadai121(1000);
 
-    kadai123(0.1, 10);
-    kadai123(1.0, 10);
-    kadai123(3.8, 10);
+//     kadai123(0.1, 10);
+//     kadai123(1.0, 10);
+//     kadai123(3.8, 10);
 
     // let data = vec![
     //     (-3.0, 2.3),
@@ -148,23 +148,23 @@ fn main() {
         Page::single(&v4).dimensions(80, 10).to_text().unwrap()
     );
 
-    let a = Matrix::append_line(vec![
-        vec![2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-        vec![-1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-        vec![0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-        vec![0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-        vec![0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0],
-        vec![0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0],
-        vec![0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0],
-        vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0],
-        vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0],
-        vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0],
-    ]);
+    // let a = Matrix::append_line(vec![
+    //     vec![2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    //     vec![-1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    //     vec![0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    //     vec![0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    //     vec![0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0],
+    //     vec![0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0],
+    //     vec![0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0],
+    //     vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0],
+    //     vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0],
+    //     vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0],
+    // ]);
 
-    let lu = a.lu_decompose();
-    println!("{}", lu.0);
-    println!("{}", lu.1);
-    println!("{}", &lu.0 * &lu.1);
+    // let lu = a.lu_decompose();
+    // println!("{}", lu.0);
+    // println!("{}", lu.1);
+    // println!("{}", &lu.0 * &lu.1);
     // println!("{}", &lu.1 * &lu.0);
     // println!("{:?}", lu);
     // kadai123(1000);
@@ -244,19 +244,19 @@ fn main() {
     // let c = Matrix::solve_eqn(&a, &b);
     // println!("{}", c);
 
-    let f1: Rc<dyn Fn(Vec<f64>) -> f64> =
-        Rc::new(|x1: Vec<f64>| -> f64 { x1[0] * x1[0] + x1[1] - 5.0 });
-    let f2: Rc<dyn Fn(Vec<f64>) -> f64> =
-        Rc::new(|x2: Vec<f64>| -> f64 { x2[0] - x2[1] * x2[1] - 1.0 });
+    // let f1: Rc<dyn Fn(Vec<f64>) -> f64> =
+    //     Rc::new(|x1: Vec<f64>| -> f64 { x1[0] * x1[0] + x1[1] - 5.0 });
+    // let f2: Rc<dyn Fn(Vec<f64>) -> f64> =
+    //     Rc::new(|x2: Vec<f64>| -> f64 { x2[0] - x2[1] * x2[1] - 1.0 });
 
-    let mut vec_f: Vec<Rc<dyn Fn(Vec<f64>) -> f64>> = Vec::new();
-    vec_f.push(f1.clone());
-    vec_f.push(f2.clone());
+    // let mut vec_f: Vec<Rc<dyn Fn(Vec<f64>) -> f64>> = Vec::new();
+    // vec_f.push(f1.clone());
+    // vec_f.push(f2.clone());
 
-    println!(
-        "{:?}",
-        newton_raphson_method::jacobian_newton_raphson_method(vec_f, vec![2.0f64.sqrt(); 2])
-            .unwrap()
-    );
-    //
+    // println!(
+    //     "{:?}",
+    //     newton_raphson_method::jacobian_newton_raphson_method(vec_f, vec![2.0f64.sqrt(); 2])
+    //         .unwrap()
+    // );
+    // //
 }
