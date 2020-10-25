@@ -1,12 +1,15 @@
 #![allow(dead_code)]
 
 // pub mod algebra {
-pub use num_traits::{Float, FromPrimitive, ToPrimitive, Zero};
+pub use num_traits::{Float, FromPrimitive, One, ToPrimitive, Zero};
 pub use std::ops::{
     Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
     Index, IndexMut, Mul, MulAssign, Neg, Not, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
 };
 pub use std::rc::Rc;
+
+pub use std::fmt;
+pub use std::fmt::{Display, Formatter};
 
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
 pub struct Matrix<T> {
@@ -15,9 +18,29 @@ pub struct Matrix<T> {
     array: Vec<T>, //                [* * * * *]
 }
 
+// pub trait Algebra<T> {
+//     fn new(n: usize, m: usize) -> Self;
+//     fn append(n: usize, m : usize) -> Self;
+//     fn append_line(vec: Vec<Vec<T>>) -> Self;
+//     fn append_column(vec: Vec<Vec<T>>) -> Self;
+//     fn transpose(&mut self);
+//     fn map(&mut self, f: Rc<dyn Fn(T) -> T>) -> Self;
+//     fn map_new<R>(&self, f: Rc<dyn Fn(T) -> R>) -> Self<R>;
+//     fn norm2<F>(&self) -> F;
+//     fn is_square(&self) -> bool;
+//     fn lu_decompose(&self) -> (Self, Self);
+// }
+
 impl<T> Matrix<T>
 where
-    T: Zero + Clone + ToPrimitive,
+    T: Zero
+        + Clone
+        + ToPrimitive
+        + One
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + Add<Output = T>
+        + Div<Output = T>,
 {
     pub fn new(n: usize, m: usize) -> Self {
         Matrix {
@@ -112,6 +135,39 @@ where
                     .powf(F::from_f32(2.0).unwrap())
         }
         size.sqrt()
+    }
+
+    pub fn is_square(&self) -> bool {
+        self.n == self.m
+    }
+
+    pub fn lu_decompose(&self) -> (Matrix<T>, Matrix<T>) {
+        // use Crout method
+        if !self.is_square() {
+            panic!("`Matrix::lu_decompose` needs square matrix");
+        }
+        let mut l = vec![vec![T::zero(); self.n]; self.n];
+        let mut u = vec![vec![T::zero(); self.n]; self.n];
+        for i in 0..self.n {
+            l[i][i] = T::one();
+        }
+        for i in 0..self.n {
+            for j in 0..i + 1 {
+                let mut lu = T::zero();
+                for k in 0..j {
+                    lu = lu.clone() + l[i][k].clone() * u[k][i].clone();
+                }
+                u[i][j] = self[i * self.n + j].clone() - lu.clone();
+            }
+            for j in i..self.n {
+                let mut lu = T::zero();
+                for k in 0..i {
+                    lu = lu.clone() + l[i][k].clone() * u[k][i].clone();
+                }
+                l[i][j] = (self[i * self.n + j].clone() - lu.clone()) / u[i][i].clone();
+            }
+        }
+        (Matrix::append_line(l), Matrix::append_line(u)) //TODO
     }
 }
 
@@ -587,6 +643,22 @@ impl<T> IndexMut<usize> for Matrix<T> {
             panic!(format!("index_mut fail: {} is out of range.", index));
         }
         &mut self.array[index]
+    }
+}
+
+impl<T> Display for Matrix<T>
+where
+    T: Display + Clone,
+{
+    fn fmt(&self, dest: &mut Formatter) -> fmt::Result {
+        let mut string = "".to_string();
+        for i in 0..self.n {
+            for j in 0..self.m {
+                string = format!("{}{} ", string, self[i * self.m + j].clone());
+            }
+            string = format!("{}\n", string);
+        }
+        write!(dest, "{}", string)
     }
 }
 // TEST
@@ -2565,6 +2637,28 @@ mod tests_matrix {
         for i in 0..13 {
             assert_eq!(dummy_matrix.index_mut(i), &mut (i as i32))
         }
+    }
+
+    #[test]
+    fn test_matrix_is_square() {
+        assert_eq!(
+            Matrix {
+                n: 2,
+                m: 2,
+                array: vec![9.0; 4]
+            }
+            .is_square(),
+            true
+        );
+        assert_eq!(
+            Matrix {
+                n: 2,
+                m: 3,
+                array: vec![3; 6]
+            }
+            .is_square(),
+            false
+        );
     }
 }
 
