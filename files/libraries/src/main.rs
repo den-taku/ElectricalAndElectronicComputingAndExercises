@@ -165,8 +165,8 @@ fn main() {
     println!("{}", lu.0);
     println!("{}", lu.1);
     println!("{}", &lu.0 * &lu.1);
-    println!("{}", &lu.1 * &lu.0);
-    println!("{:?}", lu);
+    // println!("{}", &lu.1 * &lu.0);
+    // println!("{:?}", lu);
     // kadai123(1000);
 
     // let n = Matrix::append(1, 2, vec![3.0, 4.0]);

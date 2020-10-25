@@ -151,20 +151,25 @@ where
         for i in 0..self.n {
             l[i][i] = T::one();
         }
-        for i in 0..self.n {
-            for j in 0..i + 1 {
-                let mut lu = T::zero();
-                for k in 0..j {
-                    lu = lu.clone() + l[i][k].clone() * u[k][i].clone();
+        let mut dec = self.array.clone();
+
+        for j in 0..self.n - 1 {
+            let w = T::one() / dec[j * self.n + j].clone();
+            for i in j + 1..self.n {
+                dec[i * self.n + j] = w.clone() * dec[i * self.n + j].clone();
+                for k in j + 1..self.n {
+                    dec[i * self.n + k] = dec[i * self.n + k].clone()
+                        - dec[i * self.n + j].clone() * dec[j * self.n + k].clone();
                 }
-                u[i][j] = self[i * self.n + j].clone() - lu.clone();
             }
-            for j in i..self.n {
-                let mut lu = T::zero();
-                for k in 0..i {
-                    lu = lu.clone() + l[i][k].clone() * u[k][i].clone();
-                }
-                l[i][j] = (self[i * self.n + j].clone() - lu.clone()) / u[i][i].clone();
+        }
+
+        for j in 0..self.n {
+            for i in 0..j + 1 {
+                u[i][j] = dec[i * self.n + j].clone();
+            }
+            for i in j + 1..self.n {
+                l[i][j] = dec[i * self.n + j].clone()
             }
         }
         (Matrix::append_line(l), Matrix::append_line(u)) //TODO
@@ -648,13 +653,18 @@ impl<T> IndexMut<usize> for Matrix<T> {
 
 impl<T> Display for Matrix<T>
 where
-    T: Display + Clone,
+    T: Display + Clone + PartialOrd + Zero,
 {
     fn fmt(&self, dest: &mut Formatter) -> fmt::Result {
         let mut string = "".to_string();
         for i in 0..self.n {
             for j in 0..self.m {
-                string = format!("{}{} ", string, self[i * self.m + j].clone());
+                let pad = if self[i * self.n + j] >= T::zero() {
+                    " ".to_string()
+                } else {
+                    "".to_string()
+                };
+                string = format!("{}{}{} ", string, pad, self[i * self.m + j].clone());
             }
             string = format!("{}\n", string);
         }
@@ -2659,6 +2669,34 @@ mod tests_matrix {
             .is_square(),
             false
         );
+    }
+
+    #[test]
+    fn test_matrix_lu_decompose() {
+        let a = Matrix::append_line(vec![
+            vec![2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            vec![-1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            vec![0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            vec![0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            vec![0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0],
+            vec![0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0],
+            vec![0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0],
+            vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0],
+            vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0],
+            vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0],
+        ]);
+        let lu = a.lu_decompose();
+        assert_eq!(a, &lu.0 * &lu.1);
+    }
+
+    #[test]
+    #[should_panic(expected = "`Matrix::lu_decompose` needs square matrix")]
+    fn test_matrix_lu_decompose_panic() {
+        Matrix {
+            n: 2,
+            m: 3,
+            array: vec![0; 6]
+        }.lu_decompose();
     }
 }
 
