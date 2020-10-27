@@ -23,7 +23,7 @@ fn main() {
 
     let mut fg = Figure::new();
     {
-        let axec = fg
+        let _axec = fg
             .axes2d()
             .set_x_axis(true, &[])
             .set_x_range(Fix(0.0), Fix(17.0))
