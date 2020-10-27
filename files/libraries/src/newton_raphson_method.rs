@@ -17,7 +17,7 @@ pub fn jacobian_newton_raphson_method(
     let jacobian = dif_jacobi(vec_f.clone());
     let init = Matrix::append(n, 1, vec_init);
     let f_n: Matrix<Rc<dyn Fn(Vec<f64>) -> f64>> = Matrix::append(n, 1, vec_f);
-    jacobian_newton_method(f_n, jacobian, init, threshold, 1, 10000000)
+    jacobian_newton_method(f_n, jacobian, init, threshold, 1, 1_000_000)
 }
 
 // f must be declared as dyn Fn trait object.
@@ -39,7 +39,7 @@ pub fn newton_raphson_method(
         init,
         threshold,
         1,
-        1000000,
+        1_000_000,
         expected_value,
         data,
     )

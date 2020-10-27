@@ -29,7 +29,7 @@
 
 まず二分法を用いたソースコード1について説明する。
 
-bisection\_method 関数は、引数としてrange、e、f、expected_valueを受け取る。
+bisection\_method 関数は、引数としてrange、e、f、expected\_valueを受け取る。
 これらはそれぞれ範囲、許容誤差、関数、真値である。
 まず初期区間をrangeとして与えると、bisection\_methodは
 bisection\_method\_inner関数にrange、e、f、expected\_valueを渡し、さらに
@@ -37,9 +37,6 @@ bisection\_method\_inner関数にrange、e、f、expected\_valueを渡し、さ�
 bisection\_method\_inner関数は範囲を半分に区切り、解が存在すると思われる範囲を
 再帰的に渡してtimesを一つ進める。
 この時その範囲が許容誤差内に収まったなら、半分に区切った時の値を近似解として返す。
-ソースコード中に含まれるprintln!関数は、
-課題で反復回数と誤差のcsvファイルを作成するために
-標準出力に値を渡しているだけで求解に直接は影響しない。
 
 \ 
 
@@ -58,7 +55,8 @@ newton\_raphson\_method関数は次のようなアルゴリズムで方程式を
     g(x) = x - \frac{f(x)}{f'(x)}
 \end{equation}
 となる$g(x)$を計算するnewton\_transform関数に$f(x)$、$f'(x)$を渡し、
-また閾値と回数として1、反復回数上限として1,000,000とともに
+また閾値と回数として1、反復回数上限として1,000,000、バッファとしてのdata、
+真値expected\_valueとともに
 newton\_method関数に渡す。
 
 newton\_method関数では、$g(x)$を用いて近似解の候補を求め、元の$x$との
@@ -67,44 +65,80 @@ newton\_method関数では、$g(x)$を用いて近似解の候補を求め、元
 最初にnextの値をチェックしているのは、$g(x)$の値が想定していない値になった時の処理を
 まとめてあるだけであり、アルゴリズムに直接は影響しない。これについては後で言及する。
 
-ここでも後で値をplotするためにprintln!関数を用いて標準出力に値を渡している。
 
 \ 
 
 \begin{lstlisting}[caption={bisection\_method.rs}]
 
-use std::ops::Range;
-use std::rc::Rc;
-     
-fn bisection_method(
-    mut range: Range<f64>, 
-    e: f64, 
-    f: Rc<dyn Fn(f64) -> f64>
-)-> f64 {
-    bisection_method_inner(range, e, f, 1, 1000000)
+#![allow(dead_code)]
+
+pub use std::ops::Range;
+pub use std::rc::Rc;
+    
+pub fn bisection_method(
+    range: Range<f64>,
+    e: f64,
+    f: Rc<dyn Fn(f64) -> f64>,
+    expected_value: f64,
+) -> (f64, Vec<(f64, f64)>) {
+    let data: Vec<(f64, f64)> = Vec::new();
+    bisection_method_inner(
+        range, e, f, 1, expected_value, data
+    )
 }
-     
+    
 fn bisection_method_inner(
     mut range: Range<f64>,
     e: f64,
     f: Rc<dyn Fn(f64) -> f64>,
     times: usize,
-    limit: usize,
-) -> f64 {
+    expected_value: f64,
+    mut data: Vec<(f64, f64)>,
+) -> (f64, Vec<(f64, f64)>) {
     let x_new = (range.end + range.start) / 2.;
-    if times == limit {
-        return x_new;
-    }
     if f(x_new) * f(range.start) >= 0. {
         range.start = x_new;
     } else {
         range.end = x_new;
     }
-    println!("{}, {}", times, (x_new - 1.414213566237).abs()); 
+    data.push((times as f64, (x_new - expected_value).abs()));
     if range.end - range.start <= e {
-        x_new
+        (x_new, data)
     } else {
-        bisection_method_inner(range, e, f, times + 1, limit)
+        bisection_method_inner(
+            range, e, f, times + 1, expected_value, data
+        )
+    }
+}
+    
+#[cfg(test)]
+mod tests_bisection_method {
+    use crate::bisection_method::*;
+    
+    #[test]
+    fn tests_bisection_method() {
+        let f = Rc::new(|x: f64| {
+            x.powf(5.) - 3. * x.powf(4.) + x.powf(3.) 
+                + 5. * x.powf(2.) - 6. * x + 2.
+        });
+        assert_eq!(
+            (bisection_method(
+                -2f64..0f64, 1e-3, f.clone(), 1.414213566237)
+            ).0,
+            -1.4150390625
+        );
+        assert_eq!(
+            (bisection_method(
+                -2f64..0f64, 1e-4, f.clone(), 1.414213566237)
+            ).0,
+            -1.41424560546875
+        );
+        assert_eq!(
+            (bisection_method(
+                -2f64..0f64, 1e-5, f.clone(), 1.414213566237)
+            ).0,
+            -1.4142074584960938
+        );
     }
 }
 
