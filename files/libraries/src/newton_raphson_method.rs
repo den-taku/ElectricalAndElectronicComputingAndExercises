@@ -31,7 +31,8 @@ pub fn newton_raphson_method(
     let f_dir = differential_f(f.clone()); // f is consumed here.
     if !f.is_convergence() {
         // TODO: check convergency in newton_method()
-        return Err("function is not convergence.".to_string());
+        // return Err("function is not convergence.".to_string());
+        unreachable!();
     }
     let data: Vec<(f64, f64)> = Vec::new();
     newton_method(
@@ -133,7 +134,8 @@ fn newton_method(
 ) -> Result<(f64, Vec<(f64, f64)>), String> {
     let next = f(guess);
     if next == f64::NEG_INFINITY || next == f64::INFINITY || next.is_nan() {
-        return Err(format!("x^(k+1) is not a number: last value is {}.", guess));
+        // return Err(format!("x^(k+1) is not a number: last value is {}.", guess));
+        return Ok((next, data));
     }
     if limit == times + 1 {
         return Err(format!(

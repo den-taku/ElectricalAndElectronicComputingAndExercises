@@ -66,6 +66,8 @@ newton\_method関数では、$g(x)$を用いて近似解の候補を求め、元
 まとめてあるだけであり、アルゴリズムに直接は影響しない。これについては後で言及する。
 
 
+なお、バッファに保存したdataはgnuplotを用いて描画する。
+
 \ 
 
 \begin{lstlisting}[caption={bisection\_method.rs}]
@@ -342,6 +344,9 @@ mod tests_newton_raphson_method {
 
 \section{課題1.1.2}
 
+二分法の初期区間を[0, 1.2]、ニュートン法の初期近似解を-1として
+課題1.1.1と同様のグラフを作成しようとしたところ、
+newton\_raphson\_methodが
 
 % 実験レポート1
 % ここまで
