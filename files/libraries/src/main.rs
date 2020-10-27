@@ -32,8 +32,16 @@ fn main() {
             .set_x_label("times", &[])
             .set_y_label("error", &[])
             .set_y_ticks(Some((Fix(2.0), 1)), &[], &[])
-            .lines(x_bisection, y_bisection, &[Caption("bisection_method"), Color("blue")])
-            .lines(x_newton, y_newton, &[Caption("newton_raphson_method"), Color("red")]);
+            .lines(
+                x_bisection,
+                y_bisection,
+                &[Caption("bisection_method"), Color("blue")],
+            )
+            .lines(
+                x_newton,
+                y_newton,
+                &[Caption("newton_raphson_method"), Color("red")],
+            );
 
         // data_bisection.iter().fold((), |_, e| {
         //     axec.points(&[e.0], &[e.1], &[Color("blue"), PointSymbol('O')]);
