@@ -134,8 +134,8 @@ fn newton_method(
 ) -> Result<(f64, Vec<(f64, f64)>), String> {
     let next = f(guess);
     if next == f64::NEG_INFINITY || next == f64::INFINITY || next.is_nan() {
-        // return Err(format!("x^(k+1) is not a number: last value is {}.", guess));
-        return Ok((next, data));
+        return Err(format!("x^(k+1) is not a number: last value is {}.", guess));
+        // return Ok((next, data));
     }
     if limit == times + 1 {
         return Err(format!(
