@@ -195,7 +195,7 @@ where
     F: Float,
 {
     pub fn solve_eqn(a: &Self, b: &Self) -> Self {
-        if !(a.is_square() && a.n == b.n){
+        if !(a.is_square() && a.n == b.n) {
             panic!("`Matrix::solve_eqn` needs n * n matrix and n vector.");
         }
         let mut b_mut = b.clone();
