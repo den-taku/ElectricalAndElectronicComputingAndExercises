@@ -309,7 +309,7 @@ mod tests_newton_raphson_method {
 二分法の初期期間を[-2, 0]とし、ニュートン法の初期近似解を-1とする。
 そして反復回数を横軸に、
 それぞれの手法で得られた近似解と真値($-\sqrt{2}$)との誤差の絶対値を縦軸にとった
-片対数グラフをそれぞれ図\label{bis_new}に作成し、示す。
+片対数グラフをそれぞれ図\ref{bis_new}に作成し、示す。
 
 
 
@@ -381,6 +381,236 @@ newton\_raphson\_methodが、
 \subtitle{2020/10/*}
 
 \theme{課題1.2}
+
+与えたれたアルゴリズムを実行するプログラムを作成した。
+コードをソースコード3に示す。
+ソースコード3中では、自作行列演算ライブラリであるmatrixを使用している。
+このコードは3,000行を越えるためここに示すことはできないが、
+ソースコード3中で使用しているMatrixの定義、append\_line、
+内積計算、スカラー倍、ベクタとみなしてL2ノルムを求めるnorm2を
+ソースコード4に示し説明する。
+
+ソースコード3では、まず行列Aを生成し、ループさせる関数を定義し、
+初期値からベクトルxを行列として生成し、30回ループさせている。
+関数内では、まずベクトルyを行列演算A*xをして行列として計算し、
+L2ノルムを求め、繰り返し回数と求めたノルムをバッファに保存し、
+次のxの値を生成している。
+
+
+ソースコード4では行列に関するコードを示した。
+
+まずMatrixが行列の定義である。
+次に、append\_line関数が入れ子になっているベクタを元に行列を
+生成する関数である。
+Mul\<Self\>に示してあるのが行列の内積を計算する関数である。
+内積の定義通りに各行各列の要素を計算している。
+演算子のオーバーロードにより行列*行列をするとこの関数が呼ばれる。
+Mul\<Output=T\>に示すのがスカラー倍をする関数で、各要素にスカラー倍を
+している。これも演算子オーバーロードにより行列*スカラで呼ばれる。
+Divは各要素に除算を行う。行列/スカラにより呼ばれる。
+norm2関数は各要素を2乗し、全て足し合わせた後ルートを取っている。
+これによりL2ノルムが計算できる。
+
+さて、以上のコードを用いて収束を確かめたグラフを図\ref{y_conv1}に示す。
+概ね3.7に収束していることがわかる。
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=12cm]{y_conv1.pdf}
+    \label{y_conv1}
+\end{figure}
+
+\ 
+
+
+\begin{lstlisting}[caption={main.rs}]
+
+fn kadai123(init: f32, times: usize) -> Vec<(f64, f64)> {
+    let a = Matrix::append_line(vec![
+        vec![2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        vec![-1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        vec![0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        vec![0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        vec![0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0],
+        vec![0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0],
+        vec![0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0],
+        vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0],
+        vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0],
+        vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0],
+    ]);
+    
+    let mut data = Vec::new();
+    
+    let mut f = |x: Matrix<f32>, i: usize| -> Matrix<f32> {
+        let y = &a * &x;
+        let y_norm = y.norm2();
+        println!("M: {}, y_norm: {}", i, y_norm);
+        data.push((i as f64, y_norm as f64));
+        &y / y_norm
+    };
+    
+    let mut x = Matrix::new(10, 1);
+    x += init;
+    
+    for i in 0..times {
+        x = f(x, i);
+    }
+    
+    data
+}
+
+fn main() {
+    let s0 =
+        Plot::new(kadai123(1.0, 30))
+            .point_style(
+                PointStyle::new().marker(PointMarker::Circle)
+            );
+
+    let v0 = ContinuousView::new()
+        .add(s0)
+        .x_range(0., 30.)
+        .y_range(3.5, 4.)
+        .x_label("times")
+        .y_label("value");
+
+    println!(
+        "{}",
+        Page::single(&v0).dimensions(80, 10).to_text().unwrap()
+    );
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={matrix\_dash.rs}]
+#[derive(Clone, Debug, PartialEq, PartialOrd)]
+pub struct Matrix<T> {
+    n: usize,      // line           [* * * * *]
+    m: usize,      // column         [* * * * *] -> n = 3, m = 5
+    array: Vec<T>, //                [* * * * *]
+}
+
+impl<T> Matrix<T>
+where
+    T: Clone,
+{
+    pub fn append_line(vec: Vec<Vec<T>>) -> Self {
+        let n = vec.len();
+        let m = vec[0].len();
+        if !vec.iter().all(|e| e.len() == m) {
+            panic!(
+                "`Matrix::append_line` needs appropriatly sized Vec<Vec<T>>."
+            );
+        }
+        Matrix {
+            n,
+            m,
+            array: vec.concat(),
+        }
+    }
+}
+
+impl<T> Mul<Self> for &Matrix<T>
+where
+    T: Mul<Output = T> + Add<Output = T> + Clone + Zero,
+{
+    type Output = Matrix<T>;
+    fn mul(self, rhs: Self) -> Self::Output {
+        // TODO: use Strassen algorithm
+        if !(self.m == rhs.n) {
+            panic!(
+                "`Matrix::mul` needs n * m Matrix<T> and m * k Matrix<T>."
+            )
+        }
+        Matrix {
+            n: self.n,
+            m: rhs.m,
+            array: {
+                let mut v = Vec::<T>::new();
+                for i in 0..self.n {
+                    for j in 0..rhs.m {
+                        let mut sum = T::zero();
+                        for k in 0..self.m {
+                            sum = sum
+                                + self.array[i * self.m + k].clone()
+                                    * rhs.array[j + k * rhs.m].clone()
+                        }
+                        v.push(sum)
+                    }
+                }
+                v
+            },
+        }
+    }
+}
+
+impl<T> Mul<T> for &Matrix<T>
+where
+    T: Mul<Output = T> + Clone,
+{
+    type Output = Matrix<T>;
+    fn mul(self, rhs: T) -> Self::Output {
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: {
+                let mut v = Vec::new();
+                for i in 0..self.n * self.m {
+                    v.push(self.array[i].clone() * rhs.clone())
+                }
+                v
+            },
+        }
+    }
+}
+
+impl<T> Div<T> for &Matrix<T>
+where
+    T: Div<Output = T> + Clone,
+{
+    type Output = Matrix<T>;
+    fn div(self, rhs: T) -> Self::Output {
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: {
+                let mut v = Vec::new();
+                for i in 0..self.n * self.m {
+                    v.push(self.array[i].clone() / rhs.clone())
+                }
+                v
+            },
+        }
+    }
+}
+
+impl<T> Matrix<T>
+where
+    T: Zero
+        + Clone
+        + ToPrimitive
+        + One
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + Add<Output = T>
+        + Div<Output = T>,
+{
+    pub fn norm2<F>(&self) -> F
+    where
+        F: Float + Zero + FromPrimitive + Add<Output = F>,
+    {
+        let mut size = F::zero();
+        for i in 0..self.n * self.m {
+            size = size.clone()
+                + F::from(self.array[i].clone())
+                    .unwrap()
+                    .powf(F::from_f32(2.0).unwrap())
+        }
+        size.sqrt()
+    }
+}
+
+\end{lstlisting}
+
 \section{課題1.2.1}
 \section{課題1.2.2}
 \section{課題1.2.3}

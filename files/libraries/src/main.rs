@@ -3,55 +3,150 @@ mod matrix;
 mod newton_raphson_method;
 
 use gnuplot::*;
-use std::rc::Rc;
+// use std::rc::Rc;
+// use plotlib::page::Page;
+// use plotlib::repr::Plot;
+// use plotlib::style::{PointMarker, PointStyle, LineStyle, LineJoin};
+// use plotlib::view::ContinuousView;
+
+use crate::matrix::*;
+
+fn kadai123(init: f32, times: usize) -> Vec<(f64, f64)> {
+    let a = Matrix::append_line(vec![
+        vec![2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        vec![-1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        vec![0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        vec![0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        vec![0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0],
+        vec![0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0],
+        vec![0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0],
+        vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0],
+        vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0],
+        vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0],
+    ]);
+
+    let mut data = Vec::new();
+
+    let mut f = |x: Matrix<f32>, i: usize| -> Matrix<f32> {
+        let y = &a * &x;
+        let y_norm = y.norm2();
+        println!("M: {}, y_norm: {}", i, y_norm);
+        data.push((i as f64, y_norm as f64));
+        &y / y_norm
+    };
+
+    let mut x = Matrix::new(10, 1);
+    x += init;
+
+    for i in 0..times {
+        x = f(x, i);
+    }
+
+    data
+}
 
 fn main() {
-    let f =
-    Rc::new(|x: f64| x.powf(5.) - 3. * x.powf(4.) + x.powf(3.) + 5. * x.powf(2.) - 6. * x + 2.);
+    let data = kadai123(1.0, 30);
 
-let data_bisection =
-    bisection_method::bisection_method(0f64..1.2f64, 1e-4, f.clone(), 1.0).1;
-let data_newton = newton_raphson_method::newton_raphson_method(f.clone(), 0.6, 1.0)
-    .unwrap()
-    .1;
-
-let x_bisection: Vec<f64> = data_bisection.iter().map(|e| e.0).collect();
-let y_bisection: Vec<f64> = data_bisection.iter().map(|e| e.1).collect();
-
-let x_newton: Vec<f64> = data_newton.iter().map(|e| e.0).collect();
-let y_newton: Vec<f64> = data_newton.iter().map(|e| e.1).collect();
-
-let mut fg = Figure::new();
+    impl<T> Div<T> for &Matrix<T>
+where
+    T: Div<Output = T> + Clone,
 {
-    let _axec = fg
-        .axes2d()
-        .set_x_axis(true, &[])
-        .set_x_range(Fix(0.0), Fix(17.0))
-        .set_y_range(Fix(0.1e-8), Fix(2.0))
-        .set_y_log(Some(10.0))
-        .set_x_label("times", &[])
-        .set_y_label("error", &[])
-        // .set_y_ticks(Some((Fix(-12.0), 1)), &[], &[])
-        .lines(
-            x_bisection,
-            y_bisection,
-            &[Caption("bisection_method"), Color("blue")],
-        )
-        .lines(
-            x_newton,
-            y_newton,
-            &[Caption("newton_raphson_method"), Color("red")],
-        );
-
-    // data_bisection.iter().fold((), |_, e| {
-    //     axec.points(&[e.0], &[e.1], &[Color("blue"), PointSymbol('O')]);
-    // });
-
-    // data_newton.iter().fold((), |_, e| {
-    //     axec.points(&[e.0], &[e.1], &[Color("red"), PointSymbol('O')]);
-    // });
+    type Output = Matrix<T>;
+    fn div(self, rhs: T) -> Self::Output {
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: {
+                let mut v = Vec::new();
+                for i in 0..self.n * self.m {
+                    v.push(self.array[i].clone() / rhs.clone())
+                }
+                v
+            },
+        }
+    }
 }
-let _ = fg.show(); 
+    // let s1 =
+    //     Plot::new(kadai123(0.1, 1000)).point_style(PointStyle::new().marker(PointMarker::Circle));
+    // let s2 =
+    //     Plot::new(kadai123(1.0, 1000)).point_style(PointStyle::new().marker(PointMarker::Square));
+    // let s3 =
+    //     Plot::new(kadai123(3.8, 1000)).point_style(PointStyle::new().marker(PointMarker::Cross));
 
+    // let s4 =
+    //     Plot::new(kadai123(800.0, 1000)).point_style(PointStyle::new().marker(PointMarker::Cross));
+
+    // let v1 = ContinuousView::new()
+    //     .add(s1)
+    //     .x_range(0., 1000.)
+    //     .y_range(3.5, 4.)
+    //     .x_label("times")
+    //     .y_label("value");
+
+    // let v2 = ContinuousView::new()
+    //     .add(s2)
+    //     .x_range(0., 1000.)
+    //     .y_range(3.5, 4.)
+    //     .x_label("times")
+    //     .y_label("value");
+
+    // let v3 = ContinuousView::new()
+    //     .add(s3)
+    //     .x_range(0., 1000.)
+    //     .y_range(3.5, 4.)
+    //     .x_label("times")
+    //     .y_label("value");
+
+    // let v4 = ContinuousView::new()
+    //     .add(s4)
+    //     .x_range(0., 1000.)
+    //     .y_range(3.5, 4.)
+    //     .x_label("times")
+    //     .y_label("value");
+
+    // println!(
+    //     "{}",
+    //     Page::single(&v1).dimensions(80, 10).to_text().unwrap()
+    // );
+    // println!(
+    //     "{}",
+    //     Page::single(&v2).dimensions(80, 10).to_text().unwrap()
+    // );
+    // println!(
+    //     "{}",
+    //     Page::single(&v3).dimensions(80, 10).to_text().unwrap()
+    // );
+    // println!(
+    //     "{}",
+    //     Page::single(&v4).dimensions(80, 10).to_text().unwrap()
+    // );
+
+    // let s0 =
+    //     Plot::new(kadai123(1.0, 30)).point_style(PointStyle::new().marker(PointMarker::Circle));
+
+    // let v0 = ContinuousView::new()
+    //     .add(s0)
+    //     .x_range(0., 30.)
+    //     .y_range(3.5, 4.)
+    //     .x_label("times")
+    //     .y_label("value");
+
+    // println!(
+    //     "{}",
+    //     Page::single(&v0).dimensions(80, 10).to_text().unwrap()
+    // );
+
+    // let l0 = Plot::new(kadai123(1.0, 30))
+    //     .line_style(
+    //         LineStyle::new()
+    //             .colour("blue")
+    //             .linejoin(LineJoin::Round)
+    //     ).point_style(PointStyle::new());
     
+    //     let v0 = ContinuousView::new().add(l0);
+
+    //     Page::single(&v0)
+    //         .save("kadai121.svg")
+    //         .expect("saving svg");
 }
