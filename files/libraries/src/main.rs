@@ -48,25 +48,21 @@ fn kadai123(init: f32, times: usize) -> Vec<(f64, f64)> {
 fn main() {
     let data = kadai123(1.0, 30);
 
-    impl<T> Div<T> for &Matrix<T>
-where
-    T: Div<Output = T> + Clone,
-{
-    type Output = Matrix<T>;
-    fn div(self, rhs: T) -> Self::Output {
-        Matrix {
-            n: self.n,
-            m: self.m,
-            array: {
-                let mut v = Vec::new();
-                for i in 0..self.n * self.m {
-                    v.push(self.array[i].clone() / rhs.clone())
-                }
-                v
-            },
-        }
+    let mut fg = Figure::new();
+    // axes2d()はmutable borrowを作るので後でshow()するには別スコープを作る必要がある
+    {
+        let axes = fg.axes2d();
+        // x軸を表示
+        axes.set_x_axis(true, &[]);
+        // 表示範囲の指定
+        axes.set_x_range(Fix(0.0), Fix(30.0));
+        axes.set_y_range(Fix(3.5), Fix(3.7));
+
+        data.iter().fold((), |_, e| {
+            axes.points(&[e.0], &[e.1], &[Color("blue"), PointSymbol('O')]);
+        });
     }
-}
+    let _ = fg.show();
     // let s1 =
     //     Plot::new(kadai123(0.1, 1000)).point_style(PointStyle::new().marker(PointMarker::Circle));
     // let s2 =
@@ -143,7 +139,7 @@ where
     //             .colour("blue")
     //             .linejoin(LineJoin::Round)
     //     ).point_style(PointStyle::new());
-    
+
     //     let v0 = ContinuousView::new().add(l0);
 
     //     Page::single(&v0)
