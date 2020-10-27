@@ -9,8 +9,17 @@ fn main() {
     let f =
         Rc::new(|x: f64| x.powf(5.) - 3. * x.powf(4.) + x.powf(3.) + 5. * x.powf(2.) - 6. * x + 2.);
 
-    let data_bisection = bisection_method::bisection_method(-2f64..0f64, 1e-4, f.clone(), 1.414213566237).1;
-    let data_newton = newton_raphson_method::newton_raphson_method(f.clone(), -1.0, 1.414213566237).unwrap().1;
+    let data_bisection =
+        bisection_method::bisection_method(-2f64..0f64, 1e-4, f.clone(), 1.414213566237).1;
+    let data_newton = newton_raphson_method::newton_raphson_method(f.clone(), -1.0, 1.414213566237)
+        .unwrap()
+        .1;
+
+    let x_bisection: Vec<f64> = data_bisection.iter().map(|e| e.0).collect();
+    let y_bisection: Vec<f64> = data_bisection.iter().map(|e| e.1).collect();
+
+    let x_newton: Vec<f64> = data_newton.iter().map(|e| e.0).collect();
+    let y_newton: Vec<f64> = data_newton.iter().map(|e| e.1).collect();
 
     let mut fg = Figure::new();
     {
@@ -18,16 +27,21 @@ fn main() {
             .axes2d()
             .set_x_axis(true, &[])
             .set_x_range(Fix(0.0), Fix(17.0))
-            .set_y_range(Fix(1.0), Fix(10.0))
-            .set_y_log(Some(10.0));
+            .set_y_range(Fix(2.0), Fix(5.0))
+            .set_y_log(Some(10.0))
+            .set_x_label("times", &[])
+            .set_y_label("error", &[])
+            .set_y_ticks(Some((Fix(2.0), 1)), &[], &[])
+            .lines(x_bisection, y_bisection, &[Caption("bisection_method"), Color("blue")])
+            .lines(x_newton, y_newton, &[Caption("newton_raphson_method"), Color("red")]);
 
-        data_bisection.iter().fold((), |_, e| {
-            axec.points(&[e.0], &[e.1], &[Color("blue"), PointSymbol('O')]);
-        });
+        // data_bisection.iter().fold((), |_, e| {
+        //     axec.points(&[e.0], &[e.1], &[Color("blue"), PointSymbol('O')]);
+        // });
 
-        data_newton.iter().fold((), |_, e| {
-            axec.points(&[e.0], &[e.1], &[Color("red"), PointSymbol('O')]);
-        });
+        // data_newton.iter().fold((), |_, e| {
+        //     axec.points(&[e.0], &[e.1], &[Color("red"), PointSymbol('O')]);
+        // });
     }
     let _ = fg.show();
 }
