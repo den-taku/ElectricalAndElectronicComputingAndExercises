@@ -693,12 +693,32 @@ jacobian\_newton\_methodでは、関数のベクトル、ヤコビアン(値適�
 適用し、その行列と関数のベクトルに解候補を適用したベクトルを使い、
 matrixのsolve\_eqn関数を用いて修正量$\Delta x$を求めている。
 applicate関数とsolve\_eqn関数はあとで説明するが、解を求めるのに
-LU分解を行なっている。
+LU分解を行なっているn
 
 そして、その修正量の絶対値が閾値よりも少なければ試行回数と解候補を
 記録し続けているdataを返し、条件を満たさなければ
 再帰的に以上の処理を繰り返すようにしている。
 
+次にソースコード6に示したmatrix::applicateとmatrix::solve\_eqn
+について説明する。
+
+applicate関数はRc$<$dyn Fn(R) -$>$ T$>$$>$型の値をもつ
+行列からのみ呼び出せる。
+この行列と要素数の等しいベクトルが与えられた時、その関数に一つ一つ
+値を適用し、適用した値を行列の要素にもつ新しい行列を生成する。
+
+solve\_eqn関数はnxn正方行列aとn次元ベクトルbを受け取る。
+まず、変数luにaをLU分解した結果を保存する。ここで使っている
+lu\_decompose関数はソースコード6に共に示してある。
+この関数ではLの対角行列を1に固定し、元の行列の対角行列の要素で割ることで
+値を縦に求めていく。
+求まると同時にコードにあるように他の要素との積を求めて
+横方向にひいていくことで、縦向けに到達した要素の値はLおよびUの
+値として適切なものになるようにしてある。
+そのようにして求めたLUそれぞれを用いて、前進代入、交代代入を
+順に行うことで求解している。
+
+以上が作成したプログラムの説明である。
 
 
 
@@ -884,6 +904,110 @@ mod tests_newton_raphson_method {
 
 \begin{lstlisting}[caption={matrix\_dash\_dash.rs}]
 
+impl<R, T> Matrix<Rc<dyn Fn(R) -> T>>
+where
+    R: Clone,
+{
+    pub fn applicate(&self, x: &Vec<R>) -> Matrix<T> {
+        if !(self.n * self.m == x.len()) {
+            panic!(format!(
+                "Matrix<R>::applicate needs {} elements",
+                self.n * self.m
+            ));
+        }
+        let mut mapped_array = Vec::new();
+        for i in 0..self.n * self.m {
+            mapped_array.push(self.array[i](x[i].clone()))
+        }
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: mapped_array,
+        }
+    }
+}
+
+impl<F> Matrix<F>
+where
+    F: Float,
+{
+    pub fn solve_eqn(a: &Self, b: &Self) -> Self {
+        if !(a.is_square() && a.n == b.n) {
+            panic!(
+                "`Matrix::solve_eqn` needs n * m matrix and n vector."
+            );
+        }
+        let mut b_mut = b.clone();
+        let lu = a.lu_decompose();
+        for i in 0..a.n - 1 {
+            for j in i + 1..a.n {
+                b_mut[j] = b_mut[j].clone() 
+                    - lu.0[j * a.n + i].clone() * b_mut[i].clone()
+            }
+        }
+        for i in (0..a.n).rev() {
+            b_mut[i] = b_mut[i].clone() / lu.1[i * a.n + i].clone();
+            for k in (0..i).rev() {
+                b_mut[k] = b_mut[k].clone() 
+                    - lu.1[k * a.n + i].clone() * b_mut[i].clone();
+            }
+        }
+        b_mut.m = 1usize;
+        b_mut.n = b_mut.array.len();
+        b_mut
+    }
+}
+
+impl<T> Matrix<T>
+where
+    T: Zero
+        + Clone
+        + ToPrimitive
+        + One
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + Add<Output = T>
+        + Div<Output = T>,
+{
+    pub fn is_square(&self) -> bool {
+        self.n == self.m
+    }
+
+    pub fn lu_decompose(&self) -> (Matrix<T>, Matrix<T>) {
+        // use Crout method
+        if !self.is_square() {
+            panic!("`Matrix::lu_decompose` needs square matrix");
+        }
+        let mut l = vec![vec![T::zero(); self.n]; self.n];
+        let mut u = vec![vec![T::zero(); self.n]; self.n];
+        for i in 0..self.n {
+            l[i][i] = T::one();
+        }
+        let mut dec = self.array.clone();
+
+        for j in 0..self.n - 1 {
+            let w = T::one() / dec[j * self.n + j].clone();
+            for i in j + 1..self.n {
+                dec[i * self.n + j] = w.clone() * dec[i * self.n + j].clone();
+                for k in j + 1..self.n {
+                    dec[i * self.n + k] = dec[i * self.n + k].clone()
+                        - dec[i * self.n + j].clone() * dec[j * self.n + k]
+                            .clone();
+                }
+            }
+        }
+
+        for j in 0..self.n {
+            for i in 0..j + 1 {
+                u[i][j] = dec[i * self.n + j].clone();
+            }
+            for i in j + 1..self.n {
+                l[i][j] = dec[i * self.n + j].clone()
+            }
+        }
+        (Matrix::append_line(l), Matrix::append_line(u)) 
+    }
+}
 \end{lstlisting}
 
 \section{課題1.3.1}
