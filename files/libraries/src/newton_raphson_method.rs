@@ -21,7 +21,7 @@ pub fn jacobian_newton_raphson_method(
 }
 
 // f must be declared as dyn Fn trait object.
-pub fn newton_raphson_method(f: Rc<dyn Fn(f64) -> f64>, init: f64) -> Result<f64, String> {
+pub fn newton_raphson_method(f: Rc<dyn Fn(f64) -> f64>, init: f64, expected_value: f64) -> Result<(f64, Vec<(f64, f64)>), String> {
     let threshold = 0.1e-10;
     // let f = Rc::new(f);
     let f_dir = differential_f(f.clone()); // f is consumed here.
@@ -29,7 +29,8 @@ pub fn newton_raphson_method(f: Rc<dyn Fn(f64) -> f64>, init: f64) -> Result<f64
         // TODO: check convergency in newton_method()
         return Err("function is not convergence.".to_string());
     }
-    newton_method(newton_transform(f, f_dir), init, threshold, 1, 1000000)
+    let data: Vec<(f64, f64)> = Vec::new();
+    newton_method(newton_transform(f, f_dir), init, threshold, 1, 1000000, expected_value, data)
 }
 
 fn dif_jacobi(vec_f: Vec<Rc<dyn Fn(Vec<f64>) -> f64>>) -> Matrix<Rc<dyn Fn(Vec<f64>) -> f64>> {
@@ -115,7 +116,9 @@ fn newton_method(
     threshold: f64,
     times: usize,
     limit: usize,
-) -> Result<f64, String> {
+    expected_value: f64,
+    mut data: Vec<(f64, f64)>
+) -> Result<(f64, Vec<(f64, f64)>), String> {
     let next = f(guess);
     if next == f64::NEG_INFINITY || next == f64::INFINITY || next.is_nan() {
         return Err(format!("x^(k+1) is not a number: last value is {}.", guess));
@@ -126,11 +129,11 @@ fn newton_method(
             next
         ));
     }
+    data.push((times as f64, (next - expected_value).abs()));
     if (next - guess).abs() <= threshold {
-        Ok(next)
+        Ok((next, data))
     } else {
-        println!("{}, {},", times, next);
-        newton_method(f, next, threshold, times + 1, limit)
+        newton_method(f, next, threshold, times + 1, limit, expected_value, data)
     }
 }
 
@@ -160,14 +163,14 @@ mod tests_newton_raphson_method {
         let f: Rc<dyn Fn(f64) -> f64> = Rc::new(|x: f64| -> f64 {
             x.powf(5.) - 3. * x.powf(4.) + x.powf(3.) + 5. * x.powf(2.) - 6. * x + 2.
         });
-        assert_eq!(newton_raphson_method(f, -1.), Ok(-1.4142135623730951));
+        assert_eq!(newton_raphson_method(f, -1., 1.414213566237).unwrap().0, -1.4142135623730951);
     }
 
     #[test]
     fn test_newton_raphson_method_newton_method_neg_inf() {
         let f: Rc<dyn Fn(f64) -> f64> = Rc::new(|x: f64| -> f64 { x });
         assert_eq!(
-            newton_method(f, f64::NEG_INFINITY, 0.1e-10, 1, 10000),
+            newton_method(f, f64::NEG_INFINITY, 0.1e-10, 1, 10000, 1.41, vec![(0f64, 0f64)]),
             Err("x^(k+1) is not a number: last value is -inf.".to_string())
         );
     }
@@ -176,7 +179,7 @@ mod tests_newton_raphson_method {
     fn test_newton_raphson_method_newton_method_inf() {
         let f: Rc<dyn Fn(f64) -> f64> = Rc::new(|x: f64| -> f64 { x });
         assert_eq!(
-            newton_method(f, f64::INFINITY, 0.1e-10, 1, 10000),
+            newton_method(f, f64::INFINITY, 0.1e-10, 1, 10000, 1.41, vec![(0f64, 0f64)]),
             Err("x^(k+1) is not a number: last value is inf.".to_string())
         );
     }
@@ -185,7 +188,7 @@ mod tests_newton_raphson_method {
     fn test_newton_raphson_method_newton_method_nan() {
         let f: Rc<dyn Fn(f64) -> f64> = Rc::new(|x: f64| -> f64 { x });
         assert_eq!(
-            newton_method(f, f64::NAN, 0.1e-10, 1, 10000),
+            newton_method(f, f64::NAN, 0.1e-10, 1, 10000, 1.41, vec![(0f64, 0f64)]),
             Err("x^(k+1) is not a number: last value is NaN.".to_string())
         );
     }
