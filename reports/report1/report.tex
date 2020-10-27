@@ -635,6 +635,23 @@ xを表現できるので、繰り返しAxを求めることで
 
 
 \section{課題1.2.3}
+反復回数を1000回、初期値をそれぞれ0.1、1.0、3.0、4.0、300.0にして
+同様にプロットしたグラフを図\ref{y_conv2}に示す。
+
+図より、初期値に依らず、
+試行回数300回程度で近似解が3.9の近くまで跳ね上がることがわかる。
+したがって課題1.2.1で求めた値は絶対値最大の固有値ではなかったことがわかった。
+なお、(https://keisan.casio.jp/exec/system/1505174268)を用いて固有値を求めると絶対値最大の固有値は3.9189と求まるので、
+試行回数1000回で得られた値(3.918986)が求めたい固有値の値に近いと考えて
+良いと考えた。
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=12cm]{y_conv2.pdf}
+    \caption{初期値、繰り返し回数を変えたべき乗法}
+    \label{y_conv2}
+\end{figure}
+
 % 実験レポート2
 % ここまで
 
@@ -648,6 +665,227 @@ xを表現できるので、繰り返しAxを求めることで
 \subtitle{2019/*/*}
 
 \theme{課題1.3}
+
+n元連立非線形方程式の求解をニュートン法によって行うプログラムを作成した。
+そのコードをソースコード5に示す。
+
+このコードでもmatrixライブラリを使用している。
+説明が必要な関数についてはソースコード6にコードを示し説明する。
+
+まず、jacobian\_newton\_raphson\_methodは、関数のベクトル
+vec\_fと初期近似解ベクトルvec\_initを受け取る。
+真値との誤差を知りたければvec\_expectedに真値を、値が欲しければ
+0ベクトルを与えれば良い。
+
+関数の中では、まずdif\_jacobiに関数のベクトルを与え、ヤコビアンを計算する。
+dif\_jacobiは、その中でpartial\_dirivative関数を用いて偏微分する。
+この関数は、割線法を応用して偏微分導関数を求めている。
+これにより、n次元の関数のベクトルさえ与えればプログラムで
+ヤコビアンを求められるように工夫した。
+そのあと、各ベクトルを演算しやすいようにMatrixに変換し、また
+データを保存するようにdataという変数をバッファとして宣言している。
+そしてそれらを再帰的な関数jacobian\_newton\_methodに与えている。
+
+jacobian\_newton\_methodでは、関数のベクトル、ヤコビアン(値適用前)、
+解の候補、閾値、反復回数、最大反復回数、バッファを受け取る。
+この関数では、まず解の候補をヤコビアンに適用するために$n^2$にしている。
+そして、それをmatrixライブラリのapplicate関数を用いてヤコビアンに
+適用し、その行列と関数のベクトルに解候補を適用したベクトルを使い、
+matrixのsolve\_eqn関数を用いて修正量$\Delta x$を求めている。
+applicate関数とsolve\_eqn関数はあとで説明するが、解を求めるのに
+LU分解を行なっている。
+
+そして、その修正量の絶対値が閾値よりも少なければ試行回数と解候補を
+記録し続けているdataを返し、条件を満たさなければ
+再帰的に以上の処理を繰り返すようにしている。
+
+
+
+
+\ 
+
+\begin{lstlisting}[caption={newton\_raphson\_method.rs}]
+#![allow(dead_code)]
+
+pub use crate::matrix::*;
+pub use std::rc::Rc;
+pub use std::result::Result;
+    
+pub fn jacobian_newton_raphson_method(
+    vec_f: Vec<Rc<dyn Fn(Vec<f64>) -> f64>>,
+    vec_init: Vec<f64>,
+    vec_expected: Vec<f64>
+) -> Result<Vec<(f64, Vec<f64>)>, String> {
+    let n = vec_f.len();
+    if n != vec_init.len() {
+        panic!(
+            "`jacobian_newton_raphson_method` needs 
+                vec_f and vec_init the same size."
+        );
+    }
+    let threshold = 0.1e-10;
+    let jacobian = dif_jacobi(vec_f.clone());
+    let init = Matrix::append(n, 1, vec_init);
+    let f_n: Matrix<Rc<dyn Fn(Vec<f64>) -> f64>> = 
+        Matrix::append(n, 1, vec_f);
+    let data: Vec<(f64, Vec<f64>)> = Vec::new();
+    let mtrx_expected = 
+        Matrix::append(vec_expected.len(), 1, vec_expected);
+    jacobian_newton_method(f_n, jacobian, init, 
+        threshold, 1, 1_000_000, vec_expected, data)
+}
+    
+fn dif_jacobi(
+    vec_f: Vec<Rc<dyn Fn(Vec<f64>) -> f64>>
+) -> Matrix<Rc<dyn Fn(Vec<f64>) -> f64>> {
+    Matrix::append_line({
+        let mut v = Vec::new();
+        for i in 0..vec_f.len() {
+            let mut u = Vec::new();
+            for j in 0..vec_f.len() {
+                unsafe { 
+                    u.push(partial_derivative(vec_f.index(i).clone(), j)) 
+                }
+            }
+            v.push(u);
+        }
+        v
+    })
+}
+    
+unsafe fn partial_derivative(
+    f: Rc<dyn Fn(Vec<f64>) -> f64>,
+    i: usize,
+) -> Rc<dyn Fn(Vec<f64>) -> f64> {
+    let dx = 0.1e-10;
+    let f_der = move |v: Vec<f64>| -> f64 {
+        let mut v_dx = v.clone();
+        v_dx[i] += dx;
+        (f(v_dx) - f(v)) / dx
+    };
+    Rc::new(f_der)
+}
+    
+fn jacobian_newton_method(
+    vec_f: Matrix<Rc<dyn Fn(Vec<f64>) -> f64>>,
+    jacobian: Matrix<Rc<dyn Fn(Vec<f64>) -> f64>>,
+    v_guess: Matrix<f64>,
+    threshold: f64,
+    times: usize,
+    limit: usize,
+    mtrx_expected: Matrix<f64>,
+    mut data: Vec<(f64, Vec<f64>)>
+) -> Result<Vec<(f64, Vec<f64>)>, String> {
+    let x_k_ = vec![
+        vec![v_guess.to_vec().clone(); v_guess.to_vec().len()]; 
+        v_guess.to_vec().len()
+    ];
+    let x_k = x_k_.concat();
+    let jacobian_applicated = jacobian.applicate(&x_k);
+    let f_x_k = vec_f.applicate(
+        &vec![v_guess.to_vec().clone(); v_guess.to_vec().len()]
+    );
+    let v_next = Matrix::solve_eqn(&jacobian_applicated, &f_x_k);
+    if limit == times + 1 {
+        return Err(format!(
+            "solution doesn't converge: last value is {:?}.",
+            v_next.to_vec()
+        ));
+    }
+    let dx: f64 = v_next.norm2();
+    println!("dx : {}", dx);
+    data.push((times as f64, 
+        (&(&v_guess - &v_next) - &mtrx_expected).to_vec()));
+    if dx <= threshold {
+        Ok(data)
+    } else {
+        println!("{}, {:?}", times, (&v_guess - &v_next).to_vec());
+        jacobian_newton_method(
+            vec_f,
+            jacobian,
+            &v_guess - &v_next,
+            threshold,
+            times + 1,
+            limit,
+            vec_expected,
+            data
+        )
+    }
+}
+    
+#[cfg(test)]
+mod tests_newton_raphson_method {
+    use crate::newton_raphson_method::newton_method;
+    use crate::newton_raphson_method::*;
+    
+    #[test]
+    fn test_newton_raohson_jacobi_newton_raphson() {
+        let f1: Rc<dyn Fn(Vec<f64>) -> f64> =
+            Rc::new(|x1: Vec<f64>| -> f64 { 
+                x1[0] * x1[0] + x1[1] * x1[1] - 2.0 
+            });
+        let f2: Rc<dyn Fn(Vec<f64>) -> f64> =
+            Rc::new(|x2: Vec<f64>| -> f64 { 
+                x2[0] - x2[1] * x2[1] 
+            });
+        let mut vec_f: Vec<Rc<dyn Fn(Vec<f64>) -> f64>> = 
+            Vec::new();
+        vec_f.push(f1.clone());
+        vec_f.push(f2.clone());
+
+        assert_eq!(
+            jacobian_newton_raphson_method(vec_f, 
+                vec![2.0f64.sqrt(); 2], 
+                vec![0f64, 0f64]).unwrap().pop().unwrap().1,
+            vec![1.0f64, 1.0f64]
+        );
+        let f3: Rc<dyn Fn(Vec<f64>) -> f64> =
+            Rc::new(|x1: Vec<f64>| -> f64 { 
+                x1[0] * x1[0] + x1[1] - 5.0 
+            });
+        let f4: Rc<dyn Fn(Vec<f64>) -> f64> =
+            Rc::new(|x2: Vec<f64>| -> f64 { 
+                x2[0] - x2[1] * x2[1] - 1.0 
+            });
+
+        let mut vec_f: Vec<Rc<dyn Fn(Vec<f64>) -> f64>> = Vec::new();
+        vec_f.push(f3.clone());
+        vec_f.push(f4.clone());
+
+        assert_eq!(
+            jacobian_newton_raphson_method(vec_f, 
+                vec![2.0f64.sqrt(); 2], 
+                vec![0f64, 0f64]).unwrap().pop().unwrap().1,
+            vec![2.0f64, 1.0f64]
+        );
+    }
+    
+    #[test]
+    #[should_panic(
+        expected = "`jacobian_newton_raphson_method` needs 
+            vec_f and vec_init the same size."
+    )]
+    fn test_newton_raohson_jacobi_newton_raphson_panic() {
+        let f1: Rc<dyn Fn(Vec<f64>) -> f64> =
+            Rc::new(|x1: Vec<f64>| -> f64 { 
+                x1[0] * x1[0] + x1[1] * x1[1] - 2.0 
+            });
+        let f2: Rc<dyn Fn(Vec<f64>) -> f64> =
+            Rc::new(|x2: Vec<f64>| -> f64 { 
+                x2[0] - x2[1] * x2[1] 
+            });
+        let mut vec_f: Vec<Rc<dyn Fn(Vec<f64>) -> f64>> = Vec::new();
+        vec_f.push(f1.clone());
+        vec_f.push(f2.clone());
+        let _ = jacobian_newton_raphson_method(vec_f, vec![2.0f64.sqrt()]);
+    }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={matrix\_dash\_dash.rs}]
+
+\end{lstlisting}
+
 \section{課題1.3.1}
 \section{課題1.3.2}
 

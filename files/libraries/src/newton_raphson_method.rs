@@ -8,7 +8,8 @@ pub use std::result::Result;
 pub fn jacobian_newton_raphson_method(
     vec_f: Vec<Rc<dyn Fn(Vec<f64>) -> f64>>,
     vec_init: Vec<f64>,
-) -> Result<Vec<f64>, String> {
+    vec_expected: Vec<f64>,
+) -> Result<Vec<(f64, Vec<f64>)>, String> {
     let n = vec_f.len();
     if n != vec_init.len() {
         panic!("`jacobian_newton_raphson_method` needs vec_f and vec_init the same size.");
@@ -17,7 +18,18 @@ pub fn jacobian_newton_raphson_method(
     let jacobian = dif_jacobi(vec_f.clone());
     let init = Matrix::append(n, 1, vec_init);
     let f_n: Matrix<Rc<dyn Fn(Vec<f64>) -> f64>> = Matrix::append(n, 1, vec_f);
-    jacobian_newton_method(f_n, jacobian, init, threshold, 1, 1_000_000)
+    let data: Vec<(f64, Vec<f64>)> = Vec::new();
+    let mtrx_expected = Matrix::append(vec_expected.len(), 1, vec_expected);
+    jacobian_newton_method(
+        f_n,
+        jacobian,
+        init,
+        threshold,
+        1,
+        1_000_000,
+        mtrx_expected,
+        data,
+    )
 }
 
 // f must be declared as dyn Fn trait object.
@@ -93,7 +105,9 @@ fn jacobian_newton_method(
     threshold: f64,
     times: usize,
     limit: usize,
-) -> Result<Vec<f64>, String> {
+    mtrx_expected: Matrix<f64>,
+    mut data: Vec<(f64, Vec<f64>)>,
+) -> Result<Vec<(f64, Vec<f64>)>, String> {
     let x_k_ = vec![vec![v_guess.to_vec().clone(); v_guess.to_vec().len()]; v_guess.to_vec().len()];
     let x_k = x_k_.concat();
     let jacobian_applicated = jacobian.applicate(&x_k);
@@ -107,9 +121,13 @@ fn jacobian_newton_method(
         ));
     }
     let dx: f64 = v_next.norm2();
+    data.push((
+        times as f64,
+        (&(&v_guess - &v_next) - &mtrx_expected).to_vec(),
+    ));
     println!("dx : {}", dx);
     if dx <= threshold {
-        Ok((&v_guess - &v_next).to_vec())
+        Ok(data)
     } else {
         println!("{}, {:?}", times, (&v_guess - &v_next).to_vec());
         jacobian_newton_method(
@@ -119,6 +137,8 @@ fn jacobian_newton_method(
             threshold,
             times + 1,
             limit,
+            mtrx_expected,
+            data,
         )
     }
 }
@@ -235,8 +255,13 @@ mod tests_newton_raphson_method {
         let mut vec_f: Vec<Rc<dyn Fn(Vec<f64>) -> f64>> = Vec::new();
         vec_f.push(f1.clone());
         vec_f.push(f2.clone());
+
         assert_eq!(
-            jacobian_newton_raphson_method(vec_f, vec![2.0f64.sqrt(); 2]).unwrap(),
+            jacobian_newton_raphson_method(vec_f, vec![2.0f64.sqrt(); 2], vec![0f64, 0f64])
+                .unwrap()
+                .pop()
+                .unwrap()
+                .1,
             vec![1.0f64, 1.0f64]
         );
         let f3: Rc<dyn Fn(Vec<f64>) -> f64> =
@@ -249,7 +274,11 @@ mod tests_newton_raphson_method {
         vec_f.push(f4.clone());
 
         assert_eq!(
-            jacobian_newton_raphson_method(vec_f, vec![2.0f64.sqrt(); 2]).unwrap(),
+            jacobian_newton_raphson_method(vec_f, vec![2.0f64.sqrt(); 2], vec![0f64, 0f64])
+                .unwrap()
+                .pop()
+                .unwrap()
+                .1,
             vec![2.0f64, 1.0f64]
         );
     }
@@ -266,6 +295,6 @@ mod tests_newton_raphson_method {
         let mut vec_f: Vec<Rc<dyn Fn(Vec<f64>) -> f64>> = Vec::new();
         vec_f.push(f1.clone());
         vec_f.push(f2.clone());
-        let _ = jacobian_newton_raphson_method(vec_f, vec![2.0f64.sqrt()]);
+        let _ = jacobian_newton_raphson_method(vec_f, vec![2.0f64.sqrt()], vec![0f64, 0f64]);
     }
 }

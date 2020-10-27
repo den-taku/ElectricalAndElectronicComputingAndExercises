@@ -368,3 +368,100 @@ fn newton() {
     }
     let _ = fg.show();
 }
+
+fn kadai123(init: f32, times: usize) -> Vec<(f64, f64)> {
+    let a = Matrix::append_line(vec![
+        vec![2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        vec![-1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        vec![0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        vec![0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        vec![0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0, 0.0],
+        vec![0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0, 0.0],
+        vec![0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0, 0.0],
+        vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0, 0.0],
+        vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0, -1.0],
+        vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 2.0],
+    ]);
+
+    let mut data = Vec::new();
+
+    let mut f = |x: Matrix<f32>, i: usize| -> Matrix<f32> {
+        let y = &a * &x;
+        let y_norm = y.norm2();
+        println!("M: {}, y_norm: {}", i, y_norm);
+        data.push((i as f64, y_norm as f64));
+        &y / y_norm
+    };
+
+    let mut x = Matrix::new(10, 1);
+    x += init;
+
+    for i in 0..times {
+        x = f(x, i);
+    }
+
+    data
+}
+
+fn main() {
+    let data1 = kadai123(0.1, 1000);
+    let data2 = kadai123(1.0, 1000);
+    let data3 = kadai123(3.0, 1000);
+    let data4 = kadai123(4.0, 1000);
+    let data5 = kadai123(300.0, 1000);
+
+    let x1: Vec<f64> = data1.iter().map(|e| e.0).collect();
+    let y1: Vec<f64> = data1.iter().map(|e| e.1).collect();
+
+    let x2: Vec<f64> = data2.iter().map(|e| e.0).collect();
+    let y2: Vec<f64> = data2.iter().map(|e| e.1).collect();
+
+    let x3: Vec<f64> = data3.iter().map(|e| e.0).collect();
+    let y3: Vec<f64> = data3.iter().map(|e| e.1).collect();
+
+    let x4: Vec<f64> = data4.iter().map(|e| e.0).collect();
+    let y4: Vec<f64> = data4.iter().map(|e| e.1).collect();
+
+    let x5: Vec<f64> = data5.iter().map(|e| e.0).collect();
+    let y5: Vec<f64> = data5.iter().map(|e| e.1).collect();
+
+    let mut fg = Figure::new();
+    {
+        let _axec = fg
+            .axes2d()
+            .set_x_axis(true, &[])
+            .set_x_range(Fix(0.0), Fix(1000.0))
+            .set_y_range(Fix(3.5), Fix(4.0))
+            .set_x_label("times", &[])
+            .set_y_label("error", &[])
+            // .set_y_ticks(Some((Fix(-12.0), 1)), &[], &[])
+            .lines(
+                x1,
+                y1,
+                &[Caption("init: 0.1"), Color("blue")],
+            )
+            .lines(
+                x2,
+                y2,
+                &[Caption("init: 1.0"), Color("red")],
+            )
+            .lines(
+                x3,
+                y3,
+                &[Caption("init: 3.0"), Color("yellow")],
+            )
+            .lines(
+                x4,
+                y4,
+                &[Caption("init: 4.0"), Color("black")],
+            )
+            .lines(
+                x5,
+                y5,
+                &[Caption("init: 300.0"), Color("purple")]
+            );
+
+
+    }
+    let _ = fg.show();
+}
