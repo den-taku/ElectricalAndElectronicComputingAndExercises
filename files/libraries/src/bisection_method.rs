@@ -49,15 +49,15 @@ mod tests_bisection_method {
             x.powf(5.) - 3. * x.powf(4.) + x.powf(3.) + 5. * x.powf(2.) - 6. * x + 2.
         });
         assert_eq!(
-            (bisection_method(-2f64..0f64, 1e-3, f.clone(), 1.414213566237)).0,
+            (bisection_method(-2f64..0f64, 1e-3, f.clone(), -1.414213566237)).0,
             -1.4150390625
         );
         assert_eq!(
-            (bisection_method(-2f64..0f64, 1e-4, f.clone(), 1.414213566237)).0,
+            (bisection_method(-2f64..0f64, 1e-4, f.clone(), -1.414213566237)).0,
             -1.41424560546875
         );
         assert_eq!(
-            (bisection_method(-2f64..0f64, 1e-5, f.clone(), 1.414213566237)).0,
+            (bisection_method(-2f64..0f64, 1e-5, f.clone(), -1.414213566237)).0,
             -1.4142074584960938
         );
     }

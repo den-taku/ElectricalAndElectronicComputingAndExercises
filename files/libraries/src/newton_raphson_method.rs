@@ -39,7 +39,7 @@ pub fn newton_raphson_method(
         init,
         threshold,
         1,
-        1_000_000,
+        1000000,
         expected_value,
         data,
     )
@@ -59,7 +59,7 @@ fn dif_jacobi(vec_f: Vec<Rc<dyn Fn(Vec<f64>) -> f64>>) -> Matrix<Rc<dyn Fn(Vec<f
     })
 }
 
-fn differential_f(f: Rc<dyn Fn(f64) -> f64>) -> Rc<dyn Fn(f64) -> f64> {
+pub fn differential_f(f: Rc<dyn Fn(f64) -> f64>) -> Rc<dyn Fn(f64) -> f64> {
     let dx = 0.1e-10;
     let f_dir = move |x: f64| -> f64 { (f(x + dx) - f(x)) / dx };
     Rc::new(f_dir)

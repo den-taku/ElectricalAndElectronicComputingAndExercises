@@ -123,19 +123,19 @@ mod tests_bisection_method {
         });
         assert_eq!(
             (bisection_method(
-                -2f64..0f64, 1e-3, f.clone(), 1.414213566237)
+                -2f64..0f64, 1e-3, f.clone(), -1.414213566237)
             ).0,
             -1.4150390625
         );
         assert_eq!(
             (bisection_method(
-                -2f64..0f64, 1e-4, f.clone(), 1.414213566237)
+                -2f64..0f64, 1e-4, f.clone(), -1.414213566237)
             ).0,
             -1.41424560546875
         );
         assert_eq!(
             (bisection_method(
-                -2f64..0f64, 1e-5, f.clone(), 1.414213566237)
+                -2f64..0f64, 1e-5, f.clone(), -1.414213566237)
             ).0,
             -1.4142074584960938
         );
@@ -244,7 +244,7 @@ mod tests_newton_raphson_method {
                 + 5. * x.powf(2.) - 6. * x + 2.
         });
         assert_eq!(
-            newton_raphson_method(f, -1., 1.414213566237).unwrap().0,
+            newton_raphson_method(f, -1., -1.414213566237).unwrap().0,
             -1.4142135623730951
         );
     }
@@ -259,7 +259,7 @@ mod tests_newton_raphson_method {
                 0.1e-10,
                 1,
                 10000,
-                1.41,
+                -1.41,
                 vec![(0f64, 0f64)]
             ),
             Err("x^(k+1) is not a number: last value is -inf.".to_string())
@@ -276,7 +276,7 @@ mod tests_newton_raphson_method {
                 0.1e-10,
                 1,
                 10000,
-                1.41,
+                -1.41,
                 vec![(0f64, 0f64)]
             ),
             Err("x^(k+1) is not a number: last value is inf.".to_string())
@@ -287,7 +287,7 @@ mod tests_newton_raphson_method {
     fn test_newton_raphson_method_newton_method_nan() {
         let f: Rc<dyn Fn(f64) -> f64> = Rc::new(|x: f64| -> f64 { x });
         assert_eq!(
-            newton_method(f, f64::NAN, 0.1e-10, 1, 10000, 1.41, vec![(0f64, 0f64)]),
+            newton_method(f, f64::NAN, 0.1e-10, 1, 10000, -1.41, vec![(0f64, 0f64)]),
             Err("x^(k+1) is not a number: last value is NaN.".to_string())
         );
     }
@@ -306,14 +306,39 @@ mod tests_newton_raphson_method {
 
 二分法の初期期間を[-2, 0]とし、ニュートン法の初期近似解を-1とする。
 そして反復回数を横軸に、
-それぞれの手法で得られた近似解と真値($\sqrt{2}$)との誤差の絶対値を縦軸にとった
-片対数グラフをそれぞれ図1、図2に作成し、示す。
+それぞれの手法で得られた近似解と真値($-\sqrt{2}$)との誤差の絶対値を縦軸にとった
+片対数グラフをそれぞれ図\label{bis_new}に作成し、示す。
+
+
+
+図\ref{bis_new}より、二分法(青色)は収束にこそ時間がかかるが
+比較的誤差の大きさは小さいので初めからある程度は真値近くの値を示すのに対し、
+ニュートン法では収束の速さが速いが収束する前は真値とよりかけ離れた値を
+解の候補として提示することがわかる。
+
+これは、二分法がもともと限られた範囲を二分していくためそこまで誤差が大きくなく
+安定して解に収束していくのに対し、
+ニュートン法では関数の形に依存する。
+今回のグラフでは収束の様子が図\ref{new}のように観測できた。
+このグラフでは候補の点の接線が$x$軸と交わった点が次の候補点になる様子が
+わかった。
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=12cm]{bisection_111.pdf}
-    \caption{二分法の収束の速さ}
+    \includegraphics[width=12cm]{speed_bis_new.pdf}
+    \caption{二分法・ニュートン法の収束の速さ}
+    \label{bis_new}
 \end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=12cm]{speed_new.pdf}
+    \caption{ニュートン法による収束の様子}
+    \label{new}
+\end{figure}
+
+\newpage
+\newpage
 
 \section{課題1.1.2}
 
