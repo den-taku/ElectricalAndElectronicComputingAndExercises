@@ -1,6 +1,7 @@
 mod bisection_method;
 mod matrix;
 mod newton_raphson_method;
+mod data;
 
 // use gnuplot::*;
 // use std::rc::Rc;
@@ -8,9 +9,16 @@ mod newton_raphson_method;
 // use plotlib::repr::Plot;
 // use plotlib::style::{PointMarker, PointStyle, LineStyle, LineJoin};
 // use plotlib::view::ContinuousView;
+use matrix::*;
 
 // use crate::matrix::*;
 
 fn main() {
+   let matrixa = data::matrix21a();
+   let matrixb = data::matrix21b();
+   println!("{}", matrixa);
+   println!("{}", matrixb);
+   println!("{}", Matrix::solve_eqn(&matrixa, &matrixb));
+   println!("{}", Matrix::forward_erase(&matrixa, &matrixb));
    // 
 }

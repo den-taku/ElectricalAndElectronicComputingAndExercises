@@ -31,6 +31,68 @@ pub struct Matrix<T> {
 //     fn lu_decompose(&self) -> (Self, Self);
 // }
 
+impl Matrix<f64> {
+    pub fn forward_erase(a: &Self, b: &Self) -> Self {
+        let a = a.clone();
+        let b = b.clone();
+        if a.m != a.n || a.n != b.n || b.m != 1 {
+            panic!("`Matrix::forward_erase` needs apropriate matrix.")
+        }
+        let mut v_a = vec![vec![]; a.n];
+        println!("1");
+        for i in 0..a.n {
+            for j in 0..a.m {
+                v_a[i].push(a[i * a.m + j].clone())
+            }
+        }
+        println!("2");
+        println!("{}", v_a[0].len());
+        for i in 0..a.n {
+            v_a[i].push(b[i]);
+        }
+        let a00 = v_a[0][0];
+        println!("{}", v_a[0].len());
+        println!("3");
+        for i in 0..a.m+1 {
+            v_a[0][i] /= a00;
+        }
+        println!("4");
+        for i in 1..a.n {
+            // let v_const = v_a[i-1].clone();
+            let index = {
+                let mut v_tmp = Vec::new();
+                println!("5");
+                for j in i..a.m {  
+                    v_tmp.push((v_a[j][i].clone(), j));
+                }
+                v_tmp.sort_by(|a, b| a.partial_cmp(b).unwrap());
+                v_tmp.pop().unwrap().1
+            };
+            v_a.swap(i, index);
+            let a0 = v_a[i][0];
+            println!("6");
+            // for j in i..a.m+1 {
+            //     v_a[i][j] /= a0;
+            // }
+            println!("7");
+            for k in i+1..a.n {
+                let c = v_a[k][i].clone();
+                println!("c: {}", c);
+                println!("8");
+                for l in i..a.m+1 {
+                    println!("v_a[k]'s size: {}", v_a[k].len());
+                    println!("v_a[i]'s size: {}", v_a[i].len());
+                    println!("i: {}, l: {}", i, l);
+                    v_a[k][l] -= c * v_a[i-1][l];
+                }
+                println!("k: {}", k);
+                println!("9");
+            }
+        }
+        Matrix::append_line(v_a)
+    }
+}
+
 impl<T> Matrix<T>
 where
     T: Clone + Zero,
