@@ -19,6 +19,8 @@ fn main() {
    println!("{}", matrixa);
    println!("{}", matrixb);
    println!("{}", Matrix::solve_eqn(&matrixa, &matrixb));
-   println!("{}", Matrix::forward_erase(&matrixa, &matrixb));
+   let ab = Matrix::forward_erase(&matrixa, &matrixb);
+   println!("{}", ab.clone());
+   println!("{}", Matrix::backward_erase(ab));
    // 
 }

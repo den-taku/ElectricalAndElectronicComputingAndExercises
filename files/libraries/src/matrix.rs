@@ -96,8 +96,20 @@ impl Matrix<f64> {
         Matrix::append_line(v_a)
     }
 
-    pub fn backward_erase(ab: Self) -> Self {
-        //
+    pub fn backward_erase(mut ab: Self) -> Self {
+        let nsize = ab.n+1;
+        for i in (0..ab.n).rev() {
+            for j in 0..i {
+                ab[(j+1)*(nsize)-1] -= ab[j*nsize+i].clone()
+                    * ab[(i+1)*(nsize)-1].clone();
+                // println!("{}",ab[(i+1)*nsize-1]);
+            }
+        }
+        let mut v = Vec::new();
+        for i in 0..ab.n {
+            v.push(ab[i*nsize + nsize-1])
+        }
+        Matrix::append(ab.n, 1, v)
     }
 }
 
