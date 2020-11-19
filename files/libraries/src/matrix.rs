@@ -62,16 +62,16 @@ impl Matrix<f64> {
         println!("4");
         for i in 0..a.n {
             // let v_const = v_a[i-1].clone();
-            // let index = {
-            //     let mut v_tmp = Vec::new();
-            //     println!("5");
-            //     for j in i..a.m {  
-            //         v_tmp.push((v_a[j][i].clone(), j));
-            //     }
-            //     v_tmp.sort_by(|a, b| a.partial_cmp(b).unwrap());
-            //     v_tmp.pop().unwrap().1
-            // };
-            // v_a.swap(i, index);
+            let index = {
+                let mut v_tmp = Vec::new();
+                println!("5");
+                for j in i..a.m {  
+                    v_tmp.push((v_a[j][i].clone(), j));
+                }
+                v_tmp.sort_by(|a, b| a.partial_cmp(b).unwrap());
+                v_tmp.pop().unwrap().1
+            };
+            v_a.swap(i, index);
             let a0 = v_a[i][i];
             println!("v_a[i][0]: {}", a0);
             println!("6");
@@ -94,6 +94,10 @@ impl Matrix<f64> {
             }
         }
         Matrix::append_line(v_a)
+    }
+
+    pub fn backward_erase(ab: Self) -> Self {
+        //
     }
 }
 
