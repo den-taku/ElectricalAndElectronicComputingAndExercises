@@ -32,39 +32,31 @@ pub struct Matrix<T> {
 // }
 
 impl Matrix<f64> {
-    pub fn forward_erase(a: &Self, b: &Self) -> Self {
+    pub fn solve_eqn_gauss(a: &Self, b: &Self) -> Self {
+        if !(a.is_square() && a.n == b.n) {
+            panic!("`Matrix::solve_eqn_gauss` needs n * n matrix and n vector.");
+        }
+        Matrix::backward_erase(Matrix::forward_erase(a, b))
+    } 
+
+    fn forward_erase(a: &Self, b: &Self) -> Self {
         let a = a.clone();
         let b = b.clone();
         if a.m != a.n || a.n != b.n || b.m != 1 {
             panic!("`Matrix::forward_erase` needs apropriate matrix.")
         }
         let mut v_a = vec![vec![]; a.n];
-        println!("1");
         for i in 0..a.n {
             for j in 0..a.m {
                 v_a[i].push(a[i * a.m + j].clone())
             }
         }
-        // println!("Test");
-        // println!("{:?}", v_a);
-        println!("2");
-        // println!("{}", v_a[0].len());
         for i in 0..a.n {
             v_a[i].push(b[i]);
         }
-        // println!("{:?}", v_a);
-        // let a00 = v_a[0][0];
-        // println!("{}", v_a[0].len());
-        // println!("3");
-        // for i in 0..a.m+1 {
-        //     v_a[0][i] /= a00;
-        // }
-        println!("4");
         for i in 0..a.n {
-            // let v_const = v_a[i-1].clone();
             let index = {
                 let mut v_tmp = Vec::new();
-                println!("5");
                 for j in i..a.m {  
                     v_tmp.push((v_a[j][i].clone(), j));
                 }
@@ -73,36 +65,25 @@ impl Matrix<f64> {
             };
             v_a.swap(i, index);
             let a0 = v_a[i][i];
-            println!("v_a[i][0]: {}", a0);
-            println!("6");
             for j in i..a.m+1 {
                 v_a[i][j] /= a0;
             }
-            println!("7");
             for k in i+1..a.n {
                 let c = v_a[k][i].clone();
-                println!("c: {}", c);
-                println!("8");
                 for l in i..a.m+1 {
-                    // println!("v_a[k]'s size: {}", v_a[k].len());
-                    // println!("v_a[i]'s size: {}", v_a[i].len());
-                    // println!("i: {}, l: {}", i, l);
                     v_a[k][l] -= c * v_a[i][l];
                 }
-                // println!("k: {}", k);
-                println!("9");
             }
         }
         Matrix::append_line(v_a)
     }
 
-    pub fn backward_erase(mut ab: Self) -> Self {
+    fn backward_erase(mut ab: Self) -> Self {
         let nsize = ab.n+1;
         for i in (0..ab.n).rev() {
             for j in 0..i {
                 ab[(j+1)*(nsize)-1] -= ab[j*nsize+i].clone()
                     * ab[(i+1)*(nsize)-1].clone();
-                // println!("{}",ab[(i+1)*nsize-1]);
             }
         }
         let mut v = Vec::new();
