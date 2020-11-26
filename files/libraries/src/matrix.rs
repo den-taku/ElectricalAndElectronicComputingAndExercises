@@ -33,18 +33,18 @@ pub struct Matrix<T> {
 
 impl Matrix<f64> {
     pub fn solve_eqn_gauss(a: &Self, b: &Self) -> Self {
-        if !(a.is_square() && a.n == b.n) {
+        if !(a.is_square() && a.n == b.n && b.m == 1) {
             panic!("`Matrix::solve_eqn_gauss` needs n * n matrix and n vector.");
         }
-        Matrix::backward_erase(Matrix::forward_erase(a, b))
+        Matrix::backward_substitute(Matrix::forward_erase(a, b))
     } 
 
     fn forward_erase(a: &Self, b: &Self) -> Self {
         let a = a.clone();
         let b = b.clone();
-        if a.m != a.n || a.n != b.n || b.m != 1 {
-            panic!("`Matrix::forward_erase` needs apropriate matrix.")
-        }
+        // if a.m != a.n || a.n != b.n || b.m != 1 {
+        //     panic!("`Matrix::forward_erase` needs apropriate matrix.")
+        // }
         let mut v_a = vec![vec![]; a.n];
         for i in 0..a.n {
             for j in 0..a.m {
@@ -78,7 +78,7 @@ impl Matrix<f64> {
         Matrix::append_line(v_a)
     }
 
-    fn backward_erase(mut ab: Self) -> Self {
+    fn backward_substitute(mut ab: Self) -> Self {
         let nsize = ab.n+1;
         for i in (0..ab.n).rev() {
             for j in 0..i {
