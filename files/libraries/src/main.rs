@@ -26,5 +26,8 @@ fn main() {
    println!("{}", matrixa.lower_triangular_matrix());
    println!("{}", matrixa.upper_triangular_matrix());
    println!("{}", matrixa.diagonal_matrix());
-   // 
+   
+   let mut jacobi = Jacobi::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
+   jacobi.solve(10e-10, 10_000);
+   println!("{}", jacobi);
 }

@@ -16,7 +16,7 @@ pub trait Iterative<F: Float> {
     fn solve(&mut self, convergent_condition: F, max_iteration: usize);
 }
 
-struct Jacobi<F: Float> {
+pub struct Jacobi<F: Float> {
     a: Matrix<F>,
     b: Matrix<F>,
     ans: Matrix<F>
@@ -30,7 +30,11 @@ where
         (&(&self.a * &self.ans) - &self.b).norm2::<F>() / self.b.norm2()
     }
     fn solve(&mut self, convergent_condition: F, max_iteration: usize) {
-        self.solve_inner(convergent_condition, max_iteration, 0usize)
+        let mut d = self.a.diagonal_matrix();
+        for i in 0..self.a.n * self.a.m {
+            d.array[i] = if d.array[i] != F::from_f32(0.0).unwrap() { F::from_f32(1.0).unwrap() / d.array[i] } else { F::zero() };
+        }
+        self.solve_inner(convergent_condition, max_iteration, 0usize, d, &self.a.lower_triangular_matrix() + &self.a.upper_triangular_matrix())
     }
 }
 
@@ -49,13 +53,35 @@ where
         }
     }
 
-    fn solve_inner(&mut self, convergent_condition: F, max_iteratinon: usize, times: usize) {
-        //
+    fn solve_inner(&mut self, convergent_condition: F, max_iteratinon: usize, times: usize, d_inverse: Matrix<F>, e_plus_f: Matrix<F>) {
+        let x_k = self.ans.clone();
+        self.ans = &d_inverse * &(&self.b - &(&e_plus_f * &x_k));
 
         if times + 1 == max_iteratinon || self.residual_vector() <= convergent_condition {
             return;
         }
-        self.solve_inner(convergent_condition, max_iteratinon, times + 1)
+        self.solve_inner(convergent_condition, max_iteratinon, times + 1, d_inverse, e_plus_f)
+    }
+}
+
+impl<F> Display for Jacobi<F>
+where
+    F: Float + Zero + Display + PartialOrd
+{
+    fn fmt(&self, dest: &mut Formatter) -> fmt::Result {
+        let mut string = "".to_string();
+        for i in 0..self.ans.n {
+            for j in 0..self.ans.m {
+                let pad = if self.ans[i * self.ans.m + j] >= F::zero() {
+                    " ".to_string()
+                } else {
+                    "".to_string()
+                };
+                string = format!("{}{}{} ", string, pad, self.ans[i * self.ans.m + j].clone());
+            }
+            string = format!("{}\n", string);
+        }
+        write!(dest, "{}", string)
     }
 }
 
