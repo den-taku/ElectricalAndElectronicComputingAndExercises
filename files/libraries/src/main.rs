@@ -23,5 +23,6 @@ fn main() {
    // println!("{}", Matrix::backward_erase(ab));
    println!("{}", Matrix::solve_eqn_gauss(&matrixa, &matrixb));
    println!("{}", Matrix::solve_eqn(&matrixa, &matrixb));
+   println!("{}", matrixa.lower_triangular_matrix());
    // 
 }

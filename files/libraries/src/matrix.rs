@@ -55,9 +55,40 @@ where
         if times + 1 == max_iteratinon || self.residual_vector() <= convergent_condition {
             return;
         }
-        unimplemented!()
+        self.solve_inner(convergent_condition, max_iteratinon, times + 1)
     }
 }
+
+impl<F> Matrix<F> 
+where 
+    F: Float + Zero 
+{
+    pub fn lower_triangular_matrix(&self) -> Self {
+        if self.n != self.m {
+            panic!("lower_triangular_matrix's implementation for n != m is not yet.")
+        }
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: {
+                let mut v = Vec::new();
+                for i in 0..self.n {
+                    for j in 0..self.m {
+                        v.push(
+                            if i > j {
+                                self.array[i * self.n + j]
+                            } else {
+                                F::zero()
+                            }
+                        )
+                    }
+                }
+                v
+            }
+        }
+    }
+}
+
 
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
 pub struct Matrix<T> {
