@@ -11,6 +11,54 @@ pub use std::rc::Rc;
 pub use std::fmt;
 pub use std::fmt::{Display, Formatter};
 
+pub trait Iterative<F: Float> {
+    fn residual_vector(&self) -> F;
+    fn solve(&mut self, convergent_condition: F, max_iteration: usize);
+}
+
+struct Jacobi<F: Float> {
+    a: Matrix<F>,
+    b: Matrix<F>,
+    ans: Matrix<F>
+}
+
+impl<F> Iterative<F> for Jacobi<F> 
+where
+    F: Float + FromPrimitive
+{
+    fn residual_vector(&self) -> F {
+        (&(&self.a * &self.ans) - &self.b).norm2::<F>() / self.b.norm2()
+    }
+    fn solve(&mut self, convergent_condition: F, max_iteration: usize) {
+        self.solve_inner(convergent_condition, max_iteration, 0usize)
+    }
+}
+
+impl<F> Jacobi<F> 
+where
+    F: Float + FromPrimitive
+{
+    pub fn new(a: Matrix<F>, b: Matrix<F>, init: Matrix<F>) -> Self {
+        if !(a.m == a.n && a.n == b.n && b.n == init.n) {
+            panic!("Jacobi needs n size matrix.")
+        }
+        Jacobi {
+            a,
+            b,
+            ans: init
+        }
+    }
+
+    fn solve_inner(&mut self, convergent_condition: F, max_iteratinon: usize, times: usize) {
+        //
+
+        if times + 1 == max_iteratinon || self.residual_vector() <= convergent_condition {
+            return;
+        }
+        unimplemented!()
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
 pub struct Matrix<T> {
     n: usize,      // line           [* * * * *]
