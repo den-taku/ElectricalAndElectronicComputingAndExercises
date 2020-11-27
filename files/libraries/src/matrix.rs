@@ -36,7 +36,7 @@ where
 
 impl<F> Jacobi<F> 
 where
-    F: Float + FromPrimitive
+    F: Float + FromPrimitive + Zero
 {
     pub fn new(a: Matrix<F>, b: Matrix<F>, init: Matrix<F>) -> Self {
         if !(a.m == a.n && a.n == b.n && b.n == init.n) {
@@ -76,6 +76,30 @@ where
                     for j in 0..self.m {
                         v.push(
                             if i > j {
+                                self.array[i * self.n + j]
+                            } else {
+                                F::zero()
+                            }
+                        )
+                    }
+                }
+                v
+            }
+        }
+    }
+    pub fn upper_triangular_matrix(&self) -> Self {
+        if self.n != self.m {
+            panic!("lower_triangular_matrix's implementation for n != m is not yet.")
+        }
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: {
+                let mut v = Vec::new();
+                for i in 0..self.n {
+                    for j in 0..self.m {
+                        v.push(
+                            if i < j {
                                 self.array[i * self.n + j]
                             } else {
                                 F::zero()
