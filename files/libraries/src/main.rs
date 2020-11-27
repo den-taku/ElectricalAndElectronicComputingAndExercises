@@ -25,5 +25,6 @@ fn main() {
    println!("{}", Matrix::solve_eqn(&matrixa, &matrixb));
    println!("{}", matrixa.lower_triangular_matrix());
    println!("{}", matrixa.upper_triangular_matrix());
+   println!("{}", matrixa.diagonal_matrix());
    // 
 }
