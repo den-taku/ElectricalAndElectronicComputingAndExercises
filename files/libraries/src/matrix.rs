@@ -54,9 +54,6 @@ where
     }
 
     fn solve_inner(&mut self, convergent_condition: F, max_iteratinon: usize, times: usize, d_inverse: Matrix<F>, e: Matrix<F>, f: Matrix<F>) -> usize {
-        // let x_k = self.ans.clone();
-        // self.ans = &d_inverse * &(&(&self.b -  &(&e * &self.ans)) - &(&f * &x_k));
-
         for i in 0..self.a.n {
             let a_i_i = self.a[i * (self.a.n + 1) ];
             let mut sum = F::zero();
