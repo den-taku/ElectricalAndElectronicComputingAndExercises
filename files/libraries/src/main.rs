@@ -36,4 +36,9 @@ fn main() {
    let times_gaussseidel = gauss_seidel.solve(10e-10, 10_000);
    println!("times: {}", times_gaussseidel);
    println!("{}", gauss_seidel);
+
+   let mut sor = SOR::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1), 1.0);
+   let times_sor = sor.solve(10e-10, 10_000);
+   println!("times: {}", times_sor);
+   println!("{}", sor);
 }

@@ -16,6 +16,80 @@ pub trait Iterative<F: Float> {
     fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> usize ;
 }
 
+pub struct SOR<F: Float> {
+    a: Matrix<F>,
+    b: Matrix<F>,
+    ans: Matrix<F>,
+    relaxation_factor: F
+}
+
+impl<F> Iterative<F> for SOR<F> 
+where
+    F: Float + FromPrimitive
+{
+    fn residual_vector(&self) -> F {
+        (&(&self.a * &self.ans) - &self.b).norm2::<F>() / self.b.norm2()
+    }
+    fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> usize {
+        let mut d = self.a.diagonal_matrix();
+        for i in 0..self.a.n * self.a.m {
+            d.array[i] = if d.array[i] != F::from_f32(0.0).unwrap() { F::from_f32(1.0).unwrap() / d.array[i] } else { F::zero() };
+        }
+        self.solve_inner(convergent_condition, max_iteration, 0usize, d, &self.a.lower_triangular_matrix() + &self.a.upper_triangular_matrix())
+    }
+}
+
+impl<F> SOR<F> 
+where
+    F: Float + FromPrimitive + Zero
+{
+    pub fn new(a: Matrix<F>, b: Matrix<F>, init: Matrix<F>, relaxation_factor: F) -> Self {
+        if !(a.m == a.n && a.n == b.n && b.n == init.n) {
+            panic!("SOR needs n size matrix.")
+        }
+        if relaxation_factor < F::from_f32(1.0).unwrap() {
+            panic!("Use ω which is more than 1.0")
+        }
+        SOR {
+            a,
+            b,
+            ans: init,
+            relaxation_factor
+        }
+    }
+
+    fn solve_inner(&mut self, convergent_condition: F, max_iteratinon: usize, times: usize, d_inverse: Matrix<F>, e_plus_f: Matrix<F>) -> usize {
+        let x_k = self.ans.clone();
+        self.ans = &d_inverse * &(&self.b - &(&e_plus_f * &x_k));
+
+        if times + 1 == max_iteratinon || self.residual_vector() <= convergent_condition {
+            return times;
+        }
+        self.solve_inner(convergent_condition, max_iteratinon, times + 1, d_inverse, e_plus_f)
+    }
+}
+
+impl<F> Display for SOR<F>
+where
+    F: Float + Zero + Display + PartialOrd
+{
+    fn fmt(&self, dest: &mut Formatter) -> fmt::Result {
+        let mut string = "".to_string();
+        for i in 0..self.ans.n {
+            for j in 0..self.ans.m {
+                let pad = if self.ans[i * self.ans.m + j] >= F::zero() {
+                    " ".to_string()
+                } else {
+                    "".to_string()
+                };
+                string = format!("{}{}{} ", string, pad, self.ans[i * self.ans.m + j].clone());
+            }
+            string = format!("{}\n", string);
+        }
+        write!(dest, "{}", string)
+    }
+}
+
 pub struct GaussSeidel<F: Float> {
     a: Matrix<F>,
     b: Matrix<F>,
