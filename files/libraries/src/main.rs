@@ -28,6 +28,12 @@ fn main() {
    println!("{}", matrixa.diagonal_matrix());
    
    let mut jacobi = Jacobi::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
-   jacobi.solve(10e-10, 10_000);
+   let times_jacobi = jacobi.solve(10e-10, 10_000);
+   println!("times: {}", times_jacobi);
    println!("{}", jacobi);
+
+   let mut gauss_seidel = GaussSeidel::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
+   let times_gaussseidel = gauss_seidel.solve(10e-10, 10_000);
+   println!("times: {}", times_gaussseidel);
+   println!("{}", gauss_seidel);
 }
