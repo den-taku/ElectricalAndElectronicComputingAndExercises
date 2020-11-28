@@ -353,7 +353,7 @@ impl Matrix<f64> {
         Matrix::backward_substitute(Matrix::forward_erase(a, b))
     } 
 
-    fn forward_erase(a: &Self, b: &Self) -> Self {
+    pub fn forward_erase(a: &Self, b: &Self) -> Self {
         let a = a.clone();
         let b = b.clone();
         // if a.m != a.n || a.n != b.n || b.m != 1 {
@@ -392,7 +392,7 @@ impl Matrix<f64> {
         Matrix::append_line(v_a)
     }
 
-    fn backward_substitute(mut ab: Self) -> Self {
+    pub fn backward_substitute(mut ab: Self) -> Self {
         let nsize = ab.n+1;
         for i in (0..ab.n).rev() {
             for j in 0..i {

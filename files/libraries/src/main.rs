@@ -69,4 +69,8 @@ fn main() {
    let times_sor = sor.solve(10e-10, 10_000);
    println!("times: {}", times_sor);
    println!("{}", sor);
+
+   let matrixa = data::matrix23a_f64();
+   let matrixb = data::matrix23b_f64();
+   println!("{}", Matrix::forward_erase(&matrixa, &matrixb));
 }
