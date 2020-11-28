@@ -35,7 +35,7 @@ where
         for i in 0..self.a.n * self.a.m {
             d.array[i] = if d.array[i] != F::from_f32(0.0).unwrap() { F::from_f32(1.0).unwrap() / d.array[i] } else { F::zero() };
         }
-        self.solve_inner(convergent_condition, max_iteration, 0usize, d, &self.a.lower_triangular_matrix() + &self.a.upper_triangular_matrix())
+        self.solve_inner(convergent_condition, max_iteration, 0usize, d, self.a.lower_triangular_matrix(), self.a.upper_triangular_matrix())
     }
 }
 
@@ -47,7 +47,7 @@ where
         if !(a.m == a.n && a.n == b.n && b.n == init.n) {
             panic!("SOR needs n size matrix.")
         }
-        if relaxation_factor < F::from_f32(1.0).unwrap() {
+        if relaxation_factor <= F::from_f32(0.0).unwrap() || relaxation_factor >= F::from_f32(2.0).unwrap() {
             panic!("Use ω which is more than 1.0")
         }
         SOR {
@@ -58,14 +58,24 @@ where
         }
     }
 
-    fn solve_inner(&mut self, convergent_condition: F, max_iteratinon: usize, times: usize, d_inverse: Matrix<F>, e_plus_f: Matrix<F>) -> usize {
+    fn solve_inner(&mut self, convergent_condition: F, max_iteratinon: usize, times: usize, d_inverse: Matrix<F>, e: Matrix<F>, f: Matrix<F>) -> usize {
         let x_k = self.ans.clone();
-        self.ans = &d_inverse * &(&self.b - &(&e_plus_f * &x_k));
+        for i in 0..self.a.n {
+            let a_i_i = self.a[i * (self.a.n + 1) ];
+            let mut sum = F::zero();
+            for j in 0..self.a.m {
+                if i != j {
+                    sum = sum + self.a[i * self.a.n + j] * self.ans[j];
+                }
+            }
+            self.ans[i] = (self.b[i] - sum) / a_i_i;
+        }
+        self.ans = &x_k + &(&(&self.ans - &x_k) * self.relaxation_factor);
 
         if times + 1 == max_iteratinon || self.residual_vector() <= convergent_condition {
             return times;
         }
-        self.solve_inner(convergent_condition, max_iteratinon, times + 1, d_inverse, e_plus_f)
+        self.solve_inner(convergent_condition, max_iteratinon, times + 1, d_inverse, e, f)
     }
 }
 
