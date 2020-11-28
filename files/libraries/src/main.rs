@@ -21,8 +21,8 @@ fn main() {
    // let ab = Matrix::forward_erase(&matrixa, &matrixb);
    // println!("{}", ab.clone());
    // println!("{}", Matrix::backward_erase(ab));
-   // println!("{}", Matrix::solve_eqn_gauss(&matrixa, &matrixb));
-   // println!("{}", Matrix::solve_eqn(&matrixa, &matrixb));
+   println!("{}", Matrix::solve_eqn_gauss(&matrixa, &matrixb));
+   println!("{}", Matrix::solve_eqn(&matrixa, &matrixb));
    // println!("{}", matrixa.lower_triangular_matrix());
    // println!("{}", matrixa.upper_triangular_matrix());
    // println!("{}", matrixa.diagonal_matrix());

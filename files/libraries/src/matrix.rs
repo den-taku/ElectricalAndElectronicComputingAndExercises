@@ -12,7 +12,7 @@ pub use std::fmt;
 pub use std::fmt::{Display, Formatter};
 
 pub trait Iterative<F: Float> {
-    fn residual_vector(&self) -> F;
+    fn residual_norm(&self) -> F;
     fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> usize ;
 }
 
@@ -27,7 +27,7 @@ impl<F> Iterative<F> for SOR<F>
 where
     F: Float + FromPrimitive
 {
-    fn residual_vector(&self) -> F {
+    fn residual_norm(&self) -> F {
         (&(&self.a * &self.ans) - &self.b).norm2::<F>() / self.b.norm2()
     }
     fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> usize {
@@ -72,7 +72,7 @@ where
         }
         self.ans = &x_k + &(&(&self.ans - &x_k) * self.relaxation_factor);
 
-        if times + 1 == max_iteratinon || self.residual_vector() <= convergent_condition {
+        if times == max_iteratinon || self.residual_norm() <= convergent_condition {
             return times;
         }
         self.solve_inner(convergent_condition, max_iteratinon, times + 1, d_inverse, e, f)
@@ -110,7 +110,7 @@ impl<F> Iterative<F> for GaussSeidel<F>
 where
     F: Float + FromPrimitive
 {
-    fn residual_vector(&self) -> F {
+    fn residual_norm(&self) -> F {
         (&(&self.a * &self.ans) - &self.b).norm2::<F>() / self.b.norm2()
     }
     fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> usize {
@@ -149,7 +149,7 @@ where
             self.ans[i] = (self.b[i] - sum) / a_i_i;
         }
 
-        if times + 1 == max_iteratinon || self.residual_vector() <= convergent_condition {
+        if times == max_iteratinon || self.residual_norm() <= convergent_condition {
             return times;
         }
         self.solve_inner(convergent_condition, max_iteratinon, times + 1, d_inverse, e, f)
@@ -187,7 +187,7 @@ impl<F> Iterative<F> for Jacobi<F>
 where
     F: Float + FromPrimitive
 {
-    fn residual_vector(&self) -> F {
+    fn residual_norm(&self) -> F {
         (&(&self.a * &self.ans) - &self.b).norm2::<F>() / self.b.norm2()
     }
     fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> usize {
@@ -218,7 +218,7 @@ where
         let x_k = self.ans.clone();
         self.ans = &d_inverse * &(&self.b - &(&e_plus_f * &x_k));
 
-        if times + 1 == max_iteratinon || self.residual_vector() <= convergent_condition {
+        if times == max_iteratinon || self.residual_norm() <= convergent_condition {
             return times;
         }
         self.solve_inner(convergent_condition, max_iteratinon, times + 1, d_inverse, e_plus_f)
