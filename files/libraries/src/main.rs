@@ -145,21 +145,21 @@ fn main() {
     println!("{}", Matrix::solve_eqn(&matrixa, &matrixb));
 
     let mut jacobi = Jacobi::<f32>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
-    let mut data_jacobi = jacobi.solve(10e-10, 10_000);
+    let mut data_jacobi = jacobi.solve(10e-7, 10_000);
     // println!("times: {}", times_jacobi);
     println!("{}", jacobi);
    //  println!("{:?}", data_jacobi.pop().unwrap());
 
     let mut gauss_seidel =
         GaussSeidel::<f32>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
-    let mut data_gaussseidel = gauss_seidel.solve(10e-10, 10_000);
+    let mut data_gaussseidel = gauss_seidel.solve(10e-7, 10_000);
     // println!("times: {}", times_gaussseidel);
     println!("{}", gauss_seidel);
    //  println!("{:?}", data_gaussseidel.pop().unwrap());
 
     println!("KOKO?");
     let mut sor = SOR::<f32>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1), 1.84);
-    let mut data_sor = sor.solve(10e-10, 10_000);
+    let mut data_sor = sor.solve(10e-7, 10_000);
     // println!("times: {}", times_sor);
     println!("{}", sor);
    //  println!("{:?}", data_sor.pop().unwrap());
@@ -176,8 +176,8 @@ fn main() {
         let _axec = fg
             .axes2d()
             .set_x_axis(true, &[])
-            .set_x_range(Fix(0.0), Fix(4500.0))
-            .set_y_range(Fix(10e-10), Fix(1.0))
+            .set_x_range(Fix(0.0), Fix(2200.0))
+            .set_y_range(Fix(10e-7), Fix(1.0))
             .set_y_log(Some(10.0))
             .set_x_label("times", &[])
             .set_y_label("residual\\_norm", &[])
