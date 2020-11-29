@@ -13,51 +13,60 @@ pub use std::fmt::{Display, Formatter};
 
 pub trait Iterative<F: Float> {
     fn residual_norm(&self) -> F;
-    fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> usize ;
+    fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> Vec<(usize, F)>;
 }
 
 pub struct SOR<F: Float> {
     a: Matrix<F>,
     b: Matrix<F>,
     ans: Matrix<F>,
-    relaxation_factor: F
+    relaxation_factor: F,
 }
 
-impl<F> Iterative<F> for SOR<F> 
+impl<F> Iterative<F> for SOR<F>
 where
-    F: Float + FromPrimitive
+    F: Float + FromPrimitive,
 {
     fn residual_norm(&self) -> F {
         (&(&self.a * &self.ans) - &self.b).norm2::<F>() / self.b.norm2()
     }
-    fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> usize {
-        self.solve_inner(convergent_condition, max_iteration, 0usize)
+    fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> Vec<(usize, F)> {
+        let data: Vec<(usize, F)> = Vec::new();
+        self.solve_inner(convergent_condition, max_iteration, 0usize, data)
     }
 }
 
-impl<F> SOR<F> 
+impl<F> SOR<F>
 where
-    F: Float + FromPrimitive + Zero
+    F: Float + FromPrimitive + Zero,
 {
     pub fn new(a: Matrix<F>, b: Matrix<F>, init: Matrix<F>, relaxation_factor: F) -> Self {
         if !(a.m == a.n && a.n == b.n && b.n == init.n) {
             panic!("SOR needs n size matrix.")
         }
-        if relaxation_factor <= F::from_f32(0.0).unwrap() || relaxation_factor >= F::from_f32(2.0).unwrap() {
+        if relaxation_factor <= F::from_f32(0.0).unwrap()
+            || relaxation_factor >= F::from_f32(2.0).unwrap()
+        {
             panic!("Use ω which is more than 0.0 and less than 2.0.")
         }
         SOR {
             a,
             b,
             ans: init,
-            relaxation_factor
+            relaxation_factor,
         }
     }
 
-    fn solve_inner(&mut self, convergent_condition: F, max_iteratinon: usize, times: usize) -> usize {
+    fn solve_inner(
+        &mut self,
+        convergent_condition: F,
+        max_iteratinon: usize,
+        times: usize,
+        mut data: Vec<(usize, F)>,
+    ) -> Vec<(usize, F)> {
         let x_k = self.ans.clone();
         for i in 0..self.a.n {
-            let a_i_i = self.a[i * (self.a.n + 1) ];
+            let a_i_i = self.a[i * (self.a.n + 1)];
             let mut sum = F::zero();
             for j in 0..self.a.m {
                 if i != j {
@@ -68,16 +77,19 @@ where
         }
         self.ans = &x_k + &(&(&self.ans - &x_k) * self.relaxation_factor);
 
-        if times == max_iteratinon || self.residual_norm() <= convergent_condition {
-            return times;
+        let res_norm = self.residual_norm();
+        data.push((times, res_norm));
+
+        if times == max_iteratinon || res_norm <= convergent_condition {
+            return data;
         }
-        self.solve_inner(convergent_condition, max_iteratinon, times + 1)
+        self.solve_inner(convergent_condition, max_iteratinon, times + 1, data)
     }
 }
 
 impl<F> Display for SOR<F>
 where
-    F: Float + Zero + Display + PartialOrd
+    F: Float + Zero + Display + PartialOrd,
 {
     fn fmt(&self, dest: &mut Formatter) -> fmt::Result {
         let mut string = "".to_string();
@@ -99,39 +111,42 @@ where
 pub struct GaussSeidel<F: Float> {
     a: Matrix<F>,
     b: Matrix<F>,
-    ans: Matrix<F>
+    ans: Matrix<F>,
 }
 
-impl<F> Iterative<F> for GaussSeidel<F> 
+impl<F> Iterative<F> for GaussSeidel<F>
 where
-    F: Float + FromPrimitive
+    F: Float + FromPrimitive,
 {
     fn residual_norm(&self) -> F {
         (&(&self.a * &self.ans) - &self.b).norm2::<F>() / self.b.norm2()
     }
-    fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> usize {
-        self.solve_inner(convergent_condition, max_iteration, 0usize)
+    fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> Vec<(usize, F)> {
+        let data: Vec<(usize, F)> = Vec::new();
+        self.solve_inner(convergent_condition, max_iteration, 0usize, data)
     }
 }
 
-impl<F> GaussSeidel<F> 
+impl<F> GaussSeidel<F>
 where
-    F: Float + FromPrimitive + Zero
+    F: Float + FromPrimitive + Zero,
 {
     pub fn new(a: Matrix<F>, b: Matrix<F>, init: Matrix<F>) -> Self {
         if !(a.m == a.n && a.n == b.n && b.n == init.n) {
             panic!("GaussSeidel needs n size matrix.")
         }
-        GaussSeidel {
-            a,
-            b,
-            ans: init
-        }
+        GaussSeidel { a, b, ans: init }
     }
 
-    fn solve_inner(&mut self, convergent_condition: F, max_iteratinon: usize, times: usize) -> usize {
+    fn solve_inner(
+        &mut self,
+        convergent_condition: F,
+        max_iteratinon: usize,
+        times: usize,
+        mut data: Vec<(usize, F)>,
+    ) -> Vec<(usize, F)> {
         for i in 0..self.a.n {
-            let a_i_i = self.a[i * (self.a.n + 1) ];
+            let a_i_i = self.a[i * (self.a.n + 1)];
             let mut sum = F::zero();
             for j in 0..self.a.m {
                 if i != j {
@@ -141,16 +156,19 @@ where
             self.ans[i] = (self.b[i] - sum) / a_i_i;
         }
 
-        if times == max_iteratinon || self.residual_norm() <= convergent_condition {
-            return times;
+        let res_norm = self.residual_norm();
+        data.push((times, res_norm));
+
+        if times == max_iteratinon || res_norm <= convergent_condition {
+            return data;
         }
-        self.solve_inner(convergent_condition, max_iteratinon, times + 1)
+        self.solve_inner(convergent_condition, max_iteratinon, times + 1, data)
     }
 }
 
 impl<F> Display for GaussSeidel<F>
 where
-    F: Float + Zero + Display + PartialOrd
+    F: Float + Zero + Display + PartialOrd,
 {
     fn fmt(&self, dest: &mut Formatter) -> fmt::Result {
         let mut string = "".to_string();
@@ -172,54 +190,80 @@ where
 pub struct Jacobi<F: Float> {
     a: Matrix<F>,
     b: Matrix<F>,
-    ans: Matrix<F>
+    ans: Matrix<F>,
 }
 
-impl<F> Iterative<F> for Jacobi<F> 
+impl<F> Iterative<F> for Jacobi<F>
 where
-    F: Float + FromPrimitive
+    F: Float + FromPrimitive,
 {
     fn residual_norm(&self) -> F {
         (&(&self.a * &self.ans) - &self.b).norm2::<F>() / self.b.norm2()
     }
-    fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> usize {
+    fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> Vec<(usize, F)> {
         let mut d = self.a.diagonal_matrix();
+        let data: Vec<(usize, F)> = Vec::new();
         for i in 0..self.a.n * self.a.m {
-            d.array[i] = if d.array[i] != F::from_f32(0.0).unwrap() { F::from_f32(1.0).unwrap() / d.array[i] } else { F::zero() };
+            d.array[i] = if d.array[i] != F::from_f32(0.0).unwrap() {
+                F::from_f32(1.0).unwrap() / d.array[i]
+            } else {
+                F::zero()
+            };
         }
-        self.solve_inner(convergent_condition, max_iteration, 0usize, d, &self.a.lower_triangular_matrix() + &self.a.upper_triangular_matrix())
+        self.solve_inner(
+            convergent_condition,
+            max_iteration,
+            0usize,
+            d,
+            &self.a.lower_triangular_matrix() + &self.a.upper_triangular_matrix(),
+            data,
+        )
     }
 }
 
-impl<F> Jacobi<F> 
+impl<F> Jacobi<F>
 where
-    F: Float + FromPrimitive + Zero
+    F: Float + FromPrimitive + Zero,
 {
     pub fn new(a: Matrix<F>, b: Matrix<F>, init: Matrix<F>) -> Self {
         if !(a.m == a.n && a.n == b.n && b.n == init.n) {
             panic!("Jacobi needs n size matrix.")
         }
-        Jacobi {
-            a,
-            b,
-            ans: init
-        }
+        Jacobi { a, b, ans: init }
     }
 
-    fn solve_inner(&mut self, convergent_condition: F, max_iteratinon: usize, times: usize, d_inverse: Matrix<F>, e_plus_f: Matrix<F>) -> usize {
+    fn solve_inner(
+        &mut self,
+        convergent_condition: F,
+        max_iteratinon: usize,
+        times: usize,
+        d_inverse: Matrix<F>,
+        e_plus_f: Matrix<F>,
+        mut data: Vec<(usize, F)>,
+    ) -> Vec<(usize, F)> {
         let x_k = self.ans.clone();
         self.ans = &d_inverse * &(&self.b - &(&e_plus_f * &x_k));
 
-        if times == max_iteratinon || self.residual_norm() <= convergent_condition {
-            return times;
+        let res_norm = self.residual_norm();
+        data.push((times, res_norm));
+
+        if times == max_iteratinon || res_norm <= convergent_condition {
+            return data;
         }
-        self.solve_inner(convergent_condition, max_iteratinon, times + 1, d_inverse, e_plus_f)
+        self.solve_inner(
+            convergent_condition,
+            max_iteratinon,
+            times + 1,
+            d_inverse,
+            e_plus_f,
+            data,
+        )
     }
 }
 
 impl<F> Display for Jacobi<F>
 where
-    F: Float + Zero + Display + PartialOrd
+    F: Float + Zero + Display + PartialOrd,
 {
     fn fmt(&self, dest: &mut Formatter) -> fmt::Result {
         let mut string = "".to_string();
@@ -238,9 +282,9 @@ where
     }
 }
 
-impl<F> Matrix<F> 
-where 
-    F: Float + Zero 
+impl<F> Matrix<F>
+where
+    F: Float + Zero,
 {
     pub fn lower_triangular_matrix(&self) -> Self {
         if self.n != self.m {
@@ -253,17 +297,15 @@ where
                 let mut v = Vec::new();
                 for i in 0..self.n {
                     for j in 0..self.m {
-                        v.push(
-                            if i > j {
-                                self.array[i * self.n + j]
-                            } else {
-                                F::zero()
-                            }
-                        )
+                        v.push(if i > j {
+                            self.array[i * self.n + j]
+                        } else {
+                            F::zero()
+                        })
                     }
                 }
                 v
-            }
+            },
         }
     }
     pub fn upper_triangular_matrix(&self) -> Self {
@@ -277,17 +319,15 @@ where
                 let mut v = Vec::new();
                 for i in 0..self.n {
                     for j in 0..self.m {
-                        v.push(
-                            if i < j {
-                                self.array[i * self.n + j]
-                            } else {
-                                F::zero()
-                            }
-                        )
+                        v.push(if i < j {
+                            self.array[i * self.n + j]
+                        } else {
+                            F::zero()
+                        })
                     }
                 }
                 v
-            }
+            },
         }
     }
     pub fn diagonal_matrix(&self) -> Self {
@@ -301,21 +341,18 @@ where
                 let mut v = Vec::new();
                 for i in 0..self.n {
                     for j in 0..self.m {
-                        v.push(
-                            if i == j {
-                                self.array[i * self.n + j]
-                            } else {
-                                F::zero()
-                            }
-                        )
+                        v.push(if i == j {
+                            self.array[i * self.n + j]
+                        } else {
+                            F::zero()
+                        })
                     }
                 }
                 v
-            }
+            },
         }
     }
 }
-
 
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
 pub struct Matrix<T> {
@@ -343,7 +380,7 @@ impl Matrix<f64> {
             panic!("`Matrix::solve_eqn_gauss` needs n * n matrix and n vector.");
         }
         Matrix::backward_substitute(Matrix::forward_erase(a, b))
-    } 
+    }
 
     pub fn forward_erase(a: &Self, b: &Self) -> Self {
         let a = a.clone();
@@ -363,7 +400,7 @@ impl Matrix<f64> {
         for i in 0..a.n {
             let index = {
                 let mut v_tmp = Vec::new();
-                for j in i..a.m {  
+                for j in i..a.m {
                     v_tmp.push((v_a[j][i].clone(), j));
                 }
                 v_tmp.sort_by(|a, b| a.partial_cmp(b).unwrap());
@@ -371,12 +408,12 @@ impl Matrix<f64> {
             };
             v_a.swap(i, index);
             let a0 = v_a[i][i];
-            for j in i..a.m+1 {
+            for j in i..a.m + 1 {
                 v_a[i][j] /= a0;
             }
-            for k in i+1..a.n {
+            for k in i + 1..a.n {
                 let c = v_a[k][i].clone();
-                for l in i..a.m+1 {
+                for l in i..a.m + 1 {
                     v_a[k][l] -= c * v_a[i][l];
                 }
             }
@@ -385,16 +422,16 @@ impl Matrix<f64> {
     }
 
     pub fn backward_substitute(mut ab: Self) -> Self {
-        let nsize = ab.n+1;
+        let nsize = ab.n + 1;
         for i in (0..ab.n).rev() {
             for j in 0..i {
-                ab[(j+1)*(nsize)-1] -= ab[j*nsize+i].clone()
-                    * ab[(i+1)*(nsize)-1].clone();
+                ab[(j + 1) * (nsize) - 1] -=
+                    ab[j * nsize + i].clone() * ab[(i + 1) * (nsize) - 1].clone();
             }
         }
         let mut v = Vec::new();
         for i in 0..ab.n {
-            v.push(ab[i*nsize + nsize-1])
+            v.push(ab[i * nsize + nsize - 1])
         }
         Matrix::append(ab.n, 1, v)
     }
