@@ -37,7 +37,7 @@ fn main() {
    println!("times: {}", times_gaussseidel);
    println!("{}", gauss_seidel);
 
-   let mut sor = SOR::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1), 1.2);
+   let mut sor = SOR::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1), 1.863);
    let times_sor = sor.solve(10e-10, 10_000);
    println!("times: {}", times_sor);
    println!("{}", sor);
@@ -65,12 +65,42 @@ fn main() {
    println!("times: {}", times_gaussseidel);
    println!("{}", gauss_seidel);
 
-   let mut sor = SOR::<f32>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1), 1.2);
+   let mut sor = SOR::<f32>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1), 1.863);
    let times_sor = sor.solve(10e-10, 10_000);
    println!("times: {}", times_sor);
    println!("{}", sor);
 
    let matrixa = data::matrix23a_f64();
    let matrixb = data::matrix23b_f64();
-   println!("{}", Matrix::forward_erase(&matrixa, &matrixb));
+   println!("{}", Matrix::solve_eqn_gauss(&matrixa, &matrixb));
+
+   // let matrixa = data::matrix21a_f64();
+   // let matrixb = data::matrix21b_f64();
+
+   // let mut data = Vec::new();
+   // for i in 1..2000 {
+   //    let mut sor = SOR::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1), i as f64 / 1000.0);
+   //    let omega = i as f64 / 1000.0;
+   //    let times = sor.solve(10e-10, 10_000);
+   //    data.push((omega, times));
+   //    println!("ω: {}, times: {}", omega, times);
+   // }
+   // let mut fg = Figure::new();
+   // {
+   //     let axec = fg
+   //         .axes2d()
+   //         .set_x_axis(true, &[])
+   //         .set_x_range(Fix(0.0), Fix(2.0))
+   //         .set_y_range(Fix(0.0), Fix(10000.0))
+   //         // .set_y_log(Some(10.0))
+   //         .set_x_label("ω", &[])
+   //         .set_y_label("times", &[]);
+   //         // .set_y_ticks(Some((Fix(-12.0), 1)), &[], &[])
+   //         // .lines(x, y, &[Caption("newton"), Color("blue")]);
+
+   //     data.iter().fold((), |_, e| {
+   //         axec.points(&[e.0], &[e.1], &[Color("blue"), PointSymbol('O')]);
+   //     })
+   // }
+   // let _ = fg.show();
 }

@@ -31,11 +31,7 @@ where
         (&(&self.a * &self.ans) - &self.b).norm2::<F>() / self.b.norm2()
     }
     fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> usize {
-        let mut d = self.a.diagonal_matrix();
-        for i in 0..self.a.n * self.a.m {
-            d.array[i] = if d.array[i] != F::from_f32(0.0).unwrap() { F::from_f32(1.0).unwrap() / d.array[i] } else { F::zero() };
-        }
-        self.solve_inner(convergent_condition, max_iteration, 0usize, d, self.a.lower_triangular_matrix(), self.a.upper_triangular_matrix())
+        self.solve_inner(convergent_condition, max_iteration, 0usize)
     }
 }
 
@@ -48,7 +44,7 @@ where
             panic!("SOR needs n size matrix.")
         }
         if relaxation_factor <= F::from_f32(0.0).unwrap() || relaxation_factor >= F::from_f32(2.0).unwrap() {
-            panic!("Use ω which is more than 1.0")
+            panic!("Use ω which is more than 0.0 and less than 2.0.")
         }
         SOR {
             a,
@@ -58,7 +54,7 @@ where
         }
     }
 
-    fn solve_inner(&mut self, convergent_condition: F, max_iteratinon: usize, times: usize, d_inverse: Matrix<F>, e: Matrix<F>, f: Matrix<F>) -> usize {
+    fn solve_inner(&mut self, convergent_condition: F, max_iteratinon: usize, times: usize) -> usize {
         let x_k = self.ans.clone();
         for i in 0..self.a.n {
             let a_i_i = self.a[i * (self.a.n + 1) ];
@@ -75,7 +71,7 @@ where
         if times == max_iteratinon || self.residual_norm() <= convergent_condition {
             return times;
         }
-        self.solve_inner(convergent_condition, max_iteratinon, times + 1, d_inverse, e, f)
+        self.solve_inner(convergent_condition, max_iteratinon, times + 1)
     }
 }
 
@@ -114,11 +110,7 @@ where
         (&(&self.a * &self.ans) - &self.b).norm2::<F>() / self.b.norm2()
     }
     fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> usize {
-        let mut d = self.a.diagonal_matrix();
-        for i in 0..self.a.n * self.a.m {
-            d.array[i] = if d.array[i] != F::from_f32(0.0).unwrap() { F::from_f32(1.0).unwrap() / d.array[i] } else { F::zero() };
-        }
-        self.solve_inner(convergent_condition, max_iteration, 0usize, d, self.a.lower_triangular_matrix(), self.a.upper_triangular_matrix())
+        self.solve_inner(convergent_condition, max_iteration, 0usize)
     }
 }
 
@@ -137,7 +129,7 @@ where
         }
     }
 
-    fn solve_inner(&mut self, convergent_condition: F, max_iteratinon: usize, times: usize, d_inverse: Matrix<F>, e: Matrix<F>, f: Matrix<F>) -> usize {
+    fn solve_inner(&mut self, convergent_condition: F, max_iteratinon: usize, times: usize) -> usize {
         for i in 0..self.a.n {
             let a_i_i = self.a[i * (self.a.n + 1) ];
             let mut sum = F::zero();
@@ -152,7 +144,7 @@ where
         if times == max_iteratinon || self.residual_norm() <= convergent_condition {
             return times;
         }
-        self.solve_inner(convergent_condition, max_iteratinon, times + 1, d_inverse, e, f)
+        self.solve_inner(convergent_condition, max_iteratinon, times + 1)
     }
 }
 
