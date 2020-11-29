@@ -84,9 +84,9 @@ where
         let res_norm = self.residual_norm();
         data.push((F::from_usize(times).unwrap(), res_norm));
 
-        let _norm = (&self.approximate_answer() - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9])).norm2::<F>();
+        let norm = (&self.approximate_answer() - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9])).norm2::<F>();
 
-        if times == max_iteratinon || res_norm <= convergent_condition {
+        if times == max_iteratinon || norm <= convergent_condition {
             return data;
         }
         self.solve_inner(convergent_condition, max_iteratinon, times + 1, data)
@@ -168,9 +168,9 @@ where
         let res_norm = self.residual_norm();
         data.push((F::from_usize(times).unwrap(), res_norm));
 
-        let _norm = (&self.approximate_answer() - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9])).norm2::<F>();
+        let norm = (&self.approximate_answer() - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9])).norm2::<F>();
 
-        if times == max_iteratinon || res_norm <= convergent_condition {
+        if times == max_iteratinon || norm <= convergent_condition {
             return data;
         }
         self.solve_inner(convergent_condition, max_iteratinon, times + 1, data)
@@ -261,9 +261,9 @@ where
         let res_norm = self.residual_norm();
         data.push((F::from_usize(times).unwrap(), res_norm));
 
-        let _norm = (&self.approximate_answer() - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9])).norm2::<F>();
+        let norm = (&self.approximate_answer() - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9])).norm2::<F>();
 
-        if times == max_iteratinon || res_norm <= convergent_condition {
+        if times == max_iteratinon || norm <= convergent_condition {
             return data;
         }
         self.solve_inner(
