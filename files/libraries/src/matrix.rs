@@ -84,7 +84,9 @@ where
         let res_norm = self.residual_norm();
         data.push((F::from_usize(times).unwrap(), res_norm));
 
-        let norm = (&self.approximate_answer() - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9])).norm2::<F>();
+        let norm = (&self.approximate_answer()
+            - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9]))
+            .norm2::<F>();
 
         if times == max_iteratinon || norm <= convergent_condition {
             return data;
@@ -168,7 +170,9 @@ where
         let res_norm = self.residual_norm();
         data.push((F::from_usize(times).unwrap(), res_norm));
 
-        let norm = (&self.approximate_answer() - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9])).norm2::<F>();
+        let norm = (&self.approximate_answer()
+            - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9]))
+            .norm2::<F>();
 
         if times == max_iteratinon || norm <= convergent_condition {
             return data;
@@ -261,7 +265,9 @@ where
         let res_norm = self.residual_norm();
         data.push((F::from_usize(times).unwrap(), res_norm));
 
-        let norm = (&self.approximate_answer() - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9])).norm2::<F>();
+        let norm = (&self.approximate_answer()
+            - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9]))
+            .norm2::<F>();
 
         if times == max_iteratinon || norm <= convergent_condition {
             return data;
@@ -300,7 +306,30 @@ where
 
 impl<F> Matrix<F>
 where
-    F: Float + Zero,
+    F: Float + FromPrimitive + Display + Zero,
+{
+    pub fn power_method(&self, times: usize) -> Vec<(usize, F)> {
+        let mut data = Vec::new();
+        let mut f = |x: Matrix<F>, i: usize| -> Matrix<F> {
+            let y = self * &x;
+            let y_norm = y.norm2::<F>();
+            data.push((i, y_norm));
+            &y / y_norm
+        };
+        let mut x = Matrix::new(self.n, 1);
+        x = &x + F::from_f32(1.0).unwrap();
+
+        for i in 0..times {
+            x = f(x, i);
+        }
+
+        data
+    }
+}
+
+impl<F> Matrix<F>
+where
+    F: Float + Zero + FromPrimitive,
 {
     pub fn lower_triangular_matrix(&self) -> Self {
         if self.n != self.m {
@@ -368,6 +397,29 @@ where
             },
         }
     }
+
+    pub fn diagonal_matrix_inverse(&self) -> Self {
+        if self.n != self.m {
+            panic!("lower_triangular_matrix's implementation for n != m is not yet.")
+        }
+        Matrix {
+            n: self.n,
+            m: self.m,
+            array: {
+                let mut v = Vec::new();
+                for i in 0..self.n {
+                    for j in 0..self.m {
+                        v.push(if i == j {
+                            F::from_f32(1.0).unwrap() / self.array[i * self.n + j]
+                        } else {
+                            F::zero()
+                        })
+                    }
+                }
+                v
+            },
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
@@ -390,9 +442,9 @@ pub struct Matrix<T> {
 //     fn lu_decompose(&self) -> (Self, Self);
 // }
 
-impl<F> Matrix<F> 
-where 
-    F: Float
+impl<F> Matrix<F>
+where
+    F: Float,
 {
     pub fn solve_eqn_gauss(a: &Self, b: &Self) -> Self {
         if !(a.is_square() && a.n == b.n && b.m == 1) {
@@ -444,8 +496,8 @@ where
         let nsize = ab.n + 1;
         for i in (0..ab.n).rev() {
             for j in 0..i {
-                ab[(j + 1) * (nsize) - 1] = ab[(j + 1) * (nsize) - 1] - 
-                    ab[j * nsize + i].clone() * ab[(i + 1) * (nsize) - 1].clone();
+                ab[(j + 1) * (nsize) - 1] = ab[(j + 1) * (nsize) - 1]
+                    - ab[j * nsize + i].clone() * ab[(i + 1) * (nsize) - 1].clone();
             }
         }
         let mut v = Vec::new();
