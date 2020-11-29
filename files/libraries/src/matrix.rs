@@ -14,6 +14,7 @@ pub use std::fmt::{Display, Formatter};
 pub trait Iterative<F: Float> {
     fn residual_norm(&self) -> F;
     fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> Vec<(F, F)>;
+    fn approximate_answer(&self) -> Matrix<F>;
 }
 
 pub struct SOR<F: Float> {
@@ -33,6 +34,9 @@ where
     fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> Vec<(F, F)> {
         let data: Vec<(F, F)> = Vec::new();
         self.solve_inner(convergent_condition, max_iteration, 0usize, data)
+    }
+    fn approximate_answer(&self) -> Matrix<F> {
+        self.ans.clone()
     }
 }
 
@@ -80,7 +84,9 @@ where
         let res_norm = self.residual_norm();
         data.push((F::from_usize(times).unwrap(), res_norm));
 
-        if times == max_iteratinon || res_norm <= convergent_condition {
+        let norm = (&self.approximate_answer() - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9])).norm2::<F>();
+
+        if times == max_iteratinon || norm <= convergent_condition {
             return data;
         }
         self.solve_inner(convergent_condition, max_iteratinon, times + 1, data)
@@ -125,6 +131,9 @@ where
         let data: Vec<(F, F)> = Vec::new();
         self.solve_inner(convergent_condition, max_iteration, 0usize, data)
     }
+    fn approximate_answer(&self) -> Matrix<F> {
+        self.ans.clone()
+    }
 }
 
 impl<F> GaussSeidel<F>
@@ -159,7 +168,9 @@ where
         let res_norm = self.residual_norm();
         data.push((F::from_usize(times).unwrap(), res_norm));
 
-        if times == max_iteratinon || res_norm <= convergent_condition {
+        let norm = (&self.approximate_answer() - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9])).norm2::<F>();
+
+        if times == max_iteratinon || norm <= convergent_condition {
             return data;
         }
         self.solve_inner(convergent_condition, max_iteratinon, times + 1, data)
@@ -219,6 +230,9 @@ where
             data,
         )
     }
+    fn approximate_answer(&self) -> Matrix<F> {
+        self.ans.clone()
+    }
 }
 
 impl<F> Jacobi<F>
@@ -247,7 +261,9 @@ where
         let res_norm = self.residual_norm();
         data.push((F::from_usize(times).unwrap(), res_norm));
 
-        if times == max_iteratinon || res_norm <= convergent_condition {
+        let norm = (&self.approximate_answer() - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9])).norm2::<F>();
+
+        if times == max_iteratinon || norm <= convergent_condition {
             return data;
         }
         self.solve_inner(
