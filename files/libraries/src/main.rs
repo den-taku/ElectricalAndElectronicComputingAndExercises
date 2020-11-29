@@ -3,7 +3,7 @@ mod data;
 mod matrix;
 mod newton_raphson_method;
 
-// use gnuplot::*;
+use gnuplot::*;
 // use std::rc::Rc;
 // use plotlib::page::Page;
 // use plotlib::repr::Plot;
@@ -31,6 +31,26 @@ fn main() {
     let data_jacobi = jacobi.solve(10e-10, 10_000);
     // println!("times: {}", times_jacobi);
     println!("{}", jacobi);
+    //  println!("{:?}", data_jacobi);
+
+    let mut fg = Figure::new();
+    {
+        let axec = fg
+            .axes2d()
+            .set_x_axis(true, &[])
+            .set_x_range(Fix(0.0), Fix(4500.0))
+            .set_y_range(Fix(1.0e-10), Fix(1.0))
+            .set_y_log(Some(10.0))
+            .set_x_label("times", &[])
+            .set_y_label("residual\\_norm", &[]);
+        // .set_y_ticks(Some((Fix(-12.0), 1)), &[], &[])
+        // .lines(x, y, &[Caption("residual_norm"), Color("blue")]);
+
+        data_jacobi.iter().fold((), |_, e| {
+            axec.points(&[e.0], &[e.1], &[Color("blue"), PointSymbol('O')]);
+        })
+    }
+    let _ = fg.show();
 
     let mut gauss_seidel =
         GaussSeidel::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));

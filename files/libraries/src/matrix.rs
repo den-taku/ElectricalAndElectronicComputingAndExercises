@@ -13,7 +13,7 @@ pub use std::fmt::{Display, Formatter};
 
 pub trait Iterative<F: Float> {
     fn residual_norm(&self) -> F;
-    fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> Vec<(usize, F)>;
+    fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> Vec<(F, F)>;
 }
 
 pub struct SOR<F: Float> {
@@ -30,8 +30,8 @@ where
     fn residual_norm(&self) -> F {
         (&(&self.a * &self.ans) - &self.b).norm2::<F>() / self.b.norm2()
     }
-    fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> Vec<(usize, F)> {
-        let data: Vec<(usize, F)> = Vec::new();
+    fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> Vec<(F, F)> {
+        let data: Vec<(F, F)> = Vec::new();
         self.solve_inner(convergent_condition, max_iteration, 0usize, data)
     }
 }
@@ -62,8 +62,8 @@ where
         convergent_condition: F,
         max_iteratinon: usize,
         times: usize,
-        mut data: Vec<(usize, F)>,
-    ) -> Vec<(usize, F)> {
+        mut data: Vec<(F, F)>,
+    ) -> Vec<(F, F)> {
         let x_k = self.ans.clone();
         for i in 0..self.a.n {
             let a_i_i = self.a[i * (self.a.n + 1)];
@@ -78,7 +78,7 @@ where
         self.ans = &x_k + &(&(&self.ans - &x_k) * self.relaxation_factor);
 
         let res_norm = self.residual_norm();
-        data.push((times, res_norm));
+        data.push((F::from_usize(times).unwrap(), res_norm));
 
         if times == max_iteratinon || res_norm <= convergent_condition {
             return data;
@@ -121,8 +121,8 @@ where
     fn residual_norm(&self) -> F {
         (&(&self.a * &self.ans) - &self.b).norm2::<F>() / self.b.norm2()
     }
-    fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> Vec<(usize, F)> {
-        let data: Vec<(usize, F)> = Vec::new();
+    fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> Vec<(F, F)> {
+        let data: Vec<(F, F)> = Vec::new();
         self.solve_inner(convergent_condition, max_iteration, 0usize, data)
     }
 }
@@ -143,8 +143,8 @@ where
         convergent_condition: F,
         max_iteratinon: usize,
         times: usize,
-        mut data: Vec<(usize, F)>,
-    ) -> Vec<(usize, F)> {
+        mut data: Vec<(F, F)>,
+    ) -> Vec<(F, F)> {
         for i in 0..self.a.n {
             let a_i_i = self.a[i * (self.a.n + 1)];
             let mut sum = F::zero();
@@ -157,7 +157,7 @@ where
         }
 
         let res_norm = self.residual_norm();
-        data.push((times, res_norm));
+        data.push((F::from_usize(times).unwrap(), res_norm));
 
         if times == max_iteratinon || res_norm <= convergent_condition {
             return data;
@@ -200,9 +200,9 @@ where
     fn residual_norm(&self) -> F {
         (&(&self.a * &self.ans) - &self.b).norm2::<F>() / self.b.norm2()
     }
-    fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> Vec<(usize, F)> {
+    fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> Vec<(F, F)> {
         let mut d = self.a.diagonal_matrix();
-        let data: Vec<(usize, F)> = Vec::new();
+        let data: Vec<(F, F)> = Vec::new();
         for i in 0..self.a.n * self.a.m {
             d.array[i] = if d.array[i] != F::from_f32(0.0).unwrap() {
                 F::from_f32(1.0).unwrap() / d.array[i]
@@ -239,13 +239,13 @@ where
         times: usize,
         d_inverse: Matrix<F>,
         e_plus_f: Matrix<F>,
-        mut data: Vec<(usize, F)>,
-    ) -> Vec<(usize, F)> {
+        mut data: Vec<(F, F)>,
+    ) -> Vec<(F, F)> {
         let x_k = self.ans.clone();
         self.ans = &d_inverse * &(&self.b - &(&e_plus_f * &x_k));
 
         let res_norm = self.residual_norm();
-        data.push((times, res_norm));
+        data.push((F::from_usize(times).unwrap(), res_norm));
 
         if times == max_iteratinon || res_norm <= convergent_condition {
             return data;
