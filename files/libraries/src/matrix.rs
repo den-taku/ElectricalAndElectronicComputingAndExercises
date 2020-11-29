@@ -84,9 +84,9 @@ where
         let res_norm = self.residual_norm();
         data.push((F::from_usize(times).unwrap(), res_norm));
 
-        let norm = (&self.approximate_answer() - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9])).norm2::<F>();
+        let _norm = (&self.approximate_answer() - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9])).norm2::<F>();
 
-        if times == max_iteratinon || norm <= convergent_condition {
+        if times == max_iteratinon || res_norm <= convergent_condition {
             return data;
         }
         self.solve_inner(convergent_condition, max_iteratinon, times + 1, data)
@@ -168,9 +168,9 @@ where
         let res_norm = self.residual_norm();
         data.push((F::from_usize(times).unwrap(), res_norm));
 
-        let norm = (&self.approximate_answer() - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9])).norm2::<F>();
+        let _norm = (&self.approximate_answer() - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9])).norm2::<F>();
 
-        if times == max_iteratinon || norm <= convergent_condition {
+        if times == max_iteratinon || res_norm <= convergent_condition {
             return data;
         }
         self.solve_inner(convergent_condition, max_iteratinon, times + 1, data)
@@ -261,9 +261,9 @@ where
         let res_norm = self.residual_norm();
         data.push((F::from_usize(times).unwrap(), res_norm));
 
-        let norm = (&self.approximate_answer() - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9])).norm2::<F>();
+        let _norm = (&self.approximate_answer() - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9])).norm2::<F>();
 
-        if times == max_iteratinon || norm <= convergent_condition {
+        if times == max_iteratinon || res_norm <= convergent_condition {
             return data;
         }
         self.solve_inner(
@@ -390,7 +390,10 @@ pub struct Matrix<T> {
 //     fn lu_decompose(&self) -> (Self, Self);
 // }
 
-impl Matrix<f64> {
+impl<F> Matrix<F> 
+where 
+    F: Float
+{
     pub fn solve_eqn_gauss(a: &Self, b: &Self) -> Self {
         if !(a.is_square() && a.n == b.n && b.m == 1) {
             panic!("`Matrix::solve_eqn_gauss` needs n * n matrix and n vector.");
@@ -425,12 +428,12 @@ impl Matrix<f64> {
             v_a.swap(i, index);
             let a0 = v_a[i][i];
             for j in i..a.m + 1 {
-                v_a[i][j] /= a0;
+                v_a[i][j] = v_a[i][j] / a0;
             }
             for k in i + 1..a.n {
                 let c = v_a[k][i].clone();
                 for l in i..a.m + 1 {
-                    v_a[k][l] -= c * v_a[i][l];
+                    v_a[k][l] = v_a[k][l] - c * v_a[i][l];
                 }
             }
         }
@@ -441,7 +444,7 @@ impl Matrix<f64> {
         let nsize = ab.n + 1;
         for i in (0..ab.n).rev() {
             for j in 0..i {
-                ab[(j + 1) * (nsize) - 1] -=
+                ab[(j + 1) * (nsize) - 1] = ab[(j + 1) * (nsize) - 1] - 
                     ab[j * nsize + i].clone() * ab[(i + 1) * (nsize) - 1].clone();
             }
         }
