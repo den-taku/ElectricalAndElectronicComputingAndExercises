@@ -13,12 +13,12 @@ pub use std::fmt::{Display, Formatter};
 
 pub struct QR<F> {
     a: Matrix<F>,
-    eigen_value: Matrix<F>
+    eigen_value: Matrix<F>,
 }
 
-impl<F> QR<F> 
-where 
-    F: Zero + Clone
+impl<F> QR<F>
+where
+    F: Zero + Clone,
 {
     pub fn new(a: Matrix<F>) -> Self {
         QR {
@@ -29,21 +29,27 @@ where
 }
 
 impl<F> QR<F>
-where 
-    F: Float + FromPrimitive
+where
+    F: Float + FromPrimitive,
 {
     pub fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> Vec<(F, F)> {
         let data: Vec<(F, F)> = Vec::new();
         self.solve_inner(convergent_condition, max_iteration, data, 1usize)
     }
 
-    fn solve_inner(&mut self, convergent_condition: F, max_iteratinon: usize, mut data: Vec<(F, F)>, times: usize) -> Vec<(F, F)> {
+    fn solve_inner(
+        &mut self,
+        convergent_condition: F,
+        max_iteratinon: usize,
+        mut data: Vec<(F, F)>,
+        times: usize,
+    ) -> Vec<(F, F)> {
         let (q, r) = self.a.qr_decompose();
         let a_new = &r * &q;
         let norm = (&self.a.diagonal_matrix() - &a_new.diagonal_matrix()).norm2();
         self.a = a_new;
         data.push((F::from_usize(times).unwrap(), norm));
-        if norm <= convergent_condition || times + 2 == max_iteratinon{
+        if norm <= convergent_condition || times + 2 == max_iteratinon {
             let mut lamda = Vec::new();
             for i in 0..self.a.n {
                 lamda.push(self.a[i * (self.a.n + 1)]);
@@ -69,7 +75,12 @@ where
                 } else {
                     "".to_string()
                 };
-                string = format!("{}{}{} ", string, pad, self.eigen_value[i * self.eigen_value.m + j].clone());
+                string = format!(
+                    "{}{}{} ",
+                    string,
+                    pad,
+                    self.eigen_value[i * self.eigen_value.m + j].clone()
+                );
             }
             string = format!("{}\n", string);
         }
@@ -501,11 +512,11 @@ where
 
 impl<F> Matrix<F>
 where
-    F: Float + FromPrimitive
+    F: Float + FromPrimitive,
 {
     pub fn qr_decompose(&self) -> (Self, Self) {
         let q = self.gram_schmidt();
-        
+
         let mut r = self.clone();
         let a = self.clone();
         for j in 0..self.m {
@@ -515,12 +526,14 @@ where
                 } else if i == j {
                     let mut partial_vec = a.to_matrix_culumn(j);
                     for k in 0..j {
-                        let prod = (&a.to_matrix_culumn(j).to_transpose() * &q.to_matrix_culumn(k)).to_value();
+                        let prod = (&a.to_matrix_culumn(j).to_transpose() * &q.to_matrix_culumn(k))
+                            .to_value();
                         partial_vec = &partial_vec - &(&q.to_matrix_culumn(k) * prod);
                     }
                     r[self.n * i + j] = partial_vec.norm2();
                 } else {
-                    r[self.n * i + j] = (&a.to_matrix_culumn(j).to_transpose() * &q.to_matrix_culumn(i)).to_value();
+                    r[self.n * i + j] =
+                        (&a.to_matrix_culumn(j).to_transpose() * &q.to_matrix_culumn(i)).to_value();
                 }
             }
         }
@@ -528,9 +541,9 @@ where
     }
 }
 
-impl<F> Matrix<F> 
+impl<F> Matrix<F>
 where
-    F: Float + FromPrimitive
+    F: Float + FromPrimitive,
 {
     pub fn gram_schmidt(&self) -> Self {
         if self.n != self.m {
@@ -947,9 +960,9 @@ where
     }
 }
 
-impl<T> Matrix<T> 
+impl<T> Matrix<T>
 where
-    T: Clone
+    T: Clone,
 {
     pub fn to_vec_line(&self, line: usize) -> Vec<T> {
         if self.n <= line {

@@ -3,7 +3,7 @@ mod data;
 mod matrix;
 mod newton_raphson_method;
 
-// use gnuplot::*;
+use gnuplot::*;
 // use std::rc::Rc;
 // use plotlib::page::Page;
 // use plotlib::repr::Plot;
@@ -524,17 +524,37 @@ fn main() {
 
     let matrix21a = data::matrix21a_f64();
     let matrix23a = data::matrix23a_f64();
-    
+
     let mut qr21 = QR::new(matrix21a.clone());
     let mut qr23 = QR::new(matrix23a.clone());
 
     let mut data_21 = qr21.solve(10e-10, 10_000);
     let mut data_23 = qr23.solve(10e-10, 10_000);
 
-    println!("{}", data_21.pop().unwrap().0);
+    // println!("{}", data_21.pop().unwrap().0);
     println!("{}", qr21);
-    println!("{}", data_23.pop().unwrap().0);
+    // println!("{}", data_23.pop().unwrap().0);
     println!("{}", qr23);
+
+    let mut fg = Figure::new();
+
+    let x_21: Vec<f64> = data_21.iter().map(|e| e.0).collect();
+    let y_21: Vec<f64> = data_21.iter().map(|e| e.1).collect();
+    let x_23: Vec<f64> = data_23.iter().map(|e| e.0).collect();
+    let y_23: Vec<f64> = data_23.iter().map(|e| e.1).collect();
+    {
+        let _axec = fg
+            .axes2d()
+            .set_x_axis(true, &[])
+            .set_x_range(Fix(0.0), Fix(130.0))
+            .set_y_range(Fix(10e-10), Fix(10.0))
+            .set_y_log(Some(10.0))
+            .set_x_label("times", &[])
+            .set_y_label("norm", &[])
+            .lines(x_21, y_21, &[Caption("課題2.1"), Color("green")])
+            .lines(x_23, y_23, &[Caption("課題2.3"), Color("red")]);
+    }
+    let _ = fg.show();
 
     // println!("{:?}", matrixa.to_vec_line(3));
     // println!("{}", matrixa.to_matrix_line(3));
