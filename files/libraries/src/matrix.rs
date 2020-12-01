@@ -43,7 +43,7 @@ where
         let norm = (&self.a.diagonal_matrix() - &a_new.diagonal_matrix()).norm2();
         self.a = a_new;
         data.push((F::from_usize(times).unwrap(), norm));
-        if norm <= convergent_condition {
+        if norm <= convergent_condition || times + 2 == max_iteratinon{
             let mut lamda = Vec::new();
             for i in 0..self.a.n {
                 lamda.push(self.a[i * (self.a.n + 1)]);
