@@ -25,7 +25,7 @@ pub struct CG<F: Float> {
 
 impl<F> Iterative<F> for CG<F>
 where
-    F: Float + FromPrimitive,
+    F: Float + FromPrimitive + Display,
 {
     fn residual_norm(&self) -> F {
         (&(&self.a * &self.ans) - &self.b).norm2::<F>() / self.b.norm2()
@@ -51,7 +51,7 @@ where
 
 impl<F> CG<F>
 where
-    F: Float + FromPrimitive + Zero,
+    F: Float + FromPrimitive + Zero + Display,
 {
     pub fn new(a: Matrix<F>, b: Matrix<F>, init: Matrix<F>) -> Self {
         if !(a.m == a.n && a.n == b.n && b.n == init.n) {
@@ -81,6 +81,8 @@ where
         let _norm = (&self.approximate_answer()
             - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9]))
             .norm2::<F>();
+
+        // println!("{}", self.ans);
 
         if times == max_iteratinon || res_norm <= convergent_condition {
             return data;
