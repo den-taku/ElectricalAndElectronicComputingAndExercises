@@ -433,6 +433,37 @@ where
     }
 }
 
+impl<F> Matrix<F> 
+where
+    F: Float + FromPrimitive
+{
+    pub fn gram_schmidt(&self) -> Self {
+        if self.n != self.m {
+            panic!("`Matrix::gram_chmidt` can use when n = m.")
+        }
+        let mut q = self.clone();
+        for i in 0..self.n {
+            // make u_k
+            let mat_i = self.to_matrix_line(i);
+            for k in 0..i {
+                let product = (&mat_i * &self.to_matrix_line(k).to_transpose()).to_value();
+                for j in 0..self.m {
+                    q[i * self.m + j] = q[i * self.m + j] - product * q[k * self.m + j].clone();
+                }
+            }
+
+            // normarize
+            let size = q.to_matrix_line(i).norm2();
+            for j in 0..self.m {
+                q[i * self.m + j] = q[i * self.m + j] / size;
+            }
+        }
+
+
+        q
+    }
+}
+
 impl<F> Matrix<F>
 where
     F: Float + Zero + FromPrimitive,
@@ -836,6 +867,22 @@ where
             v.push(self[self.m * line + i].clone());
         }
         v
+    }
+    pub fn to_matrix_line(&self, line: usize) -> Matrix<T> {
+        Matrix::append(1, self.m, self.to_vec_line(line))
+    }
+    pub fn to_vec_culumn(&self, culumn: usize) -> Vec<T> {
+        if self.m <= culumn {
+            panic!("`Matrix::to_vec_line` needs l < n.");
+        }
+        let mut v = Vec::new();
+        for i in 0..self.n {
+            v.push(self[self.m * i + culumn].clone());
+        }
+        v
+    }
+    pub fn to_matrix_culumn(&self, culumn: usize) -> Matrix<T> {
+        Matrix::append(self.n, 1, self.to_vec_line(culumn))
     }
 }
 

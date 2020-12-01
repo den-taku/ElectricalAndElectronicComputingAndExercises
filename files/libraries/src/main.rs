@@ -522,4 +522,8 @@ fn main() {
     println!("{:?}", data_cg.pop().unwrap());
     println!("{}", &matrixa);
     println!("{:?}", matrixa.to_vec_line(3));
+    println!("{}", matrixa.to_matrix_line(3));
+    println!("{:?}", matrixa.to_vec_culumn(3));
+    println!("{}", matrixa.to_matrix_culumn(3));
+    println!("{}", matrixa.gram_schmidt());
 }
