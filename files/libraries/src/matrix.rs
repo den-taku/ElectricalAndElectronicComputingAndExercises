@@ -433,6 +433,35 @@ where
     }
 }
 
+impl<F> Matrix<F>
+where
+    F: Float + FromPrimitive
+{
+    pub fn qr_decompose(&self) -> (Self, Self) {
+        let q = self.gram_schmidt();
+        
+        let mut r = self.clone();
+        let a = self.clone();
+        for j in 0..self.m {
+            for i in 0..self.n {
+                if i > j {
+                    r[self.n * i + j] = F::from_f32(0.0).unwrap();
+                } else if i == j {
+                    let mut partial_vec = a.to_matrix_culumn(j);
+                    for k in 0..j {
+                        let prod = (&a.to_matrix_culumn(j).to_transpose() * &q.to_matrix_culumn(k)).to_value();
+                        partial_vec = &partial_vec - &(&q.to_matrix_culumn(k) * prod);
+                    }
+                    r[self.n * i + j] = partial_vec.norm2();
+                } else {
+                    r[self.n * i + j] = (&a.to_matrix_culumn(j).to_transpose() * &q.to_matrix_culumn(i)).to_value();
+                }
+            }
+        }
+        (q, r)
+    }
+}
+
 impl<F> Matrix<F> 
 where
     F: Float + FromPrimitive
@@ -442,24 +471,22 @@ where
             panic!("`Matrix::gram_chmidt` can use when n = m.")
         }
         let mut q = self.clone();
-        for i in 0..self.n {
+        for j in 0..self.m {
             // make u_k
-            let mat_i = self.to_matrix_line(i);
-            for k in 0..i {
-                let product = (&mat_i * &self.to_matrix_line(k).to_transpose()).to_value();
-                for j in 0..self.m {
-                    q[i * self.m + j] = q[i * self.m + j] - product * q[k * self.m + j].clone();
+            let mat_j = self.to_matrix_culumn(j);
+            for k in 0..j {
+                let product = (&mat_j.to_transpose() * &q.to_matrix_culumn(k)).to_value();
+                for i in 0..self.n {
+                    q[i * self.m + j] = q[i * self.m + j] - product * q[i * self.m + k].clone();
                 }
             }
 
             // normarize
-            let size = q.to_matrix_line(i).norm2();
-            for j in 0..self.m {
+            let size = q.to_matrix_culumn(j).norm2();
+            for i in 0..self.n {
                 q[i * self.m + j] = q[i * self.m + j] / size;
             }
         }
-
-
         q
     }
 }
@@ -882,7 +909,7 @@ where
         v
     }
     pub fn to_matrix_culumn(&self, culumn: usize) -> Matrix<T> {
-        Matrix::append(self.n, 1, self.to_vec_line(culumn))
+        Matrix::append(self.n, 1, self.to_vec_culumn(culumn))
     }
 }
 

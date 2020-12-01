@@ -521,9 +521,17 @@ fn main() {
     println!("{}", cg);
     println!("{:?}", data_cg.pop().unwrap());
     println!("{}", &matrixa);
-    println!("{:?}", matrixa.to_vec_line(3));
-    println!("{}", matrixa.to_matrix_line(3));
-    println!("{:?}", matrixa.to_vec_culumn(3));
-    println!("{}", matrixa.to_matrix_culumn(3));
-    println!("{}", matrixa.gram_schmidt());
+    // println!("{:?}", matrixa.to_vec_line(3));
+    // println!("{}", matrixa.to_matrix_line(3));
+    // println!("{:?}", matrixa.to_vec_culumn(3));
+    // println!("{}", matrixa.to_matrix_culumn(3));
+    // println!("{}", matrixa.gram_schmidt());
+    // println!("{}", matrixa.qr_decompose().0);
+    // println!("{}", matrixa.qr_decompose().1);
+    println!("{}", &matrixa.qr_decompose().0 * &matrixa.qr_decompose().1);
+    println!("{}", &matrixa.gram_schmidt().to_matrix_culumn(3).to_transpose() * &matrixa.gram_schmidt().to_matrix_culumn(5));
+    // println!("{}", matrixa.gram_schmidt().to_matrix_culumn(0));
+    println!("{}", &matrixa.gram_schmidt().to_matrix_culumn(0).to_transpose() * &matrixa.gram_schmidt().to_matrix_culumn(0));
+    println!("{}", &matrixa.gram_schmidt().to_matrix_culumn(3).to_transpose() * &matrixa.gram_schmidt().to_matrix_culumn(3));
+    println!("{}", &matrixa.gram_schmidt().to_matrix_culumn(0).to_transpose() * &matrixa.gram_schmidt().to_matrix_culumn(3));
 }
