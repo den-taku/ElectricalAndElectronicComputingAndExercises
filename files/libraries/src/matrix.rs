@@ -11,6 +11,44 @@ pub use std::rc::Rc;
 pub use std::fmt;
 pub use std::fmt::{Display, Formatter};
 
+pub struct QR<F> {
+    a: Matrix<F>,
+    eigen_value: Matrix<F>
+}
+
+impl<F> QR<F> 
+where 
+    F: Zero + Clone
+{
+    pub fn new(a: Matrix<F>) -> Self {
+        QR {
+            eigen_value: Matrix::append(a.n.clone(), 1, vec![F::zero(); a.n]),
+            a: a,
+        }
+    }
+}
+
+impl<F> Display for QR<F>
+where
+    F: Zero + Display + PartialOrd + Clone,
+{
+    fn fmt(&self, dest: &mut Formatter) -> fmt::Result {
+        let mut string = "".to_string();
+        for i in 0..self.eigen_value.n {
+            for j in 0..self.eigen_value.m {
+                let pad = if self.eigen_value[i * self.eigen_value.m + j] >= F::zero() {
+                    " ".to_string()
+                } else {
+                    "".to_string()
+                };
+                string = format!("{}{}{} ", string, pad, self.eigen_value[i * self.eigen_value.m + j].clone());
+            }
+            string = format!("{}\n", string);
+        }
+        write!(dest, "{}", string)
+    }
+}
+
 pub trait Iterative<F: Float> {
     fn residual_norm(&self) -> F;
     fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> Vec<(F, F)>;

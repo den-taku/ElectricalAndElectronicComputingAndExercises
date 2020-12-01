@@ -521,6 +521,16 @@ fn main() {
     println!("{}", cg);
     println!("{:?}", data_cg.pop().unwrap());
     println!("{}", &matrixa);
+
+    let matrix21a = data::matrix21a_f64();
+    let matrix23a = data::matrix23a_f64();
+    
+    let qr21 = QR::new(matrix21a.clone());
+    let qr23 = QR::new(matrix23a.clone());
+
+    println!("{}", qr21);
+    println!("{}", qr23);
+
     // println!("{:?}", matrixa.to_vec_line(3));
     // println!("{}", matrixa.to_matrix_line(3));
     // println!("{:?}", matrixa.to_vec_culumn(3));
@@ -528,10 +538,11 @@ fn main() {
     // println!("{}", matrixa.gram_schmidt());
     // println!("{}", matrixa.qr_decompose().0);
     // println!("{}", matrixa.qr_decompose().1);
-    println!("{}", &matrixa.qr_decompose().0 * &matrixa.qr_decompose().1);
-    println!("{}", &matrixa.gram_schmidt().to_matrix_culumn(3).to_transpose() * &matrixa.gram_schmidt().to_matrix_culumn(5));
+    // println!("{}", &matrixa.qr_decompose().0 * &matrixa.qr_decompose().1);
+    // println!("{}", &matrixa.qr_decompose().1 * &matrixa.qr_decompose().0);
+    // println!("{}", &matrixa.gram_schmidt().to_matrix_culumn(3).to_transpose() * &matrixa.gram_schmidt().to_matrix_culumn(5));
     // println!("{}", matrixa.gram_schmidt().to_matrix_culumn(0));
-    println!("{}", &matrixa.gram_schmidt().to_matrix_culumn(0).to_transpose() * &matrixa.gram_schmidt().to_matrix_culumn(0));
-    println!("{}", &matrixa.gram_schmidt().to_matrix_culumn(3).to_transpose() * &matrixa.gram_schmidt().to_matrix_culumn(3));
-    println!("{}", &matrixa.gram_schmidt().to_matrix_culumn(0).to_transpose() * &matrixa.gram_schmidt().to_matrix_culumn(3));
+    // println!("{}", &matrixa.gram_schmidt().to_matrix_culumn(0).to_transpose() * &matrixa.gram_schmidt().to_matrix_culumn(0));
+    // println!("{}", &matrixa.gram_schmidt().to_matrix_culumn(3).to_transpose() * &matrixa.gram_schmidt().to_matrix_culumn(3));
+    // println!("{}", &matrixa.gram_schmidt().to_matrix_culumn(0).to_transpose() * &matrixa.gram_schmidt().to_matrix_culumn(3));
 }
