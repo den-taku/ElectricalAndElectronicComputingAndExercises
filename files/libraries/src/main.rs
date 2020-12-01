@@ -520,4 +520,6 @@ fn main() {
     let mut data_cg = cg.solve(10e-10, 10_000);
     println!("{}", cg);
     println!("{:?}", data_cg.pop().unwrap());
+    println!("{}", &matrixa);
+    println!("{:?}", matrixa.to_vec_line(3));
 }

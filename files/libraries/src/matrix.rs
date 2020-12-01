@@ -823,6 +823,22 @@ where
     }
 }
 
+impl<T> Matrix<T> 
+where
+    T: Clone
+{
+    pub fn to_vec_line(&self, line: usize) -> Vec<T> {
+        if self.n <= line {
+            panic!("`Matrix::to_vec_line` needs l < n.");
+        }
+        let mut v = Vec::new();
+        for i in 0..self.m {
+            v.push(self[self.m * line + i].clone());
+        }
+        v
+    }
+}
+
 impl<R, T> Matrix<Rc<dyn Fn(R) -> T>>
 where
     R: Clone,
