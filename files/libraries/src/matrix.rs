@@ -17,6 +17,110 @@ pub trait Iterative<F: Float> {
     fn approximate_answer(&self) -> Matrix<F>;
 }
 
+pub struct CG<F: Float> {
+    a: Matrix<F>,
+    b: Matrix<F>,
+    ans: Matrix<F>,
+}
+
+impl<F> Iterative<F> for CG<F>
+where
+    F: Float + FromPrimitive,
+{
+    fn residual_norm(&self) -> F {
+        (&(&self.a * &self.ans) - &self.b).norm2::<F>() / self.b.norm2()
+    }
+    fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> Vec<(F, F)> {
+        let data: Vec<(F, F)> = Vec::new();
+        let res_vec = &self.b - &(&self.a * &self.ans);
+        let p_vec = res_vec.clone();
+
+        self.solve_inner(
+            convergent_condition,
+            max_iteration,
+            0usize,
+            res_vec,
+            p_vec,
+            data,
+        )
+    }
+    fn approximate_answer(&self) -> Matrix<F> {
+        self.ans.clone()
+    }
+}
+
+impl<F> CG<F>
+where
+    F: Float + FromPrimitive + Zero,
+{
+    pub fn new(a: Matrix<F>, b: Matrix<F>, init: Matrix<F>) -> Self {
+        if !(a.m == a.n && a.n == b.n && b.n == init.n) {
+            panic!("Jacobi needs n size matrix.")
+        }
+        CG { a, b, ans: init }
+    }
+
+    fn solve_inner(
+        &mut self,
+        convergent_condition: F,
+        max_iteratinon: usize,
+        times: usize,
+        mut r: Matrix<F>,
+        p: Matrix<F>,
+        mut data: Vec<(F, F)>,
+    ) -> Vec<(F, F)> {
+        let alpha =
+            (&r.to_transpose() * &r).to_value() / (&p.to_transpose() * &(&self.a * &p)).to_value();
+        self.ans = &self.ans + &(&p * alpha);
+        let past_r = r.clone();
+        r = &r - &(&(&self.a * &p) * alpha);
+
+        let res_norm = self.residual_norm();
+        data.push((F::from_usize(times).unwrap(), res_norm));
+
+        let _norm = (&self.approximate_answer()
+            - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9]))
+            .norm2::<F>();
+
+        if times == max_iteratinon || res_norm <= convergent_condition {
+            return data;
+        }
+
+        let beta =
+            (&r.to_transpose() * &r).to_value() / (&past_r.to_transpose() * &past_r).to_value();
+
+        self.solve_inner(
+            convergent_condition,
+            max_iteratinon,
+            times + 1,
+            r.clone(),
+            &r + &(&p * beta),
+            data,
+        )
+    }
+}
+
+impl<F> Display for CG<F>
+where
+    F: Float + Zero + Display + PartialOrd,
+{
+    fn fmt(&self, dest: &mut Formatter) -> fmt::Result {
+        let mut string = "".to_string();
+        for i in 0..self.ans.n {
+            for j in 0..self.ans.m {
+                let pad = if self.ans[i * self.ans.m + j] >= F::zero() {
+                    " ".to_string()
+                } else {
+                    "".to_string()
+                };
+                string = format!("{}{}{} ", string, pad, self.ans[i * self.ans.m + j].clone());
+            }
+            string = format!("{}\n", string);
+        }
+        write!(dest, "{}", string)
+    }
+}
+
 pub struct SOR<F: Float> {
     a: Matrix<F>,
     b: Matrix<F>,
@@ -84,11 +188,11 @@ where
         let res_norm = self.residual_norm();
         data.push((F::from_usize(times).unwrap(), res_norm));
 
-        let norm = (&self.approximate_answer()
+        let _norm = (&self.approximate_answer()
             - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9]))
             .norm2::<F>();
 
-        if times == max_iteratinon || norm <= convergent_condition {
+        if times == max_iteratinon || res_norm <= convergent_condition {
             return data;
         }
         self.solve_inner(convergent_condition, max_iteratinon, times + 1, data)
@@ -170,11 +274,11 @@ where
         let res_norm = self.residual_norm();
         data.push((F::from_usize(times).unwrap(), res_norm));
 
-        let norm = (&self.approximate_answer()
+        let _norm = (&self.approximate_answer()
             - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9]))
             .norm2::<F>();
 
-        if times == max_iteratinon || norm <= convergent_condition {
+        if times == max_iteratinon || res_norm <= convergent_condition {
             return data;
         }
         self.solve_inner(convergent_condition, max_iteratinon, times + 1, data)
@@ -265,11 +369,11 @@ where
         let res_norm = self.residual_norm();
         data.push((F::from_usize(times).unwrap(), res_norm));
 
-        let norm = (&self.approximate_answer()
+        let _norm = (&self.approximate_answer()
             - &Matrix::append(9, 1, vec![F::from_f32(1.0).unwrap(); 9]))
             .norm2::<F>();
 
-        if times == max_iteratinon || norm <= convergent_condition {
+        if times == max_iteratinon || res_norm <= convergent_condition {
             return data;
         }
         self.solve_inner(
@@ -579,6 +683,20 @@ where
         self.m = tmp;
     }
 
+    pub fn to_transpose(&self) -> Self {
+        let mut new_array = Vec::new();
+        for j in 0..self.m {
+            for i in 0..self.n {
+                new_array.push(self.array[i * self.m + j].clone());
+            }
+        }
+        Matrix {
+            n: self.m,
+            m: self.n,
+            array: new_array,
+        }
+    }
+
     pub fn map(&mut self, f: Rc<dyn Fn(T) -> T>) -> Self {
         for i in 0..self.n * self.m {
             self.array[i] = f(self.array[i].clone())
@@ -600,6 +718,13 @@ where
 
     pub fn to_vec(&self) -> Vec<T> {
         self.array.clone()
+    }
+
+    pub fn to_value(&self) -> T {
+        if self.n == 1 && self.m == 1 {
+            return self.array[0].clone();
+        }
+        panic!("`Matrix::to_value` is for 1x1 Matrix.")
     }
 }
 

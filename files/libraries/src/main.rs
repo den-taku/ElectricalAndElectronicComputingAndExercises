@@ -14,24 +14,24 @@ use matrix::*;
 // use crate::matrix::*;
 
 fn main() {
-    let matrixa = data::matrix21a_f64();
-    let matrixb = data::matrix21b_f64();
+    // let matrixa = data::matrix21a_f64();
+    // let matrixb = data::matrix21b_f64();
     // println!("{}", matrixa);
     // println!("{}", matrixb);
     // let ab = Matrix::forward_erase(&matrixa, &matrixb);
     // println!("{}", ab.clone());
     // println!("{}", Matrix::backward_erase(ab));
-    println!("{}", Matrix::solve_eqn_gauss(&matrixa, &matrixb));
-    println!("{}", Matrix::solve_eqn(&matrixa, &matrixb));
+    // println!("{}", Matrix::solve_eqn_gauss(&matrixa, &matrixb));
+    // println!("{}", Matrix::solve_eqn(&matrixa, &matrixb));
     // println!("{}", matrixa.lower_triangular_matrix());
     // println!("{}", matrixa.upper_triangular_matrix());
     // println!("{}", matrixa.diagonal_matrix());
 
-    let mut jacobi = Jacobi::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
-    let mut data_jacobi = jacobi.solve(10e-10, 10_000);
-    // println!("times: {}", times_jacobi);
-    println!("{}", jacobi);
-    println!("{:?}", data_jacobi.pop().unwrap());
+    // let mut jacobi = Jacobi::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
+    // let mut data_jacobi = jacobi.solve(10e-10, 10_000);
+    // // println!("times: {}", times_jacobi);
+    // println!("{}", jacobi);
+    // println!("{:?}", data_jacobi.pop().unwrap());
     //  println!("{:?}", data_jacobi);
 
     //  let mut fg = Figure::new();
@@ -53,12 +53,12 @@ fn main() {
     //  }
     //  let _ = fg.show();
 
-    let mut gauss_seidel =
-        GaussSeidel::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
-    let mut data_gauss_seidel = gauss_seidel.solve(10e-10, 10_000);
-    // println!("times: {}", times_gaussseidel);
-    println!("{}", gauss_seidel);
-    println!("{:?}", data_gauss_seidel.pop().unwrap());
+    // let mut gauss_seidel =
+    //     GaussSeidel::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
+    // let mut data_gauss_seidel = gauss_seidel.solve(10e-10, 10_000);
+    // // println!("times: {}", times_gaussseidel);
+    // println!("{}", gauss_seidel);
+    // println!("{:?}", data_gauss_seidel.pop().unwrap());
 
     //  let mut fg = Figure::new();
     //  {
@@ -79,26 +79,26 @@ fn main() {
     //  }
     //  let _ = fg.show();
 
-    let mut sor = SOR::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1), 1.863);
-    let mut data_sor = sor.solve(10e-10, 10_000);
-    // println!("times: {}", times_sor);
-    println!("{}", sor);
-    println!("{:?}", data_sor.pop().unwrap());
+    // let mut sor = SOR::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1), 1.863);
+    // let mut data_sor = sor.solve(10e-10, 10_000);
+    // // println!("times: {}", times_sor);
+    // println!("{}", sor);
+    // println!("{:?}", data_sor.pop().unwrap());
 
-    println!(
-        "Jacobi:       {}",
-        (&jacobi.approximate_answer() - &Matrix::append(9, 1, vec![1.0; 9])).norm2::<f64>()
-    );
-    println!(
-        "Gauss-Seidek: {}",
-        (&gauss_seidel.approximate_answer() - &Matrix::append(9, 1, vec![1.0; 9])).norm2::<f64>()
-    );
-    println!(
-        "SOR:          {}",
-        (&sor.approximate_answer() - &Matrix::append(9, 1, vec![1.0; 9])).norm2::<f64>()
-    );
+    // println!(
+    //     "Jacobi:       {}",
+    //     (&jacobi.approximate_answer() - &Matrix::append(9, 1, vec![1.0; 9])).norm2::<f64>()
+    // );
+    // println!(
+    //     "Gauss-Seidek: {}",
+    //     (&gauss_seidel.approximate_answer() - &Matrix::append(9, 1, vec![1.0; 9])).norm2::<f64>()
+    // );
+    // println!(
+    //     "SOR:          {}",
+    //     (&sor.approximate_answer() - &Matrix::append(9, 1, vec![1.0; 9])).norm2::<f64>()
+    // );
 
-    println!("");
+    // println!("");
 
     //     let mut fg = Figure::new();
 
@@ -134,10 +134,10 @@ fn main() {
     //     }
     //     let _ = fg.show();
 
-    println!("ZZZZZZZZZZZZ f32 ZZZZZZZZZZZZZzz");
+    // println!("ZZZZZZZZZZZZ f32 ZZZZZZZZZZZZZzz");
 
-    let matrixa = data::matrix21a_f32();
-    let matrixb = data::matrix21b_f32();
+    // let matrixa = data::matrix21a_f32();
+    // let matrixb = data::matrix21b_f32();
     // println!("{}", matrixa);
     // println!("{}", matrixb);
     // let ab = Matrix::forward_erase(&matrixa, &matrixb);
@@ -149,42 +149,42 @@ fn main() {
     // println!("{}", matrixa.upper_triangular_matrix());
     // println!("{}", matrixa.diagonal_matrix());
 
-    println!("{}", Matrix::solve_eqn_gauss(&matrixa, &matrixb));
+    // println!("{}", Matrix::solve_eqn_gauss(&matrixa, &matrixb));
 
-    println!("{}", Matrix::solve_eqn(&matrixa, &matrixb));
+    // println!("{}", Matrix::solve_eqn(&matrixa, &matrixb));
 
-    let mut jacobi = Jacobi::<f32>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
-    let mut data_jacobi = jacobi.solve(10e-7, 10_000);
-    // println!("times: {}", times_jacobi);
-    println!("{}", jacobi);
-    println!("{:?}", data_jacobi.pop().unwrap());
+    // let mut jacobi = Jacobi::<f32>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
+    // let mut data_jacobi = jacobi.solve(10e-7, 10_000);
+    // // println!("times: {}", times_jacobi);
+    // println!("{}", jacobi);
+    // println!("{:?}", data_jacobi.pop().unwrap());
 
-    let mut gauss_seidel =
-        GaussSeidel::<f32>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
-    let mut data_gaussseidel = gauss_seidel.solve(10e-7, 10_000);
-    // println!("times: {}", times_gaussseidel);
-    println!("{}", gauss_seidel);
-    println!("{:?}", data_gaussseidel.pop().unwrap());
+    // let mut gauss_seidel =
+    //     GaussSeidel::<f32>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
+    // let mut data_gaussseidel = gauss_seidel.solve(10e-7, 10_000);
+    // // println!("times: {}", times_gaussseidel);
+    // println!("{}", gauss_seidel);
+    // println!("{:?}", data_gaussseidel.pop().unwrap());
 
-    println!("KOKO?");
-    let mut sor = SOR::<f32>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1), 1.84);
-    let mut data_sor = sor.solve(10e-7, 10_000);
-    // println!("times: {}", times_sor);
-    println!("{}", sor);
-    println!("{:?}", data_sor.pop().unwrap());
+    // println!("KOKO?");
+    // let mut sor = SOR::<f32>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1), 1.84);
+    // let mut data_sor = sor.solve(10e-7, 10_000);
+    // // println!("times: {}", times_sor);
+    // println!("{}", sor);
+    // println!("{:?}", data_sor.pop().unwrap());
 
-    println!(
-        "Jacobi:       {}",
-        (&jacobi.approximate_answer() - &Matrix::append(9, 1, vec![1.0; 9])).norm2::<f32>()
-    );
-    println!(
-        "Gauss-Seidek: {}",
-        (&gauss_seidel.approximate_answer() - &Matrix::append(9, 1, vec![1.0; 9])).norm2::<f32>()
-    );
-    println!(
-        "SOR:          {}",
-        (&sor.approximate_answer() - &Matrix::append(9, 1, vec![1.0; 9])).norm2::<f32>()
-    );
+    // println!(
+    //     "Jacobi:       {}",
+    //     (&jacobi.approximate_answer() - &Matrix::append(9, 1, vec![1.0; 9])).norm2::<f32>()
+    // );
+    // println!(
+    //     "Gauss-Seidek: {}",
+    //     (&gauss_seidel.approximate_answer() - &Matrix::append(9, 1, vec![1.0; 9])).norm2::<f32>()
+    // );
+    // println!(
+    //     "SOR:          {}",
+    //     (&sor.approximate_answer() - &Matrix::append(9, 1, vec![1.0; 9])).norm2::<f32>()
+    // );
     //     let mut fg = Figure::new();
 
     //     let x_jacobi: Vec<f32> = data_jacobi.iter().map(|e| e.0).collect();
@@ -282,26 +282,26 @@ fn main() {
     // }
     // let _ = fg.show();
 
-    let matrixa = data::matrix23a_f64();
-    let matrixb = data::matrix23b_f64();
-    println!("{}", Matrix::solve_eqn_gauss(&matrixa, &matrixb));
-    println!("{}", Matrix::solve_eqn(&matrixa, &matrixb));
+    // let matrixa = data::matrix23a_f64();
+    // let matrixb = data::matrix23b_f64();
+    // println!("{}", Matrix::solve_eqn_gauss(&matrixa, &matrixb));
+    // println!("{}", Matrix::solve_eqn(&matrixa, &matrixb));
 
-    let mut jacobi = Jacobi::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
-    let mut data_jacobi = jacobi.solve(10e-10, 10_000);
-    println!("{}", jacobi);
-    println!("{:?}", data_jacobi.pop().unwrap());
+    // let mut jacobi = Jacobi::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
+    // let mut data_jacobi = jacobi.solve(10e-10, 10_000);
+    // println!("{}", jacobi);
+    // println!("{:?}", data_jacobi.pop().unwrap());
 
-    let mut gauss_seidel =
-        GaussSeidel::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
-    let mut data_gauss_seidel = gauss_seidel.solve(10e-10, 10_000);
-    println!("{}", gauss_seidel);
-    println!("{:?}", data_gauss_seidel.pop().unwrap());
+    // let mut gauss_seidel =
+    //     GaussSeidel::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
+    // let mut data_gauss_seidel = gauss_seidel.solve(10e-10, 10_000);
+    // println!("{}", gauss_seidel);
+    // println!("{:?}", data_gauss_seidel.pop().unwrap());
 
-    let mut sor = SOR::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1), 1.8);
-    let mut data_sor = sor.solve(10e-10, 10_000);
-    println!("{}", sor);
-    println!("{:?}", data_sor.pop().unwrap());
+    // let mut sor = SOR::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1), 1.8);
+    // let mut data_sor = sor.solve(10e-10, 10_000);
+    // println!("{}", sor);
+    // println!("{:?}", data_sor.pop().unwrap());
 
     //  let mut fg = Figure::new();
 
@@ -330,14 +330,22 @@ fn main() {
     //  }
     //  let _ = fg.show();
 
-    println!(
-        "{}",
-        (&(&matrixa.diagonal_matrix_inverse()
-            * &(&matrixa.lower_triangular_matrix() + &matrixa.upper_triangular_matrix()))
-            * (-1.0))
-            .power_method(10000)
-            .pop()
-            .unwrap()
-            .1
-    );
+    // println!(
+    //     "{}",
+    //     (&(&matrixa.diagonal_matrix_inverse()
+    //         * &(&matrixa.lower_triangular_matrix() + &matrixa.upper_triangular_matrix()))
+    //         * (-1.0))
+    //         .power_method(10000)
+    //         .pop()
+    //         .unwrap()
+    //         .1
+    // );
+
+    let matrixa = data::matrix21a_f64();
+    let matrixb = data::matrix21b_f64();
+    let mut cg = CG::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
+    let mut data_cg = cg.solve(10e-10, 10_000);
+    println!("{}", cg);
+    println!("{:?}", data_cg.pop().unwrap());
+    // println!("{}", matrixa.to_transpose());
 }
