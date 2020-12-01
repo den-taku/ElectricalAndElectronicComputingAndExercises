@@ -28,6 +28,34 @@ where
     }
 }
 
+impl<F> QR<F>
+where 
+    F: Float + FromPrimitive
+{
+    pub fn solve(&mut self, convergent_condition: F, max_iteration: usize) -> Vec<(F, F)> {
+        let data: Vec<(F, F)> = Vec::new();
+        self.solve_inner(convergent_condition, max_iteration, data, 1usize)
+    }
+
+    fn solve_inner(&mut self, convergent_condition: F, max_iteratinon: usize, mut data: Vec<(F, F)>, times: usize) -> Vec<(F, F)> {
+        let (q, r) = self.a.qr_decompose();
+        let a_new = &r * &q;
+        let norm = (&self.a.diagonal_matrix() - &a_new.diagonal_matrix()).norm2();
+        self.a = a_new;
+        data.push((F::from_usize(times).unwrap(), norm));
+        if norm <= convergent_condition {
+            let mut lamda = Vec::new();
+            for i in 0..self.a.n {
+                lamda.push(self.a[i * (self.a.n + 1)]);
+            }
+            self.eigen_value = Matrix::append(self.a.n, 1, lamda);
+            data
+        } else {
+            self.solve_inner(convergent_condition, max_iteratinon, data, times + 1)
+        }
+    }
+}
+
 impl<F> Display for QR<F>
 where
     F: Zero + Display + PartialOrd + Clone,

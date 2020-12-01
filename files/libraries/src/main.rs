@@ -525,10 +525,15 @@ fn main() {
     let matrix21a = data::matrix21a_f64();
     let matrix23a = data::matrix23a_f64();
     
-    let qr21 = QR::new(matrix21a.clone());
-    let qr23 = QR::new(matrix23a.clone());
+    let mut qr21 = QR::new(matrix21a.clone());
+    let mut qr23 = QR::new(matrix23a.clone());
 
+    let mut data_21 = qr21.solve(10e-10, 10_000);
+    let mut data_23 = qr23.solve(10e-10, 10_000);
+
+    println!("{}", data_21.pop().unwrap().0);
     println!("{}", qr21);
+    println!("{}", data_23.pop().unwrap().0);
     println!("{}", qr23);
 
     // println!("{:?}", matrixa.to_vec_line(3));
