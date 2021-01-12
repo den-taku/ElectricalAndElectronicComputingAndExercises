@@ -260,9 +260,10 @@ where
                     sum = sum + self.a[i * self.a.n + j] * self.ans[j];
                 }
             }
-            self.ans[i] = (self.b[i] - sum) / a_i_i;
+            // self.ans[i] = (self.b[i] - sum) / a_i_i;
+            self.ans[i] = self.ans[i] * self.relaxation_factor * ((self.b[i] - sum) / a_i_i  - self.ans[i]);
         }
-        self.ans = &x_k + &(&(&self.ans - &x_k) * self.relaxation_factor);
+        // self.ans = &x_k + &(&(&self.ans - &x_k) * self.relaxation_factor);
 
         let res_norm = self.residual_norm();
         data.push((F::from_usize(times).unwrap(), res_norm));
