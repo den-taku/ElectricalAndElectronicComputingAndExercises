@@ -251,7 +251,7 @@ where
         times: usize,
         mut data: Vec<(F, F)>,
     ) -> Vec<(F, F)> {
-        let x_k = self.ans.clone();
+        // let x_k = self.ans.clone();
         for i in 0..self.a.n {
             let a_i_i = self.a[i * (self.a.n + 1)];
             let mut sum = F::zero();

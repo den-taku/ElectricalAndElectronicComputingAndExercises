@@ -3,7 +3,7 @@ mod data;
 mod matrix;
 mod newton_raphson_method;
 
-// use gnuplot::*;
+use gnuplot::*;
 // use std::rc::Rc;
 // use plotlib::page::Page;
 // use plotlib::repr::Plot;
@@ -255,11 +255,11 @@ fn main() {
     // let matrixa = data::matrix21a_f64();
     // let matrixb = data::matrix21b_f64();
 
-    // let mut data = Vec::new();
+    let mut data = Vec::new();
     for i in 1..2000 {
        let mut sor = SOR::<f64>::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1), i as f64 / 1000.0);
        let omega = i as f64 / 1000.0;
-       let times = sor.solve(10e-10, 10_000);
+       let times = sor.solve(10e-10, 10_000).pop().unwrap().0;
        data.push((omega, times));
        println!("ω: {}, times: {}", omega, times);
     }
@@ -341,12 +341,12 @@ fn main() {
     //         .1
     // );
 
-    let matrixa = data::matrix21a_f64();
-    let matrixb = data::matrix21b_f64();
-    let mut cg = CG::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
-    let mut data_cg = cg.solve(10e-10, 10_000);
-    println!("{}", cg);
-    println!("{:?}", data_cg.pop().unwrap());
+    // let matrixa = data::matrix21a_f64();
+    // let matrixb = data::matrix21b_f64();
+    // let mut cg = CG::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
+    // let mut data_cg = cg.solve(10e-10, 10_000);
+    // println!("{}", cg);
+    // println!("{:?}", data_cg.pop().unwrap());
     // println!("{}", matrixa.to_transpose());
     // let p0 = Matrix::append(
     //     9,
@@ -507,34 +507,34 @@ fn main() {
     // println!("{}", (&p6.to_transpose() * &(&matrixa * &p7)).to_value());
     // println!("{}", (&p6.to_transpose() * &(&matrixa * &p8)).to_value());
     // println!("{}", (&p6.to_transpose() * &(&matrixa * &p9)).to_value());
-    let matrixa = data::matrix21a_f32();
-    let matrixb = data::matrix21b_f32();
-    let mut cg = CG::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
-    let mut data_cg = cg.solve(10e-6, 10_000);
-    println!("{}", cg);
-    println!("{:?}", data_cg.pop().unwrap());
+    // let matrixa = data::matrix21a_f32();
+    // let matrixb = data::matrix21b_f32();
+    // let mut cg = CG::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
+    // let mut data_cg = cg.solve(10e-6, 10_000);
+    // println!("{}", cg);
+    // println!("{:?}", data_cg.pop().unwrap());
 
-    let matrixa = data::matrix23a_f64();
-    let matrixb = data::matrix23b_f64();
-    let mut cg = CG::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
-    let mut data_cg = cg.solve(10e-10, 10_000);
-    println!("{}", cg);
-    println!("{:?}", data_cg.pop().unwrap());
-    println!("{}", &matrixa);
+    // let matrixa = data::matrix23a_f64();
+    // let matrixb = data::matrix23b_f64();
+    // let mut cg = CG::new(matrixa.clone(), matrixb.clone(), Matrix::new(9, 1));
+    // let mut data_cg = cg.solve(10e-10, 10_000);
+    // println!("{}", cg);
+    // println!("{:?}", data_cg.pop().unwrap());
+    // println!("{}", &matrixa);
 
-    let matrix21a = data::matrix21a_f64();
-    let matrix23a = data::matrix23a_f64();
+    // let matrix21a = data::matrix21a_f64();
+    // let matrix23a = data::matrix23a_f64();
 
-    let mut qr21 = QR::new(matrix21a.clone());
-    let mut qr23 = QR::new(matrix23a.clone());
+    // let mut qr21 = QR::new(matrix21a.clone());
+    // let mut qr23 = QR::new(matrix23a.clone());
 
-    let mut data_21 = qr21.solve(10e-10, 10_000);
-    let mut data_23 = qr23.solve(10e-10, 10_000);
+    // let mut data_21 = qr21.solve(10e-10, 10_000);
+    // let mut data_23 = qr23.solve(10e-10, 10_000);
 
-    println!("{}", data_21.pop().unwrap().0);
-    println!("{}", qr21);
-    println!("{}", data_23.pop().unwrap().0);
-    println!("{}", qr23);
+    // println!("{}", data_21.pop().unwrap().0);
+    // println!("{}", qr21);
+    // println!("{}", data_23.pop().unwrap().0);
+    // println!("{}", qr23);
 
     // let mut fg = Figure::new();
 
