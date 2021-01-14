@@ -1,6 +1,29 @@
-use num_traits::Float;
 use num_traits::FromPrimitive;
+use num_traits::{Float, Zero};
 use std::f64::consts::PI;
+
+pub fn least_squares_method<F>(data: Vec<(F, F)>) -> (F, F)
+where
+    F: Float + Zero + FromPrimitive,
+{
+    let sigma_one = F::from_usize(data.len()).unwrap();
+    let mut sigma_x = F::zero();
+    let mut sigma_y = F::zero();
+    let mut sigma_xy = F::zero();
+    let mut sigma_xx = F::zero();
+
+    for e in data {
+        sigma_x = sigma_x + e.0;
+        sigma_y = sigma_y + e.1;
+        sigma_xy = sigma_xy + e.0 * e.1;
+        sigma_xx = sigma_xx + e.0 * e.0;
+    }
+
+    (
+        (sigma_x * sigma_y - sigma_one * sigma_xy) / (sigma_x * sigma_x - sigma_one * sigma_xx),
+        (sigma_x * sigma_xy - sigma_y * sigma_xx) / (sigma_x * sigma_x - sigma_one * sigma_xx),
+    )
+}
 
 /// v_x_n+1 = v_x + h * v_y
 /// v_y_n+1 = v_y - h * v_x
@@ -32,20 +55,14 @@ where
     let now = F::from_f64(now).unwrap();
 
     // while 0 <= t <= 5π
-    if now <= F::from_f64(5.0).unwrap() * F::from_f64(PI).unwrap() {
+    if now <= F::from_f64(2.0).unwrap() * F::from_f64(PI).unwrap() {
         euler(v_x_n_1, v_y_n_1, h, now, log)
     } else {
         log
     }
 }
 
-pub fn euler2<F>(
-    v_x: F,
-    v_y: F,
-    h: F,
-    t: F,
-    max: F, 
-) -> F
+pub fn euler2<F>(v_x: F, v_y: F, h: F, t: F, max: F) -> F
 where
     F: Float + FromPrimitive,
 {
@@ -64,11 +81,7 @@ where
 
     let now = F::from_f64(now).unwrap();
 
-    let max = if max >= err_norm {
-        max
-    } else {
-        err_norm
-    };
+    let max = if max >= err_norm { max } else { err_norm };
 
     // while 0 <= t <= 5π
     if now <= F::from_f64(5.0).unwrap() * F::from_f64(PI).unwrap() {
