@@ -37,9 +37,12 @@ fn main() {
         // err.sort_by(|a, b| a.partial_cmp(&b).unwrap());
         errs.push((i as f64, max));
     }
+    println!("{:?}", &errs);
     let errs: Vec<(f64, f64)> = errs.iter().map(|e| {
         (e.0, f64::log2(e.1))
     }).collect();
+
+    println!("{:?}", &errs);
     // let log = (data, err);
     // log.1.iter().fold((), |_, e| {
     //     println!("when {}, {}", e.0, e.1);
@@ -47,7 +50,7 @@ fn main() {
 
     // let log = euler::<f64>(0.0, -1.0, PI / 32.0, 0.0, (data, err));
 
-    draw_graph(2.9, 18.1, 0.0, 1.6, "x", "log_2E_r", "blue", errs);
+    draw_graph(2.9, 18.1, 0.0, 7.0, "p", "log_2E_r", "blue", errs);
     // draw_graph(0.0, 1.7, 0.0, 1.6, "x", "log_2E_r", "blue", log.1.clone());
     // draw_graph(-4.0, 4.0, -4.0, 4.0, "x", "y", "blue", log.0.clone());
     // println!("{:?}", &log.1);
