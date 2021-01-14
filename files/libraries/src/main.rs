@@ -24,34 +24,50 @@ fn main() {
         true_y.push(-f64::cos(2.0 * PI * i as f64 / 100.0));
     }
 
-    let data: Vec<(f64, f64)> = Vec::new();
-    let err: Vec<(f64, f64)> = Vec::new();
-    let log = euler::<f64>(0.0, -1.0, PI / 32.0, 0.0, (data, err));
-    // draw_graph(-4.0, 4.0, -4.0, 4.0, "x", "y", "blue", log.0.clone());
-    // draw_graph(0.0, 5.0 * PI, 0.0, 4.0, "x", "y", "blue", log.1.clone());
-    // println!("{:?}", &log.1);
-    let mut fg = Figure::new();
-    {
-        let axec = fg
-            .axes2d()
-            .set_x_axis(true, &[])
-            .set_x_range(Fix(-2.2), Fix(2.2))
-            .set_y_range(Fix(-2.2), Fix(2.2))
-            .set_x_label("v_x", &[])
-            .set_y_label("v_y", &[])
-            .lines(
-                true_x,
-                true_y,
-                &[Caption("Analytical solution"), Color("red")],
-            );
-        log.0.iter().fold((), |_, e| {
-            axec.points(&[e.0], &[e.1], &[Color("blue"), PointSymbol('O')]);
-        });
-        axec.points(
-            &[300.0],
-            &[300.0],
-            &[Caption("Euler"), Color("blue"), PointSymbol('O')],
-        );
+    let mut data: Vec<(f64, f64)> = Vec::new();
+    data.push((0.0, -1.0));
+    let mut err: Vec<(f64, f64)> = Vec::new();
+
+    let mut now = 0.0;
+    let tau = 2.0 * PI;
+    for i in 3..19 {
+        let h = tau * 2f64.powf(- i as f64);
+        now += h;
+        // println!("now: {}", now);
+        euler2::<f64>(h, now, (&mut data, &mut err));
     }
-    let _ = fg.show();
+    let log = (data, err);
+    log.1.iter().fold((), |_, e| {
+        println!("when {}, {}", e.0, e.1);
+    });
+
+    // let log = euler::<f64>(0.0, -1.0, PI / 32.0, 0.0, (data, err));
+
+    draw_graph(0.0, PI, 0.0, 1.6, "x", "log_2E_r", "blue", log.1.clone());
+    // draw_graph(-4.0, 4.0, -4.0, 4.0, "x", "y", "blue", log.0.clone());
+    // println!("{:?}", &log.1);
+    // let mut fg = Figure::new();
+    // {
+    //     let axec = fg
+    //         .axes2d()
+    //         .set_x_axis(true, &[])
+    //         .set_x_range(Fix(-2.2), Fix(2.2))
+    //         .set_y_range(Fix(-2.2), Fix(2.2))
+    //         .set_x_label("v_x", &[])
+    //         .set_y_label("v_y", &[])
+    //         .lines(
+    //             true_x,
+    //             true_y,
+    //             &[Caption("Analytical solution"), Color("red")],
+    //         );
+    //     log.0.iter().fold((), |_, e| {
+    //         axec.points(&[e.0], &[e.1], &[Color("blue"), PointSymbol('O')]);
+    //     });
+    //     axec.points(
+    //         &[300.0],
+    //         &[300.0],
+    //         &[Caption("Euler"), Color("blue"), PointSymbol('O')],
+    //     );
+    // }
+    // let _ = fg.show();
 }
