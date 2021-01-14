@@ -261,7 +261,8 @@ where
                 }
             }
             // self.ans[i] = (self.b[i] - sum) / a_i_i;
-            self.ans[i] = self.ans[i] + self.relaxation_factor * ((self.b[i] - sum) / a_i_i  - self.ans[i]);
+            self.ans[i] =
+                self.ans[i] + self.relaxation_factor * ((self.b[i] - sum) / a_i_i - self.ans[i]);
         }
         // self.ans = &x_k + &(&(&self.ans - &x_k) * self.relaxation_factor);
 

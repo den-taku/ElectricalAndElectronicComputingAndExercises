@@ -1,3 +1,4 @@
+mod approximate;
 mod bisection_method;
 mod data;
 mod matrix;
@@ -9,8 +10,15 @@ use gnuplot::*;
 // use plotlib::repr::Plot;
 // use plotlib::style::{PointMarker, PointStyle, LineStyle, LineJoin};
 // use plotlib::view::ContinuousView;
-use matrix::*;
+// use matrix::*;
+use approximate::*;
+use std::f64::consts::PI;
 
 fn main() {
-    //
+    let data: Vec<(f64, f64)> = Vec::new();
+    let err: Vec<(f64, f64)> = Vec::new();
+    let log = euler::<f64>(0.0, -1.0, PI / 32.0, 0.0, (data, err));
+    println!("{:?}", &log.0);
+    println!("");
+    println!("{:?}", &log.1);
 }
