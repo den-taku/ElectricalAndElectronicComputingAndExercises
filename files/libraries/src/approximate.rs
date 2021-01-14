@@ -10,7 +10,7 @@ pub fn euler<F>(
     v_y: F,
     h: F,
     t: F,
-    mut log: (Vec<(F, F)>, Vec<(F, F)>), // (data, norm) 
+    mut log: (Vec<(F, F)>, Vec<(F, F)>), // (data, norm)
 ) -> (Vec<(F, F)>, Vec<(F, F)>)
 where
     F: Float + FromPrimitive,

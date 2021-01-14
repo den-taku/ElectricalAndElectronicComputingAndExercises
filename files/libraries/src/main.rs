@@ -1,10 +1,11 @@
 mod approximate;
 mod bisection_method;
 mod data;
+mod draw;
 mod matrix;
 mod newton_raphson_method;
 
-use gnuplot::*;
+// use gnuplot::*;
 // use std::rc::Rc;
 // use plotlib::page::Page;
 // use plotlib::repr::Plot;
@@ -12,6 +13,7 @@ use gnuplot::*;
 // use plotlib::view::ContinuousView;
 // use matrix::*;
 use approximate::*;
+use draw::*;
 use std::f64::consts::PI;
 
 fn main() {
@@ -21,4 +23,5 @@ fn main() {
     println!("{:?}", &log.0);
     println!("");
     println!("{:?}", &log.1);
+    draw_graph(-4.0, 4.0, -4.0, 4.0, "x", "y", "blue", log.0.clone());
 }
