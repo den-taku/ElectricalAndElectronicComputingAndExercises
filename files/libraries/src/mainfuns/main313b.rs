@@ -1,0 +1,71 @@
+mod bisection_method;
+mod data;
+mod draw;
+mod euler;
+mod heun;
+mod matrix;
+mod newton_raphson_method;
+
+use gnuplot::*;
+// use std::rc::Rc;
+// use plotlib::page::Page;
+// use plotlib::repr::Plot;
+// use plotlib::style::{PointMarker, PointStyle, LineStyle, LineJoin};
+// use plotlib::view::ContinuousView;
+// use matrix::*;
+use draw::*;
+use euler::*;
+use heun::*;
+use std::f64::consts::PI;
+
+fn main() {
+    let mut errs = Vec::new();
+
+    let tau = 2.0 * PI;
+    for i in 3..19 {
+        println!("p = {}", i);
+        let h = tau * 2f64.powf(-i as f64);
+        let max = heun2::<f64>(0.0, -1.0, h, 0.0, 0.0);
+        // err.sort_by(|a, b| a.partial_cmp(&b).unwrap());
+        errs.push((i as f64, max));
+    }
+    println!("{:?}", &errs);
+    let errs: Vec<(f64, f64)> = errs.iter().map(|e| (e.0, f64::log2(e.1))).collect();
+
+    println!("{:?}", &errs);
+
+    let (a, b) = least_squares_method(errs.clone());
+    println!("The func is {} p + {}.", a, b);
+    // draw_graph(2.9, 18.1, 0.0, 7.0, "p", "log_2E_r", "blue", errs);
+    let mut line_x = Vec::new();
+    let mut line_y = Vec::new();
+    for i in 0..20 {
+        line_x.push(i as f64);
+        line_y.push(-0.13478047683713912 * i as f64 + 2.8352123147754655);
+    }
+
+    let mut fg = Figure::new();
+    {
+        let axec = fg
+            .axes2d()
+            .set_x_axis(true, &[])
+            .set_x_range(Fix(2.9), Fix(18.1))
+            .set_y_range(Fix(0.0), Fix(7.0))
+            .set_x_label("p", &[])
+            .set_y_label("log_2E_r", &[])
+            .lines(
+                line_x,
+                line_y,
+                &[Caption("least squares method"), Color("red")],
+            );
+        errs.iter().fold((), |_, e| {
+            axec.points(&[e.0], &[e.1], &[Color("blue"), PointSymbol('O')]);
+        });
+        axec.points(
+            &[300.0],
+            &[300.0],
+            &[Caption("Heun method"), Color("blue"), PointSymbol('O')],
+        );
+    }
+    let _ = fg.show();
+}
