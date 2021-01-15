@@ -54,7 +54,7 @@ where
 
     // while 0 <= t <= 2π
     if now <= F::from_f64(2.0).unwrap() * F::from_f64(PI).unwrap() {
-        euler2(v_x_n_1, v_y_n_1, h, now, max)
+        heun2(v_x_n_1, v_y_n_1, h, now, max)
     } else {
         max
     }

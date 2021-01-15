@@ -14,6 +14,7 @@ use gnuplot::*;
 // use plotlib::view::ContinuousView;
 // use matrix::*;
 use draw::*;
+use euler::*;
 use heun::*;
 use std::f64::consts::PI;
 
@@ -40,7 +41,7 @@ fn main() {
     let mut line_y = Vec::new();
     for i in 0..20 {
         line_x.push(i as f64);
-        line_y.push(-0.22906782253272903 * i as f64 + 4.146697070946706);
+        line_y.push(-0.13478047683713912 * i as f64 + 2.8352123147754655);
     }
 
     let mut fg = Figure::new();
