@@ -15,8 +15,8 @@ where
         + h * h / F::from_f64(2.0).unwrap()
         + h * h * h / F::from_f64(6.0).unwrap()
         + h * h * h * h / F::from_f64(24.0).unwrap();
-    let v_x_n_1 = v_x + hs + v_y;
-    let v_y_n_1 = v_y - hs + v_x;
+    let v_x_n_1 = v_x + hs * v_y;
+    let v_y_n_1 = v_y - hs * v_x;
     log.0.push((v_x_n_1, v_y_n_1));
 
     let now = (t + h).to_f64().unwrap();
