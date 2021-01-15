@@ -50,12 +50,11 @@ where
             * (v_y_n_1 + F::from_f64(-f64::cos(now)).unwrap()))
     .sqrt();
     log.1.push((t, err_norm));
-    println!("      {}", err_norm.to_f64().unwrap());
 
     let now = F::from_f64(now).unwrap();
 
     // while 0 <= t <= 5π
-    if now <= F::from_f64(2.0).unwrap() * F::from_f64(PI).unwrap() {
+    if now <= F::from_f64(5.0).unwrap() * F::from_f64(PI).unwrap() {
         euler(v_x_n_1, v_y_n_1, h, now, log)
     } else {
         log
