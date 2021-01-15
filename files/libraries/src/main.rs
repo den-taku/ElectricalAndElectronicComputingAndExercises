@@ -5,6 +5,7 @@ mod euler;
 mod heun;
 mod matrix;
 mod newton_raphson_method;
+mod runge_kutta4;
 
 use gnuplot::*;
 // use std::rc::Rc;
@@ -14,8 +15,8 @@ use gnuplot::*;
 // use plotlib::view::ContinuousView;
 // use matrix::*;
 use draw::*;
-use euler::*;
-use heun::*;
+// use euler::*;
+use runge_kutta4::*;
 use std::f64::consts::PI;
 
 fn main() {
