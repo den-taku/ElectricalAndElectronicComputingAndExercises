@@ -51,7 +51,11 @@ fn main() {
         axec.points(
             &[300.0],
             &[300.0],
-            &[Caption("Heun method"), Color("blue"), PointSymbol('O')],
+            &[
+                Caption("Lunge-Kutta method"),
+                Color("blue"),
+                PointSymbol('O'),
+            ],
         );
     }
     let _ = fg.show();

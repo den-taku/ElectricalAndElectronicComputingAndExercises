@@ -11,8 +11,7 @@ pub fn runge4<F>(
 where
     F: Float + FromPrimitive,
 {
-    let hs = F::from_f64(1.0).unwrap()
-        + h
+    let hs = h
         + h * h / F::from_f64(2.0).unwrap()
         + h * h * h / F::from_f64(6.0).unwrap()
         + h * h * h * h / F::from_f64(24.0).unwrap();
