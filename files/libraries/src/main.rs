@@ -14,7 +14,7 @@ use gnuplot::*;
 // use plotlib::view::ContinuousView;
 // use matrix::*;
 use draw::*;
-use euler::*;
+use heun::*;
 use std::f64::consts::PI;
 
 fn main() {
@@ -27,7 +27,7 @@ fn main() {
 
     let data: Vec<(f64, f64)> = Vec::new();
     let err: Vec<(f64, f64)> = Vec::new();
-    let log = euler::<f64>(0.0, -1.0, PI / 32.0, 0.0, (data, err));
+    let log = heun::<f64>(0.0, -1.0, PI / 32.0, 0.0, (data, err));
     // draw_graph(-4.0, 4.0, -4.0, 4.0, "x", "y", "blue", log.0.clone());
     // draw_graph(0.0, 5.0 * PI, 0.0, 4.0, "x", "y", "blue", log.1.clone());
     // println!("{:?}", &log.1);
@@ -36,8 +36,8 @@ fn main() {
         let axec = fg
             .axes2d()
             .set_x_axis(true, &[])
-            .set_x_range(Fix(-2.2), Fix(2.2))
-            .set_y_range(Fix(-2.2), Fix(2.2))
+            .set_x_range(Fix(-2.5), Fix(2.5))
+            .set_y_range(Fix(-2.5), Fix(2.5))
             .set_x_label("v_x", &[])
             .set_y_label("v_y", &[])
             .lines(
@@ -51,7 +51,7 @@ fn main() {
         axec.points(
             &[300.0],
             &[300.0],
-            &[Caption("Euler"), Color("blue"), PointSymbol('O')],
+            &[Caption("Heun method"), Color("blue"), PointSymbol('O')],
         );
     }
     let _ = fg.show();
