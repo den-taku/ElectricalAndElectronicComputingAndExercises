@@ -67,7 +67,6 @@ where
 {
     let v_x_n_1 = v_x + h * v_y;
     let v_y_n_1 = v_y - h * v_x;
-    // log.0.push((v_x_n_1, v_y_n_1));
 
     let now = (t + h).to_f64().unwrap();
 
@@ -82,8 +81,8 @@ where
 
     let max = if max >= err_norm { max } else { err_norm };
 
-    // while 0 <= t <= 5π
-    if now <= F::from_f64(5.0).unwrap() * F::from_f64(PI).unwrap() {
+    // while 0 <= t <= 2π
+    if now <= F::from_f64(2.0).unwrap() * F::from_f64(PI).unwrap() {
         euler2(v_x_n_1, v_y_n_1, h, now, max)
     } else {
         max
