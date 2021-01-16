@@ -15,8 +15,8 @@ use gnuplot::*;
 // use plotlib::view::ContinuousView;
 // use matrix::*;
 use draw::*;
-use euler::*;
-// use heun::*;
+// use euler::*;
+use heun::*;
 // use runge_kutta4::*;
 use std::f64::consts::PI;
 

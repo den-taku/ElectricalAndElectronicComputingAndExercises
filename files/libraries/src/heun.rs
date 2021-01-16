@@ -60,7 +60,7 @@ where
     }
 }
 
-fn fun32<F: Flaot + FromPrimitive>(x: F, y: F, gamma: F) -> (F, F) {
+fn fun32<F: Float + FromPrimitive>(x: F, y: F, gamma: F) -> (F, F) {
     (
         (F::from_f64(3.0).unwrap() - gamma * x - F::from_f64(9.0).unwrap() * y) * x,
         (-F::from_f64(2.0).unwrap() + F::from_f64(2.0).unwrap() * x) * y,
@@ -80,8 +80,15 @@ pub fn heun32<F>(
 where
     F: Float + FromPrimitive,
 {
-    let (k1x, k2x) = h * fun32(x, y, gamma);
-    let (k2x, k2y) = h * fun32(x + k1x, y + k1y);
+    // let (k1x, k1y) = fun32(x, y, gamma).iter().map(|e| (e.0 * h, e.1 * h)).collect();
+    // let (k2x, k2y) = fun32(x + k1x, y + k1y).iter().map(|e| (e.0 * h, e.1 * h)).collect();
+
+    let (k1x, k1y) = match fun32(x, y, gamma) {
+        (a, b) => (a * h, b * h)
+    };
+    let (k2x, k2y) = match fun32(x + k1x, y + k1y, gamma) {
+        (a, b) => (a * h, b * h)
+    };
 
     let x_n_1 = x + (k1x + k2x) / F::from_f64(2.0).unwrap();
     let y_n_1 = y + (k1y + k2y) / F::from_f64(2.0).unwrap();
