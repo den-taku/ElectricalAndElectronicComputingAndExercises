@@ -16,59 +16,76 @@ use gnuplot::*;
 // use matrix::*;
 use draw::*;
 use euler::*;
-use runge_kutta4::*;
+// use heun::*;
+// use runge_kutta4::*;
 use std::f64::consts::PI;
 
 fn main() {
-    let mut errs = Vec::new();
+    let x_0 = 2.0;
+    let y_0 = 1.0;
+    let gamma = 0.6;
+    let h = 0.1;
+    let t_0 = 0.0;
 
-    let tau = 2.0 * PI;
-    for i in 3..19 {
-        println!("p = {}", i);
-        let h = tau * 2f64.powf(-i as f64);
-        let max = runge42::<f64>(0.0, -1.0, h, 0.0, 0.0);
-        // err.sort_by(|a, b| a.partial_cmp(&b).unwrap());
-        errs.push((i as f64, max));
-    }
-    println!("{:?}", &errs);
-    let errs: Vec<(f64, f64)> = errs.iter().map(|e| (e.0, f64::log2(e.1))).collect();
+    let mut log = (Vec::new(), Vec::new());
+    log.0.push((t_0, x_0));
+    log.1.push((t_0, y_0));
 
-    println!("{:?}", &errs);
+    let log = euler32(x_0, y_0, h, t_0, gamma, log);
 
-    let (a, b) = least_squares_method(errs.clone());
-    println!("The func is {} p + {}.", a, b);
-    // draw_graph(2.9, 18.1, 0.0, 7.0, "p", "log_2E_r", "blue", errs);
-    let mut line_x = Vec::new();
-    let mut line_y = Vec::new();
-    for i in 0..20 {
-        line_x.push(i as f64);
-        line_y.push(-0.14931232118875365  * i as f64 + 3.0295210471999314);
-    }
+    let max = {
+        let x_max = {
+           let mut copy = log.0.clone();
+        copy.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+        copy.pop().unwrap().1
+        };
 
+        let y_max = {
+            let mut copy = log.1.clone();
+         copy.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+         copy.pop().unwrap().1 
+         };
+
+         if x_max > y_max {
+             x_max
+         } else {
+             y_max
+         }
+        
+    };
+
+    // draw_graph(0.0, 20.0, 0.0, max + 1.0, "time", "")
     let mut fg = Figure::new();
     {
         let axec = fg
             .axes2d()
             .set_x_axis(true, &[])
-            .set_x_range(Fix(2.9), Fix(18.1))
-            .set_y_range(Fix(0.0), Fix(7.0))
-            .set_x_label("p", &[])
-            .set_y_label("log_2E_r", &[])
-            .lines(
-                line_x,
-                line_y,
-                &[Caption("least squares method"), Color("red")],
-            );
-        errs.iter().fold((), |_, e| {
+            .set_x_range(Fix(0.0), Fix(2.0))
+            .set_y_range(Fix(0.0), Fix(max))
+            .set_x_label("time", &[])
+            .set_y_label("number", &[]);
+        log.0.iter().fold((), |_, e| {
             axec.points(&[e.0], &[e.1], &[Color("blue"), PointSymbol('O')]);
+        });
+        log.1.iter().fold((), |_, e| {
+            axec.points(&[e.0], &[e.1], &[Color("red"), PointSymbol('x')]);
         });
         axec.points(
             &[300.0],
             &[300.0],
             &[
-                Caption("Lunge-Kutta method"),
+                Caption("x(t)"),
                 Color("blue"),
                 PointSymbol('O'),
+            ],
+        );
+        axec.points(
+            &[300.0],
+            &[300.0],
+            &[
+                Caption("y(t)"),
+                Color("red"),
+                PointSymbol('x'),
             ],
         );
     }
