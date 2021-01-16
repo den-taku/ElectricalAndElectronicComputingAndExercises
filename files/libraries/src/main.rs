@@ -23,7 +23,7 @@ use std::f64::consts::PI;
 fn main() {
     let x_0 = 2.0;
     let y_0 = 1.0;
-    let gamma = 0.0;
+    let gamma = 0.6;
     let h = 0.1;
     let t_0 = 0.0;
 
@@ -49,10 +49,12 @@ fn main() {
         copy.pop().unwrap().1
     };
 
-    let mut data = Vec::new();
+    let mut data_x = Vec::new();
+    let mut data_y = Vec::new();
 
     for i in 0..log.1.len() {
-        data.push((log.0[i].1.clone(), log.1[i].1.clone()));
+        data_x.push(log.0[i].1.clone());
+        data_y.push(log.1[i].1.clone());
     }
 
     // draw_graph(0.0, 20.0, 0.0, max + 1.0, "time", "")
@@ -66,19 +68,24 @@ fn main() {
             // .set_y_range(Fix(0.00001), Fix(10e10))
             // .set_y_log(Some(10.0))
             .set_x_label("time", &[])
-            .set_y_label("number", &[]);
-        data.iter().fold((), |_, e| {
-            axec.points(&[e.0], &[e.1], &[Color("blue"), PointSymbol('O')]);
-        });
-        axec.points(
-            &[300.0],
-            &[300.0],
-            &[
-                Caption("Numerical solution"),
-                Color("blue"),
-                PointSymbol('O'),
-            ],
-        );
+            .set_y_label("number", &[])
+            .lines(
+                data_x,
+                data_y,
+                &[Caption("Numerical solution"), Color("blue")]
+            );
+        // data.iter().fold((), |_, e| {
+            // axec.points(&[e.0], &[e.1], &[Color("blue"), PointSymbol('O')]);
+        // });
+        // axec.points(
+        //     &[300.0],
+        //     &[300.0],
+        //     &[
+        //         Caption("Numerical solution"),
+        //         Color("blue"),
+        //         PointSymbol('O'),
+        //     ],
+        // );
         axec.points(
             &[2.0 / 2.0],
             &[(3.0 * 2.0 - 2.0 * gamma) / 9.0 / 2.0],
