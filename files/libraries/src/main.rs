@@ -15,15 +15,15 @@ use gnuplot::*;
 // use plotlib::view::ContinuousView;
 // use matrix::*;
 use draw::*;
-// use euler::*;
-// use heun::*;
+use euler::*;
+use heun::*;
 use runge_kutta4::*;
 use std::f64::consts::PI;
 
 fn main() {
     let x_0 = 2.0;
     let y_0 = 1.0;
-    let gamma = 0.6;
+    let gamma = 0.0;
     let h = 0.1;
     let t_0 = 0.0;
 
@@ -65,6 +65,8 @@ fn main() {
             .set_x_axis(true, &[])
             .set_x_range(Fix(0.0), Fix(20.0))
             .set_y_range(Fix(0.0), Fix(max + 0.3))
+            // .set_y_range(Fix(0.00001), Fix(10e10))
+            // .set_y_log(Some(10.0))
             .set_x_label("time", &[])
             .set_y_label("number", &[]);
         log.0.iter().fold((), |_, e| {
