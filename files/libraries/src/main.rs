@@ -40,6 +40,7 @@ fn main() {
         copy.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
         println!("x_max: {:?}", &copy[copy.len() - 1]);
         copy.pop().unwrap().1
+    };
 
     let y_max = {
         let mut copy = log.1.clone();
@@ -50,10 +51,9 @@ fn main() {
 
     let mut data = Vec::new();
 
-    for i in log.1.len() {
+    for i in 0..log.1.len() {
         data.push((log.0[i].1.clone(), log.1[i].1.clone()));
     }
-
 
     // draw_graph(0.0, 20.0, 0.0, max + 1.0, "time", "")
     let mut fg = Figure::new();
@@ -61,8 +61,8 @@ fn main() {
         let axec = fg
             .axes2d()
             .set_x_axis(true, &[])
-            .set_x_range(Fix(0.0), Fix(x_max+0.2))
-            .set_y_range(Fix(0.0), Fix(y_max+0.2))
+            .set_x_range(Fix(0.0), Fix(x_max + 0.2))
+            .set_y_range(Fix(0.0), Fix(y_max + 0.2))
             // .set_y_range(Fix(0.00001), Fix(10e10))
             // .set_y_log(Some(10.0))
             .set_x_label("time", &[])
@@ -73,12 +73,20 @@ fn main() {
         axec.points(
             &[300.0],
             &[300.0],
-            &[Caption("Numerical solution"), Color("blue"), PointSymbol('O')],
+            &[
+                Caption("Numerical solution"),
+                Color("blue"),
+                PointSymbol('O'),
+            ],
         );
         axec.points(
-            &[2.0/2.0],
+            &[2.0 / 2.0],
             &[(3.0 * 2.0 - 2.0 * gamma) / 9.0 / 2.0],
-            &[Caption("Equilibrium solution"), Color("red"), PointSymbol('x')],
+            &[
+                Caption("Equilibrium solution"),
+                Color("red"),
+                PointSymbol('x'),
+            ],
         );
     }
     let _ = fg.show();
