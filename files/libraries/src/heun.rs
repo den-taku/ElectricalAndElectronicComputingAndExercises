@@ -59,3 +59,42 @@ where
         max
     }
 }
+
+fn fun32<F: Flaot + FromPrimitive>(x: F, y: F, gamma: F) -> (F, F) {
+    (
+        (F::from_f64(3.0).unwrap() - gamma * x - F::from_f64(9.0).unwrap() * y) * x,
+        (-F::from_f64(2.0).unwrap() + F::from_f64(2.0).unwrap() * x) * y,
+    )
+}
+
+/// dx/dt = (3 - γ * x - 9 * y) * x
+/// dy/dt = (-2 + 2 * x) * y
+pub fn heun32<F>(
+    x: F,
+    y: F,
+    h: F,
+    t: F,
+    gamma: F,
+    mut log: (Vec<(F, F)>, Vec<(F, F)>), // (data, norm)
+) -> (Vec<(F, F)>, Vec<(F, F)>)
+where
+    F: Float + FromPrimitive,
+{
+    let (k1x, k2x) = h * fun32(x, y, gamma);
+    let (k2x, k2y) = h * fun32(x + k1x, y + k1y);
+
+    let x_n_1 = x + (k1x + k2x) / F::from_f64(2.0).unwrap();
+    let y_n_1 = y + (k1y + k2y) / F::from_f64(2.0).unwrap();
+
+    let now = t + h;
+
+    log.0.push((now, x_n_1));
+    log.1.push((now, y_n_1));
+
+    // while 0 <= t <= 20
+    if now <= F::from_f64(20.0).unwrap() {
+        heun32(x_n_1, y_n_1, h, now, gamma, log)
+    } else {
+        log
+    }
+}

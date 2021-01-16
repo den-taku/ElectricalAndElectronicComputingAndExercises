@@ -97,13 +97,13 @@ pub fn euler32<F>(
     h: F,
     t: F,
     gamma: F,
-    mut log: (Vec<(F, F)>, Vec<(F, F)>) // (data, norm)
+    mut log: (Vec<(F, F)>, Vec<(F, F)>), // (data, norm)
 ) -> (Vec<(F, F)>, Vec<(F, F)>)
 where
     F: Float + FromPrimitive,
 {
     let x_n_1 = x + h * (F::from_f64(3.0).unwrap() - gamma * x - F::from_f64(9.0).unwrap() * y) * x;
-    let y_n_1 = y + h * (- F::from_f64(2.0).unwrap() + F::from_f64(2.0).unwrap() * x) * y;
+    let y_n_1 = y + h * (-F::from_f64(2.0).unwrap() + F::from_f64(2.0).unwrap() * x) * y;
 
     let now = t + h;
 
@@ -117,7 +117,6 @@ where
         log
     }
 }
-
 
 // v_x_n+1 = v_x + h * v_y
 // v_y_n+1 = v_y - h * v_x

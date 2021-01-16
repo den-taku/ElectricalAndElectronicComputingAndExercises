@@ -31,27 +31,28 @@ fn main() {
     log.0.push((t_0, x_0));
     log.1.push((t_0, y_0));
 
-    let log = euler32(x_0, y_0, h, t_0, gamma, log);
+    let log = heun32(x_0, y_0, h, t_0, gamma, log);
 
     let max = {
         let x_max = {
-           let mut copy = log.0.clone();
-        copy.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
-        copy.pop().unwrap().1
+            let mut copy = log.0.clone();
+            copy.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+            println!("x_max: {:?}", &copy[copy.len() - 1]);
+            copy.pop().unwrap().1
         };
 
         let y_max = {
             let mut copy = log.1.clone();
-         copy.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
-         copy.pop().unwrap().1 
-         };
+            copy.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+            println!("y_max: {:?}", &copy[copy.len() - 1]);
+            copy.pop().unwrap().1
+        };
 
-         if x_max > y_max {
-             x_max
-         } else {
-             y_max
-         }
-        
+        if x_max > y_max {
+            x_max
+        } else {
+            y_max
+        }
     };
 
     // draw_graph(0.0, 20.0, 0.0, max + 1.0, "time", "")
@@ -60,8 +61,8 @@ fn main() {
         let axec = fg
             .axes2d()
             .set_x_axis(true, &[])
-            .set_x_range(Fix(0.0), Fix(2.0))
-            .set_y_range(Fix(0.0), Fix(max))
+            .set_x_range(Fix(0.0), Fix(20.0))
+            .set_y_range(Fix(0.0), Fix(max + 0.3))
             .set_x_label("time", &[])
             .set_y_label("number", &[]);
         log.0.iter().fold((), |_, e| {
@@ -73,20 +74,12 @@ fn main() {
         axec.points(
             &[300.0],
             &[300.0],
-            &[
-                Caption("x(t)"),
-                Color("blue"),
-                PointSymbol('O'),
-            ],
+            &[Caption("x(t)"), Color("blue"), PointSymbol('O')],
         );
         axec.points(
             &[300.0],
             &[300.0],
-            &[
-                Caption("y(t)"),
-                Color("red"),
-                PointSymbol('x'),
-            ],
+            &[Caption("y(t)"), Color("red"), PointSymbol('x')],
         );
     }
     let _ = fg.show();
