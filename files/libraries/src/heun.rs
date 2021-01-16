@@ -80,14 +80,11 @@ pub fn heun32<F>(
 where
     F: Float + FromPrimitive,
 {
-    // let (k1x, k1y) = fun32(x, y, gamma).iter().map(|e| (e.0 * h, e.1 * h)).collect();
-    // let (k2x, k2y) = fun32(x + k1x, y + k1y).iter().map(|e| (e.0 * h, e.1 * h)).collect();
-
     let (k1x, k1y) = match fun32(x, y, gamma) {
-        (a, b) => (a * h, b * h)
+        (a, b) => (a * h, b * h),
     };
     let (k2x, k2y) = match fun32(x + k1x, y + k1y, gamma) {
-        (a, b) => (a * h, b * h)
+        (a, b) => (a * h, b * h),
     };
 
     let x_n_1 = x + (k1x + k2x) / F::from_f64(2.0).unwrap();

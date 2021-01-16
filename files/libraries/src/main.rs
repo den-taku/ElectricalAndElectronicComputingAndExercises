@@ -16,8 +16,8 @@ use gnuplot::*;
 // use matrix::*;
 use draw::*;
 // use euler::*;
-use heun::*;
-// use runge_kutta4::*;
+// use heun::*;
+use runge_kutta4::*;
 use std::f64::consts::PI;
 
 fn main() {
@@ -31,7 +31,9 @@ fn main() {
     log.0.push((t_0, x_0));
     log.1.push((t_0, y_0));
 
-    let log = heun32(x_0, y_0, h, t_0, gamma, log);
+    // let log = euler32(x_0, y_0, h, t_0, gamma, log);
+    // let log = heun32(x_0, y_0, h, t_0, gamma, log);
+    let log = runge432(x_0, y_0, h, t_0, gamma, log);
 
     let max = {
         let x_max = {
