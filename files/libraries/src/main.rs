@@ -20,7 +20,7 @@ use euler::*;
 use heun::*;
 use pulus::*;
 use runge_kutta4::*;
-use std::f64::consts::PI;
+// use std::f64::consts::PI;
 
 fn main() {
     let init = vec![0f64; 100];
