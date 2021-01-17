@@ -23,8 +23,13 @@ use runge_kutta4::*;
 // use std::f64::consts::PI;
 
 fn main() {
-    let init = vec![0f64; 100];
+    let mut init = Vec::new();
+    for i in 0..100 {
+        init.push((i as f64 * 0.01, 0f64));
+    }
     let data = vec![(-0.001, init.clone()), (0.0, init)];
 
     let log = fixed_end_pulus(0.0, 5.0, data.clone());
+
+    draw_graph(0.0, 0.1, 0.0, 2.0, "x", "u", "blue", log[3000].1.clone());
 }
