@@ -31,5 +31,18 @@ fn main() {
 
     let log = fixed_end_pulus(0.0, 5.0, data.clone());
 
+    let u = log.iter().map(|e| {
+        e.1.iter().map(|v| {
+            v.1
+        }).collect::<Vec<f64>>()
+    }).collect::<Vec<Vec<f64>>>();
+    let u = u.concat();
+
     draw_graph(0.0, 0.1, 0.0, 2.0, "x", "u", "blue", log[3000].1.clone());
+
+    // let mut fg = Figure::new();
+    // fg.axes3d()
+    //     .surface()
+
+
 }
