@@ -21,10 +21,10 @@ where
 
     let now = (t + h).to_f64().unwrap();
 
-    let err_norm = ((v_x_n_1 + F::from_f64(-f64::sin(now)).unwrap())
-        * (v_x_n_1 + F::from_f64(-f64::sin(now)).unwrap())
-        + (v_y_n_1 + F::from_f64(-f64::cos(now)).unwrap())
-            * (v_y_n_1 + F::from_f64(-f64::cos(now)).unwrap()))
+    let err_norm = ((v_x_n_1 - F::from_f64(-f64::sin(now)).unwrap())
+        * (v_x_n_1 - F::from_f64(-f64::sin(now)).unwrap())
+        + (v_y_n_1 - F::from_f64(-f64::cos(now)).unwrap())
+            * (v_y_n_1 - F::from_f64(-f64::cos(now)).unwrap()))
     .sqrt();
     log.1.push((t, err_norm));
 
@@ -50,10 +50,10 @@ where
 
     let now = (t + h).to_f64().unwrap();
 
-    let err_norm = ((v_x_n_1 + F::from_f64(-f64::sin(now)).unwrap())
-        * (v_x_n_1 + F::from_f64(-f64::sin(now)).unwrap())
-        + (v_y_n_1 + F::from_f64(-f64::cos(now)).unwrap())
-            * (v_y_n_1 + F::from_f64(-f64::cos(now)).unwrap()))
+    let err_norm = ((v_x_n_1 - F::from_f64(-f64::sin(now)).unwrap())
+        * (v_x_n_1 - F::from_f64(-f64::sin(now)).unwrap())
+        + (v_y_n_1 - F::from_f64(-f64::cos(now)).unwrap())
+            * (v_y_n_1 - F::from_f64(-f64::cos(now)).unwrap()))
     .sqrt();
 
     let now = F::from_f64(now).unwrap();

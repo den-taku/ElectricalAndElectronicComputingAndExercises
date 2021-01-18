@@ -42,7 +42,7 @@ fn main() {
     let mut line_y = Vec::new();
     for i in 0..20 {
         line_x.push(i as f64);
-        line_y.push(-0.14931232118875365  * i as f64 + 3.0295210471999314);
+        line_y.push(a * i as f64 + b);
     }
 
     let mut fg = Figure::new();
@@ -51,7 +51,7 @@ fn main() {
             .axes2d()
             .set_x_axis(true, &[])
             .set_x_range(Fix(2.9), Fix(18.1))
-            .set_y_range(Fix(0.0), Fix(7.0))
+            .set_y_range(Fix(-18.0), Fix(7.0))
             .set_x_label("p", &[])
             .set_y_label("log_2E_r", &[])
             .lines(
