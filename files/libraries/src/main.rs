@@ -2,11 +2,8 @@ mod bisection_method;
 mod data;
 mod draw;
 mod euler;
-mod heun;
 mod matrix;
 mod newton_raphson_method;
-mod pulus;
-mod runge_kutta4;
 
 use gnuplot::*;
 // use std::rc::Rc;
@@ -17,72 +14,97 @@ use gnuplot::*;
 // use matrix::*;
 use draw::*;
 use euler::*;
-use heun::*;
-use pulus::*;
-use runge_kutta4::*;
-// use std::f64::consts::PI;
+use std::f64::consts::PI;
 
 fn main() {
-    let mut init = Vec::new();
-    for i in 0..100 {
-        init.push((i as f64 * 0.01, 0f64));
+    let mut true_x = vec![];
+    let mut true_y = vec![];
+    let mut time = vec![];
+    for i in 0..5000 {
+        time.push(i as f64 / 1000.0);
+        true_x.push(-f64::sin(i as f64 / 1000.0));
+        true_y.push(-f64::cos(i as f64 / 1000.0));
     }
-    let data = vec![(-0.001, init.clone()), (0.0, init)];
+    let mut fg = Figure::new();
+    {
+        let axec = fg
+            .axes2d()
+            .set_x_axis(true, &[])
+            .set_x_range(Fix(0.0), Fix(5.0))
+            .set_y_range(Fix(-1.3), Fix(1.3))
+            .set_x_label("t", &[])
+            .set_y_label("V", &[])
+            .lines(
+                time.clone(),
+                true_x,
+                &[Caption("sin wave"), Color("blue")],
+            )
+            .lines(
+                time,
+                true_y,
+                &[Caption("cos wave"), Color("red")],
+            );
+    }
+    let _ = fg.show();
 
-    let log = fixed_end_pulus(0.0, 5.0, data.clone());
-    // let log = freed_end_pulus(0.0, 5.0, data.clone());
-    // let log = fixed_end_pulus2(0.0, 5.0, data.clone());
-    // let log = freed_end_pulus2(0.0, 5.0, data.clone());
 
-    for i in 0..log.len() {
-        println!("{} writing...", i);
-        write_to_png(
-            &format!("png/fixed1_{:04}.png", i),
-            0.0,
-            0.1,
-            -2.0,
-            2.0,
-            "x(t)",
-            "u(t)",
-            "blue",
-            log[i].1.clone(),
+    let mut errs = Vec::new();
+
+    let tau = 2.0 * PI;
+    for i in 3..19 {
+        println!("p = {}", i);
+        let h = tau * (2f64.powf(-(i as f64)));
+        let max = euler2::<f64>(0.0, -1.0, h, 0.0, 0.0);
+        // err.sort_by(|a, b| a.partial_cmp(&b).unwrap());
+        errs.push((i as f64, max));
+    }
+    println!("{:?}", &errs);
+    let errs: Vec<(f64, f64)> = errs.iter().map(|e| (e.0, f64::log2(e.1))).collect();
+
+    // println!("{:?}", &errs);
+    // let log = (data, err);
+    // log.1.iter().fold((), |_, e| {
+    //     println!("when {}, {}", e.0, e.1);
+    // });
+
+    // let log = euler::<f64>(0.0, -1.0, PI / 32.0, 0.0, (data, err));
+
+    // draw_graph(0.0, 1.7, 0.0, 1.6, "x", "log_2E_r", "blue", log.1.clone());
+    // draw_graph(-4.0, 4.0, -4.0, 4.0, "x", "y", "blue", log.0.clone());
+    // println!("{:?}", &log.1);
+
+    let (a, b) = least_squares_method(errs.clone());
+    println!("The func is {} p + {}.", a, b);
+    // draw_graph(2.9, 18.1, 0.0, 7.0, "p", "log_2E_r", "blue", errs);
+    let mut line_x = Vec::new();
+    let mut line_y = Vec::new();
+    for i in 0..20 {
+        line_x.push(i as f64);
+        line_y.push(-0.22906782253272903 * i as f64 + 4.146697070946706);
+    }
+
+    let mut fg = Figure::new();
+    {
+        let axec = fg
+            .axes2d()
+            .set_x_axis(true, &[])
+            .set_x_range(Fix(2.9), Fix(18.1))
+            .set_y_range(Fix(0.0), Fix(7.0))
+            .set_x_label("p", &[])
+            .set_y_label("log_2E_r", &[])
+            .lines(
+                line_x,
+                line_y,
+                &[Caption("least squares method"), Color("red")],
+            );
+        errs.iter().fold((), |_, e| {
+            axec.points(&[e.0], &[e.1], &[Color("blue"), PointSymbol('O')]);
+        });
+        axec.points(
+            &[300.0],
+            &[300.0],
+            &[Caption("Euler"), Color("blue"), PointSymbol('O')],
         );
     }
-
-    draw_graph(0.0, 0.1, -2.0, 2.0, "x", "u", "blue", log[1678].1.clone());
-
-    // let u = log.iter().map(|e| {
-    //     e.1.iter().map(|v| {
-    //         v.1
-    //     }).collect::<Vec<f64>>()
-    // }).collect::<Vec<Vec<f64>>>();
-    // let u = u.concat();
-
-    // let x = {
-    //     let mut v = vec![];
-    //     for i in 0..5000 {
-    //         for j in 0..100 {
-    //             v.push(j as f64 * 1.0 / 100.0);
-    //         }
-    //     }
-    //     v
-    // };
-
-    // let y = {
-    //     let mut v = vec![];
-    //     for i in 0..5000 {
-    //         for j in 0..100 {
-    //             v.push(i as f64 * 0.001)
-    //         }
-    //     }
-    //     v
-    // };
-
-    // let mut fg = Figure::new();
-    // {
-    //     fg.axes3d()
-    //         .points(x, y, u, &[PointSymbol('o'), Color("blue"), PointSize(2.0)])
-    //         .set_title("Fix End Pulus", &[]);
-    // }
-    // fg.show();
+    let _ = fg.show();
 }
