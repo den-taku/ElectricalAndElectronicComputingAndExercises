@@ -44,10 +44,10 @@ where
 
     let now = (t + h).to_f64().unwrap();
 
-    let err_norm = ((v_x_n_1 + F::from_f64(-f64::sin(now)).unwrap())
-        * (v_x_n_1 + F::from_f64(-f64::sin(now)).unwrap())
-        + (v_y_n_1 + F::from_f64(-f64::cos(now)).unwrap())
-            * (v_y_n_1 + F::from_f64(-f64::cos(now)).unwrap()))
+    let err_norm = ((v_x_n_1 - F::from_f64(-f64::sin(now)).unwrap())
+        * (v_x_n_1 - F::from_f64(-f64::sin(now)).unwrap())
+        + (v_y_n_1 - F::from_f64(-f64::cos(now)).unwrap())
+            * (v_y_n_1 - F::from_f64(-f64::cos(now)).unwrap()))
     .sqrt();
     log.1.push((t, err_norm));
 
@@ -70,16 +70,17 @@ where
 
     let now = (t + h).to_f64().unwrap();
 
-    let err_norm = ((v_x_n_1 + F::from_f64(-f64::sin(now)).unwrap())
-        * (v_x_n_1 + F::from_f64(-f64::sin(now)).unwrap())
-        + (v_y_n_1 + F::from_f64(-f64::cos(now)).unwrap())
-            * (v_y_n_1 + F::from_f64(-f64::cos(now)).unwrap()))
+    let err_norm = ((v_x_n_1 - F::from_f64(-f64::sin(now)).unwrap())
+        * (v_x_n_1 - F::from_f64(-f64::sin(now)).unwrap())
+        + (v_y_n_1 - F::from_f64(-f64::cos(now)).unwrap())
+            * (v_y_n_1 - F::from_f64(-f64::cos(now)).unwrap()))
     .sqrt();
     // log.1.push((t, err_norm));
 
     let now = F::from_f64(now).unwrap();
 
     let max = if max >= err_norm { max } else { err_norm };
+    // println!("max: {}", max.to_f64().unwrap());
 
     // while 0 <= t <= 2π
     if now <= F::from_f64(2.0).unwrap() * F::from_f64(PI).unwrap() {

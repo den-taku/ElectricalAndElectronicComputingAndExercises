@@ -1,7 +1,7 @@
-mod approximate;
 mod bisection_method;
 mod data;
 mod draw;
+mod euler;
 mod matrix;
 mod newton_raphson_method;
 
@@ -12,8 +12,8 @@ use gnuplot::*;
 // use plotlib::style::{PointMarker, PointStyle, LineStyle, LineJoin};
 // use plotlib::view::ContinuousView;
 // use matrix::*;
-use approximate::*;
 use draw::*;
+use euler::*;
 use std::f64::consts::PI;
 
 fn main() {
@@ -28,7 +28,16 @@ fn main() {
     let err: Vec<(f64, f64)> = Vec::new();
     let log = euler::<f64>(0.0, -1.0, PI / 32.0, 0.0, (data, err));
     // draw_graph(-4.0, 4.0, -4.0, 4.0, "x", "y", "blue", log.0.clone());
-    // draw_graph(0.0, 5.0 * PI, 0.0, 4.0, "x", "y", "blue", log.1.clone());
+    draw_graph(
+        0.0,
+        5.0 * PI,
+        0.0,
+        1.5,
+        "t",
+        "e_r(t)",
+        "blue",
+        log.1.clone(),
+    );
     // println!("{:?}", &log.1);
     let mut fg = Figure::new();
     {

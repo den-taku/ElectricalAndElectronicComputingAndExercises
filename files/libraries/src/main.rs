@@ -17,43 +17,42 @@ use euler::*;
 use std::f64::consts::PI;
 
 fn main() {
-    let mut true_x = vec![];
-    let mut true_y = vec![];
-    let mut time = vec![];
-    for i in 0..5000 {
-        time.push(i as f64 / 1000.0);
-        true_x.push(-f64::sin(i as f64 / 1000.0));
-        true_y.push(-f64::cos(i as f64 / 1000.0));
-    }
-    let mut fg = Figure::new();
-    {
-        let axec = fg
-            .axes2d()
-            .set_x_axis(true, &[])
-            .set_x_range(Fix(0.0), Fix(5.0))
-            .set_y_range(Fix(-1.3), Fix(1.3))
-            .set_x_label("t", &[])
-            .set_y_label("V", &[])
-            .lines(
-                time.clone(),
-                true_x,
-                &[Caption("sin wave"), Color("blue")],
-            )
-            .lines(
-                time,
-                true_y,
-                &[Caption("cos wave"), Color("red")],
-            );
-    }
-    let _ = fg.show();
-
+    // let mut true_x = vec![];
+    // let mut true_y = vec![];
+    // let mut time = vec![];
+    // for i in 0..6283 {
+    //     time.push(i as f64 / 1000.0);
+    //     true_x.push(-f64::sin(i as f64 / 1000.0));
+    //     true_y.push(-f64::cos(i as f64 / 1000.0));
+    // }
+    // let mut fg = Figure::new();
+    // {
+    //     let axec = fg
+    //         .axes2d()
+    //         .set_x_axis(true, &[])
+    //         .set_x_range(Fix(0.0), Fix(2.0 * PI))
+    //         .set_y_range(Fix(-1.3), Fix(1.3))
+    //         .set_x_label("t", &[])
+    //         .set_y_label("V", &[])
+    //         .lines(
+    //             time.clone(),
+    //             true_x,
+    //             &[Caption("sin wave"), Color("blue")],
+    //         )
+    //         .lines(
+    //             time,
+    //             true_y,
+    //             &[Caption("cos wave"), Color("red")],
+    //         );
+    // }
+    // let _ = fg.show();
 
     let mut errs = Vec::new();
 
     let tau = 2.0 * PI;
     for i in 3..19 {
-        println!("p = {}", i);
         let h = tau * (2f64.powf(-(i as f64)));
+        println!("p = {}, h = {}", i, h);
         let max = euler2::<f64>(0.0, -1.0, h, 0.0, 0.0);
         // err.sort_by(|a, b| a.partial_cmp(&b).unwrap());
         errs.push((i as f64, max));
@@ -89,7 +88,7 @@ fn main() {
             .axes2d()
             .set_x_axis(true, &[])
             .set_x_range(Fix(2.9), Fix(18.1))
-            .set_y_range(Fix(0.0), Fix(7.0))
+            .set_y_range(Fix(-18.0), Fix(7.0))
             .set_x_label("p", &[])
             .set_y_label("log_2E_r", &[])
             .lines(
