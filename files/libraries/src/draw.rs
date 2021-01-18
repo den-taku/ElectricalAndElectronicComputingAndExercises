@@ -101,5 +101,5 @@ pub fn write_to_png(
             axec.points(&[e.0], &[e.1], &[Color(color), PointSymbol('O')]);
         })
     }
-    let _ = fg.save_to_png(filename, 400, 800);
+    let _ = fg.save_to_png(filename, 650, 400);
 }
