@@ -29,12 +29,27 @@ fn main() {
     }
     let data = vec![(-0.001, init.clone()), (0.0, init)];
 
-    // let log = fixed_end_pulus(0.0, 5.0, data.clone());
+    let log = fixed_end_pulus(0.0, 5.0, data.clone());
     // let log = freed_end_pulus(0.0, 5.0, data.clone());
     // let log = fixed_end_pulus2(0.0, 5.0, data.clone());
-    let log = freed_end_pulus2(0.0, 5.0, data.clone());
+    // let log = freed_end_pulus2(0.0, 5.0, data.clone());
 
-    draw_graph(0.0, 0.1, 0.0, 2.0, "x", "u", "blue", log[3000].1.clone());
+    for i in 0..log.len() {
+        println!("{} writing...", i);
+        write_to_png(
+            &format!("png/fixed1_{:04}.png", i),
+            0.0,
+            0.1,
+            -2.0,
+            2.0,
+            "x(t)",
+            "u(t)",
+            "blue",
+            log[i].1.clone(),
+        );
+    }
+
+    draw_graph(0.0, 0.1, -2.0, 2.0, "x", "u", "blue", log[1678].1.clone());
 
     // let u = log.iter().map(|e| {
     //     e.1.iter().map(|v| {
