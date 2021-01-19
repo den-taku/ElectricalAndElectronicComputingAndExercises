@@ -41,7 +41,7 @@ where
     data.push((now, data_now));
 
     if t < T {
-        fixed_end_pulus(now, T, data)
+        freed_end_pulus(now, T, data)
     } else {
         data
     }
@@ -94,7 +94,7 @@ where
     data.push((now, data_now));
 
     if t < T {
-        fixed_end_pulus(now, T, data)
+        freed_end_pulus2(now, T, data)
     } else {
         data
     }
@@ -194,7 +194,7 @@ where
     data.push((now, data_now));
 
     if t < T {
-        fixed_end_pulus(now, T, data)
+        fixed_end_pulus2(now, T, data)
     } else {
         data
     }
