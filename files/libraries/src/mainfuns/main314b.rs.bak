@@ -51,7 +51,7 @@ fn main() {
             .axes2d()
             .set_x_axis(true, &[])
             .set_x_range(Fix(2.9), Fix(18.1))
-            .set_y_range(Fix(-18.0), Fix(7.0))
+            .set_y_range(Fix(-46.0), Fix(7.0))
             .set_x_label("p", &[])
             .set_y_label("log_2E_r", &[])
             .lines(

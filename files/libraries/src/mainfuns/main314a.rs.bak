@@ -30,33 +30,33 @@ fn main() {
     let data: Vec<(f64, f64)> = Vec::new();
     let err: Vec<(f64, f64)> = Vec::new();
     let log = runge4::<f64>(0.0, -1.0, PI / 32.0, 0.0, (data, err));
-    draw_graph(0.0, 5.0 * PI, 0.0, 2.0, "x", "error", "blue", log.1.clone());
-    // let mut fg = Figure::new();
-    // {
-    //     let axec = fg
-    //         .axes2d()
-    //         .set_x_axis(true, &[])
-    //         .set_x_range(Fix(-2.5), Fix(2.5))
-    //         .set_y_range(Fix(-2.5), Fix(2.5))
-    //         .set_x_label("v_x", &[])
-    //         .set_y_label("v_y", &[])
-    //         .lines(
-    //             true_x,
-    //             true_y,
-    //             &[Caption("Analytical solution"), Color("red")],
-    //         );
-    //     log.0.iter().fold((), |_, e| {
-    //         axec.points(&[e.0], &[e.1], &[Color("blue"), PointSymbol('O')]);
-    //     });
-    //     axec.points(
-    //         &[300.0],
-    //         &[300.0],
-    //         &[
-    //             Caption("Lunge-Kutta method"),
-    //             Color("blue"),
-    //             PointSymbol('O'),
-    //         ],
-    //     );
-    // }
-    // let _ = fg.show();
+    // draw_graph_log10(0.0, 5.0 * PI, 0.00000000001, 0.1, "x", "error", "blue", log.1.clone());
+    let mut fg = Figure::new();
+    {
+        let axec = fg
+            .axes2d()
+            .set_x_axis(true, &[])
+            .set_x_range(Fix(-2.5), Fix(2.5))
+            .set_y_range(Fix(-2.5), Fix(2.5))
+            .set_x_label("v_x", &[])
+            .set_y_label("v_y", &[])
+            .lines(
+                true_x,
+                true_y,
+                &[Caption("Analytical solution"), Color("red")],
+            );
+        log.0.iter().fold((), |_, e| {
+            axec.points(&[e.0], &[e.1], &[Color("blue"), PointSymbol('O')]);
+        });
+        axec.points(
+            &[300.0],
+            &[300.0],
+            &[
+                Caption("Lunge-Kutta method"),
+                Color("blue"),
+                PointSymbol('O'),
+            ],
+        );
+    }
+    let _ = fg.show();
 }

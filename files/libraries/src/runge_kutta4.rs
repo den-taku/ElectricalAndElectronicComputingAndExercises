@@ -1,6 +1,10 @@
 use num_traits::{Float, FromPrimitive};
 use std::f64::consts::PI;
 
+fn fun31<F: Float + FromPrimitive>(x: F, y: F) -> (F, F) {
+    (y, -x)
+}
+
 pub fn runge4<F>(
     v_x: F,
     v_y: F,
@@ -11,12 +15,28 @@ pub fn runge4<F>(
 where
     F: Float + FromPrimitive,
 {
-    let hs = h
-        + h * h / F::from_f64(2.0).unwrap()
-        + h * h * h / F::from_f64(6.0).unwrap()
-        + h * h * h * h / F::from_f64(24.0).unwrap();
-    let v_x_n_1 = v_x + hs * v_y;
-    let v_y_n_1 = v_y - hs * v_x;
+    let half = F::from_f64(0.5).unwrap();
+
+    let (k1x, k1y) = match fun31(v_x, v_y) {
+        (a, b) => (a * h, b * h),
+    };
+    let (k2x, k2y) = match fun31(v_x + k1x * half, v_y + k1y * half) {
+        (a, b) => (a * h, b * h),
+    };
+    let (k3x, k3y) = match fun31(v_x + k2x * half, v_y + k2y * half) {
+        (a, b) => (a * h, b * h),
+    };
+    let (k4x, k4y) = match fun31(v_x + k3x, v_y + k3y) {
+        (a, b) => (a * h, b * h),
+    };
+
+    let v_x_n_1 = v_x
+        + (k1x + F::from_f64(2.0).unwrap() * k2x + F::from_f64(2.0).unwrap() * k3x + k4x)
+            / F::from_f64(6.0).unwrap();
+    let v_y_n_1 = v_y
+        + (k1y + F::from_f64(2.0).unwrap() * k2y + F::from_f64(2.0).unwrap() * k3y + k4y)
+            / F::from_f64(6.0).unwrap();
+
     log.0.push((v_x_n_1, v_y_n_1));
 
     let now = (t + h).to_f64().unwrap();
@@ -41,12 +61,27 @@ pub fn runge42<F>(v_x: F, v_y: F, h: F, t: F, max: F) -> F
 where
     F: Float + FromPrimitive,
 {
-    let hs = h
-        + h * h / F::from_f64(2.0).unwrap()
-        + h * h * h / F::from_f64(6.0).unwrap()
-        + h * h * h * h / F::from_f64(24.0).unwrap();
-    let v_x_n_1 = v_x + hs * v_y;
-    let v_y_n_1 = v_y - hs * v_x;
+    let half = F::from_f64(0.5).unwrap();
+
+    let (k1x, k1y) = match fun31(v_x, v_y) {
+        (a, b) => (a * h, b * h),
+    };
+    let (k2x, k2y) = match fun31(v_x + k1x * half, v_y + k1y * half) {
+        (a, b) => (a * h, b * h),
+    };
+    let (k3x, k3y) = match fun31(v_x + k2x * half, v_y + k2y * half) {
+        (a, b) => (a * h, b * h),
+    };
+    let (k4x, k4y) = match fun31(v_x + k3x, v_y + k3y) {
+        (a, b) => (a * h, b * h),
+    };
+
+    let v_x_n_1 = v_x
+        + (k1x + F::from_f64(2.0).unwrap() * k2x + F::from_f64(2.0).unwrap() * k3x + k4x)
+            / F::from_f64(6.0).unwrap();
+    let v_y_n_1 = v_y
+        + (k1y + F::from_f64(2.0).unwrap() * k2y + F::from_f64(2.0).unwrap() * k3y + k4y)
+            / F::from_f64(6.0).unwrap();
 
     let now = (t + h).to_f64().unwrap();
 

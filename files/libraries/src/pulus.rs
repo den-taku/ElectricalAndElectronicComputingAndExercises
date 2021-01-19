@@ -29,12 +29,12 @@ where
     // xi (0 < i < 99)
     for i in 1..99 {
         let u = -past2[i] + mu * past1[i - 1] + two * (one - mu) * past1[i] + mu * past1[i + 1];
-        data_now.push((dt * F::from_usize(i).unwrap(), u))
+        data_now.push((dx * F::from_usize(i).unwrap(), u))
     }
 
     // x_{n-1}
     let xn_1 = -past2[100 - 1] + mu * past1[100 - 2] + (two - mu) * past1[100 - 1];
-    data_now.push((dt * F::from_f64(99.0).unwrap(), xn_1));
+    data_now.push((dx * F::from_f64(99.0).unwrap(), xn_1));
 
     let now = t + dt;
 
@@ -82,12 +82,12 @@ where
     // xi (0 < i < 99)
     for i in 1..99 {
         let u = -past2[i] + mu * past1[i - 1] + two * (one - mu) * past1[i] + mu * past1[i + 1];
-        data_now.push((dt * F::from_usize(i).unwrap(), u))
+        data_now.push((dx * F::from_usize(i).unwrap(), u))
     }
 
     // x_{n-1}
     let xn_1 = -past2[100 - 1] + mu * past1[100 - 2] + (two - mu) * past1[100 - 1];
-    data_now.push((dt * F::from_f64(99.0).unwrap(), xn_1));
+    data_now.push((dx * F::from_f64(99.0).unwrap(), xn_1));
 
     let now = t + dt;
 
@@ -129,12 +129,12 @@ where
     // xi (0 < i < 99)
     for i in 1..99 {
         let u = -past2[i] + mu * past1[i - 1] + two * (one - mu) * past1[i] + mu * past1[i + 1];
-        data_now.push((dt * F::from_usize(i).unwrap(), u))
+        data_now.push((dx * F::from_usize(i).unwrap(), u))
     }
 
     // x_{n-1}
     let xn_1 = -past2[100 - 1] + mu * past1[100 - 2] + two * (one - mu) * past1[100 - 1];
-    data_now.push((dt * F::from_f64(99.0).unwrap(), xn_1));
+    data_now.push((dx * F::from_f64(99.0).unwrap(), xn_1));
 
     let now = t + dt;
 
@@ -182,12 +182,12 @@ where
     // xi (0 < i < 99)
     for i in 1..99 {
         let u = -past2[i] + mu * past1[i - 1] + two * (one - mu) * past1[i] + mu * past1[i + 1];
-        data_now.push((dt * F::from_usize(i).unwrap(), u))
+        data_now.push((dx * F::from_usize(i).unwrap(), u))
     }
 
     // x_{n-1}
     let xn_1 = -past2[100 - 1] + mu * past1[100 - 2] + two * (one - mu) * past1[100 - 1];
-    data_now.push((dt * F::from_f64(99.0).unwrap(), xn_1));
+    data_now.push((dx * F::from_f64(99.0).unwrap(), xn_1));
 
     let now = t + dt;
 

@@ -39,7 +39,7 @@ fn main() {
         write_to_png(
             &format!("png/png2/freed1_{:04}.png", i),
             0.0,
-            0.1,
+            1.0,
             -2.0,
             2.0,
             "x(t)",
@@ -49,7 +49,7 @@ fn main() {
         );
     }
 
-    draw_graph(0.0, 0.1, -2.0, 2.0, "x", "u", "blue", log[1678].1.clone());
+    draw_graph(0.0, 1.0, -2.0, 2.0, "x", "u", "blue", log[400].1.clone());
 
     // let u = log.iter().map(|e| {
     //     e.1.iter().map(|v| {
