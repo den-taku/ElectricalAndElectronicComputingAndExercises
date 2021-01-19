@@ -31,23 +31,23 @@ fn main() {
 
     // let log = fixed_end_pulus::<f64>(0.0, 5.0, data.clone());
     // let log = freed_end_pulus::<f64>(0.0, 5.0, data.clone());
-    let log = fixed_end_pulus2::<f64>(0.0, 5.0, data.clone());
-    // let log = freed_end_pulus2::<f64>(0.0, 5.0, data.clone());
+    // let log = fixed_end_pulus2::<f64>(0.0, 5.0, data.clone());
+    let log = freed_end_pulus2::<f64>(0.0, 5.0, data.clone());
 
-    for i in 0..log.len() {
-        println!("{} writing...", i);
-        write_to_png(
-            &format!("png/png3/fixed2_{:04}.png", i),
-            0.0,
-            1.0,
-            -2.0,
-            2.0,
-            "x(t)",
-            "u(t)",
-            "blue",
-            log[i].1.clone(),
-        );
-    }
+    // for i in 0..log.len() {
+    //     println!("{} writing...", i);
+    //     write_to_png(
+    //         &format!("png/png4/free2_{:04}.png", i),
+    //         0.0,
+    //         1.0,
+    //         -2.0,
+    //         2.0,
+    //         "x(t)",
+    //         "u(t)",
+    //         "blue",
+    //         log[i].1.clone(),
+    //     );
+    // }
 
     draw_graph(0.0, 1.0, -2.0, 2.0, "x", "u", "blue", log[400].1.clone());
 
